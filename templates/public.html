@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% load i18n %}
+
+<style type="text/css">
+{% block css %}
+{% spaceless %}
+
+{{ block.super }}
+
+{% endspaceless %}
+{% endblock css %}
+</style>
+
+{% block meta %}{{ block.super }}
+    {% include "meta.html" %}
+{% endblock meta %}
+
+{% block body %}
+<div class="Public">
+
+    <header id="PublicHeader">{% block header %}{% endblock header %}</header>
+
+    <main id="PublicBody" role="main">{% block main %}{% endblock main %}</main>
+
+    <footer id="PublicFooter">{% block footer %}{% endblock footer %}</footer>
+
+    {{ block.super }}
+
+</div>
+{% endblock body %}
