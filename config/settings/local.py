@@ -50,7 +50,6 @@ INSTALLED_APPS = [
     'rest_framework',
 
     # CORE
-    'grio.apps.GrioConfig',
     'miq.apps.MiqConfig',
 
     # APPS
@@ -91,6 +90,7 @@ if os.environ.get('GITHUB_WORKFLOW'):
 MIDDLEWARE = [
     # CORS
     'miq.middleware.CORSMiddleware',
+
     #
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -133,9 +133,6 @@ AUTH_PASSWORD_VALIDATORS = [
 # AUTHENTICATION
 """
 
-# LOGIN_URL = reverse_lazy('accounts:login')
-# LOGIN_REDIRECT_URL = reverse_lazy('blog:account')
-
 
 """
 # REST FRAMEWORK
@@ -165,10 +162,11 @@ SITE_ID = 1
 # API
 """
 
-API_PATH = 'api/v1'
+API_VERSION = 1
+API_PATH = f'api/v{API_VERSION}'
 
 """
-LANG & LOCATION
+# LANG & LOCATION
 """
 
 USE_TZ = True
@@ -179,13 +177,14 @@ LANGUAGE_CODE = 'en-us'
 
 
 """
-AUTO FIELD
+# AUTO FIELD
 """
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
+"""
 # MEDIA & STATIC
+"""
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BUILD_DIR / 'static']
