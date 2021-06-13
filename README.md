@@ -4,8 +4,6 @@ A more elabborate version of the [django-react-boilerplate](https://github.com/m
 
 ### How to use
 
-I have broken the steps by branches so you can follow along.
-
 In your working directory:
 
 ```bash
