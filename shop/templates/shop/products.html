@@ -1,0 +1,28 @@
+
+{% extends 'shop/base.html' %}
+
+
+{% block title %}Shop{% endblock title %}
+
+{% block main %}
+
+<div class="d-fl flex-wrap flex-row justify-content-center">
+    {% for product in products %}
+        <div class="col-md-4 col-6 text-center">
+            <a href="{{product.detail_path}}"> 
+                {{product}}    
+            </a>
+
+            {# {% include 'shop/product/product-card.html' %} #}
+        </div>
+
+    {% empty %}
+    {# {% include 'components/empty.html' %} #}
+    {% endfor %}
+</div>
+
+
+{% endblock main %}
+
+
+

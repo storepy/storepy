@@ -120,7 +120,7 @@ celerybeat.pid
 
 # Environments
 .venv
-grioenv/
+storenv/
 miqenv/
 env/
 venv/

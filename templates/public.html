@@ -2,22 +2,46 @@
 
 <style type="text/css">
     {% block css %}
-    {% spaceless %}
+    {% spaceless %}{{ block.super }}
 
-    {{ block.super }}
+    #public-header .header-navbar{
+        display: flex;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        justify-content: center;
+    }
+
+    #public-header .header-logo{
+        font-weight: 900;
+        font-size:x-large;
+    }
 
     {% endspaceless %}
     {% endblock css %}
 </style>
 
 {% block meta %} {{ block.super }} 
-    {% include "meta.html" %} 
+    {% include "miq/meta.html" %} 
 {% endblock meta %} 
 
 {% block body %}
 
+{% if is_live is False and request.path != '/login/' and not request.user.is_staff %}
+
+    {% include 'miq/index-close.html' %}
+
+{% else %}
+
 <div class="public">
-    <header id="public-header">{% block header %}{% endblock header %}</header>
+    <header id="public-header">
+        {% block navbar %}
+            <div class="header-navbar">
+                <a href="/" class="header-logo">{{site.name}}</a>
+            </div>
+        {% endblock navbar %}
+        {% block header %}{% endblock header %}
+    </header>
 
     <main id="public-main" role="main">{% block main %}{% endblock main %}</main>
 
@@ -26,4 +50,14 @@
     <footer id="public-footer">{% block footer %}{% endblock footer %}</footer>
 </div>
 
+{% endif %}
+
 {% endblock body %}
+
+
+{% block head_scripts %}
+
+{% include "miq/ga-tracking-code.html" %}
+{# {% include "ga-tracking-code.html" %} #}
+    
+{% endblock head_scripts %}

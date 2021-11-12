@@ -1,0 +1,75 @@
+@use "@miq/styles/src/variables" as *;
+@use "@miq/styles/src/mixins" as mixins;
+
+.product-detail-view {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  grid-template-rows: auto auto 1fr;
+  position: relative;
+  margin: 10px 0 40px;
+  width: 100%;
+  column-gap: 40px;
+
+  @include mixins.md-down {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .product-header {
+    align-self: start;
+    text-align: center;
+
+    @include mixins.md-down {
+      align-self: auto;
+    }
+  }
+
+  .product-info {
+    text-align: center;
+    align-self: start;
+
+    @include mixins.md-down {
+      align-self: auto;
+      order: 2;
+    }
+  }
+
+  .product-media {
+    align-self: start;
+    width: auto;
+    float: none;
+    margin: 0;
+    grid-row: 1/4;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    flex-direction: column;
+    -webkit-box-align: center;
+    align-items: center;
+
+    @include mixins.md-down {
+      align-self: auto;
+      order: 1;
+    }
+
+    .product-images {
+      // display: flex;
+
+      .thumbnails {
+        @include mixins.xs-screen {
+          // align-items: center;
+          justify-content: space-between;
+          max-height: 75px;
+        }
+      }
+    }
+  }
+
+  .product-info-meta {
+    align-self: start;
+
+    @include mixins.md-down {
+      align-self: auto;
+      order: 3;
+    }
+  }
+}

@@ -1,19 +1,17 @@
 {
-    "python.pythonPath": "/Users/marqetintl/Desktop/marqetintl/py/grio/Griot/grioenv/bin/python",
-    "prettier.configPath": ".prettierrc",
-    "prettier.requireConfig": true,
-    "prettier.semi": false,
-    "prettier.tabWidth": 4,
-    "editor.formatOnPaste": true,
-    "editor.formatOnSave": true,
-    "python.testing.unittestArgs": ["-v", "-s", ".", "-p", "test*.py"],
-    "python.testing.pytestEnabled": true,
-    "python.testing.nosetestsEnabled": false,
-    "python.testing.unittestEnabled": false,
-    "python.testing.pytestArgs": [
-        "."
-    ],
-    "python.linting.flake8Enabled": true,
-    "python.linting.pylintEnabled": false,
-    "python.linting.enabled": true
+  "python.pythonPath": "storenv/bin/python",
+  "prettier.configPath": ".prettierrc",
+  "prettier.requireConfig": true,
+  "prettier.semi": false,
+  "prettier.tabWidth": 2,
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "python.testing.unittestArgs": ["-v", "-s", ".", "-p", "test*.py"],
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestArgs": ["."],
+  "python.linting.flake8Enabled": true,
+  "python.linting.pylintEnabled": false,
+  "python.linting.enabled": true,
+  "editor.bracketPairColorization.enabled": true
 }

@@ -1,10 +1,7 @@
 {% extends 'base-react.html' %}
 
-<!-- prettier-ignore -->
-{% block head %}
-{% spaceless %}
+{% block head %}{% spaceless %}
 
-<!-- prettier-ignore -->
 <title>
     {% block title %} {% firstof title "This is marqetintl" %} {% endblock title %} | {{ site.name|default:"marqetintl" | capfirst }}
 </title>
@@ -15,9 +12,8 @@
 
 {% block head_scripts %} {% endblock head_scripts %}
 
-<!-- prettier-ignore -->
+{% if sharedData %}
 {{ sharedData|json_script:"sharedData" }}
+{% endif %}
 
-<!-- prettier-ignore -->
-{% endspaceless %} 
-{% endblock head %}
+{% endspaceless %}{% endblock head %}

@@ -1,22 +1,22 @@
 asgiref==3.3.4
 attrs==21.2.0
 beautifulsoup4==4.9.3
-coverage==5.5
 Django==3.2.2
 django-environ==0.4.5
 djangorestframework==3.12.4
 gunicorn==20.1.0
 iniconfig==1.1.1
+mccabe==0.6.1
+-e git+https://github.com/marqetintl/miq.git@main#egg=miq
+-e git+https://github.com/marqetintl/miqpay.git@main#egg=miq_pay
 packaging==20.9
 Pillow==8.2.0
 pluggy==0.13.1
 psycopg2-binary==2.8.6
 py==1.10.0
 pycodestyle==2.7.0
+pyflakes==2.3.1
 pyparsing==2.4.7
-pytest==6.2.4
-pytest-cov==2.11.1
-pytest-django==4.2.0
 pytz==2021.1
 selenium==3.141.0
 soupsieve==2.2.1

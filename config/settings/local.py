@@ -30,6 +30,7 @@ SECRET_KEY = env('SECRET_KEY')
 
 DEBUG = env('DEBUG')
 
+# CORS_ORIGIN = 'http://192.168.1.243:3000'
 CORS_ORIGIN = 'http://127.0.0.1:3000'
 
 ALLOWED_HOSTS = ['*']
@@ -51,8 +52,13 @@ INSTALLED_APPS = [
 
     # CORE
     'miq.apps.MiqConfig',
+    'shop.apps.ShopConfig',
 
     # APPS
+    # 'apps.portfolio.apps.PortfolioConfig',
+    # 'apps.casting.apps.CastingConfig',
+
+
 ]
 
 DATABASES = {
@@ -87,11 +93,7 @@ if os.environ.get('GITHUB_WORKFLOW'):
 # MIDDLEWARE
 """
 
-MIDDLEWARE = [
-    # CORS
-    'miq.middleware.CORSMiddleware',
-
-    #
+DJANGO_MIDDLEWARES = (
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -99,7 +101,20 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
+)
+
+
+MIDDLEWARE = (
+
+    # CORS
+    'miq.middleware.CORSMiddleware',
+
+    #
+    *DJANGO_MIDDLEWARES,
+
+    #
+    'miq.middleware.SiteMiddleware',
+)
 
 ROOT_URLCONF = 'config.urls'
 
