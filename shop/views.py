@@ -3,10 +3,24 @@ from django.contrib.sites.shortcuts import get_current_site
 
 # from apps.blog.models import Article
 from miq.models import Index
+from miq.models.section_mod import SectionType
 from miq.serializers import PublicImageSerializer
 from miq.views.generic import ListView, DetailView, TemplateView
 
+# from miq.auth.serializers import get_section_serializer
+
 from .models import Product, Category
+
+
+def serialize_section(section):
+    type = section.type
+    data = {
+        'type': type,
+        'html': section.html,
+        'title': section.title,
+        'text': section.text,
+    }
+    return data
 
 
 class IndexView(TemplateView):
@@ -21,7 +35,15 @@ class IndexView(TemplateView):
             return context
 
         context['page'] = page
+        context['sections'] = page.sections.exclude(html='')
         context['title'] = page.title
+
+        self.update_sharedData(context, {
+            'page': {
+                # 'sections': [get_section_serializer(section.type)(section).data for section in page.sections.all()[:10]]
+                'sections': [serialize_section(section) for section in page.sections.all()[:10]]
+            }
+        })
 
         # context['articles'] = Article.objects.published().order_by(
         #     '-page__dt_published')[:8]

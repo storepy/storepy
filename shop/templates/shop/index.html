@@ -4,9 +4,6 @@
 <div>[number, social accounts]</div>
 <div>[logo]/[nav]/[cart]</div>
 {% block navbar %}{% endblock navbar %}
-    
-
-
 
 <div>[slider]</div>
 <div>[Promotion/item of the day/style of the day/Offre de la semaine]</div>
@@ -14,8 +11,15 @@
 <div>[best sellers/meilleur ventes]</div>
 <div>[categories]</div>
 <div>[blog]</div>
-<div></div>
-{% block main %}{% endblock main %}
+<div></div> 
+
+{% block main %}
+
+{% for section in sections %}
+    {{section.html|safe}}
+{% endfor %}
+    
+{% endblock main %}
 
 
 

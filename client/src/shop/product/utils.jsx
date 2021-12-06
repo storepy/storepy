@@ -1,9 +1,9 @@
-import { StaffService } from "@miq/adminjs";
+import { StaffService } from "@miq/utils";
 
 class StaffProductService extends StaffService {
-  // constructor(path) {
-  //   super(path);
-  // }
+  constructor(path) {
+    super(path);
+  }
 
   patchPage(prodSlug, values, oldValues) {
     return this.patchPath(`${this.path}${prodSlug}/page/`, values, oldValues);

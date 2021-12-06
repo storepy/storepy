@@ -28,8 +28,10 @@
 {% block body %}
 
 {% if is_live is False and request.path != '/login/' and not request.user.is_staff %}
-
+    
+    <!-- CLOSE -->
     {% include 'miq/index-close.html' %}
+    <!-- CLOSE End -->
 
 {% else %}
 
