@@ -23,20 +23,23 @@ const PublicRoutes = (props) => {
   );
 };
 
-ReactDOM.render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <SharedDataProvider>
-        <Switch>
-          <AdminRoute path={STAFF_PATH} component={AdminLayout} />
+const root = document.getElementById("root");
+if (root) {
+  ReactDOM.render(
+    <React.StrictMode>
+      <BrowserRouter>
+        <SharedDataProvider>
+          <Switch>
+            <AdminRoute path={STAFF_PATH} component={AdminLayout} />
 
-          <Route component={PublicRoutes} />
-        </Switch>
-      </SharedDataProvider>
-    </BrowserRouter>
-  </React.StrictMode>,
-  document.getElementById("root")
-);
+            <Route component={PublicRoutes} />
+          </Switch>
+        </SharedDataProvider>
+      </BrowserRouter>
+    </React.StrictMode>,
+    root
+  );
+}
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

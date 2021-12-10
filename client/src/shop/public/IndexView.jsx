@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { SharedDataCtx } from "@miq/contexts";
-import { Jumbotron } from "@miq/components";
+import { ClosePageRender } from "@miq/adminjs";
+// import { Jumbotron } from "@miq/components";
 
 const Navbar = (props) => {
   return <div className="">Navbar</div>;
@@ -11,6 +12,8 @@ const SearchInput = (props) => {
 };
 
 export default function ShopPublicIndexView(props) {
+  return null;
+
   const ctx = useContext(SharedDataCtx);
 
   if (!ctx.isLoaded) {
@@ -19,34 +22,20 @@ export default function ShopPublicIndexView(props) {
 
   const { page = {} } = ctx;
 
-  console.log(page);
+  // console.log(page);
 
-  const url = "http://127.0.0.1:8000/media/images/getonerd/Ouidah_Output_90_3XxWhtT.jpg";
-  return null;
+  const src = "http://127.0.0.1:8000/media/images/getonerd/Ouidah_Output_90_3XxWhtT.jpg";
+  const src_mobile = "http://127.0.0.1:8000/media/images/getonerd/Manu_Output_183_CXdnMWM.jpg";
+  const ct_image_data = { src, src_mobile };
+  const data = { ct_title: "A title", ct_text: "A text", ct_image_data };
+  // return null;
 
   return (
     <div className="">
       <Navbar {...props} context={ctx} />
       <SearchInput {...props} context={ctx} />
-
-      <div
-        className="close-template"
-        style={{
-          backgroundImage: `url(${url})`,
-        }}
-      >
-        <div className="close-template-inner">
-          <div className="text-center p-3">
-            <h1 className="close-template-title mb-1">lorem</h1>
-            <h3 className="close-template-text">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Libero quos reiciendis harum nam nobis deleniti,
-              sunt eveniet voluptatum vero illum aperiam eius at nostrum dicta, maxime accusamus officia voluptas iure.
-            </h3>
-          </div>
-        </div>
-      </div>
-
-      <Jumbotron />
+      <ClosePageRender {...data} />
+      {/* <Jumbotron /> */}
     </div>
   );
 }

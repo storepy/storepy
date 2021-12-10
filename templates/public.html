@@ -31,11 +31,13 @@
     
     <!-- CLOSE -->
     {% include 'miq/index-close.html' %}
-    <!-- CLOSE End -->
+    <!-- CLOSE END -->
 
 {% else %}
-
+<!-- OPEN -->
 <div class="public">
+
+    <!-- HEADER -->
     <header id="public-header">
         {% block navbar %}
             <div class="header-navbar">
@@ -44,14 +46,19 @@
         {% endblock navbar %}
         {% block header %}{% endblock header %}
     </header>
+    <!-- HEADER END -->
 
-    <main id="public-main" role="main">{% block main %}{% endblock main %}</main>
+    <!-- MAIN --><main id="public-main" role="main">{% block main %}{% endblock main %}</main><!-- MAIN END -->
 
+    <!-- JS -->
     {{ block.super }}
+    <!-- JS END -->
 
+    <!-- FOOTER -->
     <footer id="public-footer">{% block footer %}{% endblock footer %}</footer>
+    <!-- FOOTER END -->
 </div>
-
+<!-- OPEN END -->
 {% endif %}
 
 {% endblock body %}
@@ -60,6 +67,6 @@
 {% block head_scripts %}
 
 {% include "miq/ga-tracking-code.html" %}
-{# {% include "ga-tracking-code.html" %} #}
+{% include "miq/fb-pixel-code.html" %}
     
 {% endblock head_scripts %}

@@ -1,0 +1,2 @@
+(this["webpackJsonp@store/client"]=this["webpackJsonp@store/client"]||[]).push([[18],{338:function(e,t,n){"use strict";n.r(t),n.d(t,"default",(function(){return s}));n(2);var c=n(0);function s(e){return Object(c.jsx)("div",{children:Object(c.jsx)("div",{className:"",children:"Index"})})}}}]);
+//# sourceMappingURL=18.f6083e1c.chunk.js.map
