@@ -1,19 +1,12 @@
 from django.db import models
-# from django.conf import settings
-# from django.contrib.sites.models import Site
-
-# from django.db.models.functions import Concat
-# from django.contrib.auth import get_user_model
+from django.urls import reverse_lazy
 from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 
 from miq.models import BaseModelMixin
 
+from .managers import CategoryManager
 from .proxies import CategoryPage
-
-# Navbar
-# class CategoryGroup(BaseModelMixin):
-#     name = models.CharField(_("Name"), max_length=99, )
 
 
 class Category(BaseModelMixin):
@@ -23,21 +16,25 @@ class Category(BaseModelMixin):
         CategoryPage, on_delete=models.PROTECT, blank=True,
         related_name='shop_category')
 
+    cover = models.OneToOneField(
+        'miq.Image', verbose_name=_("Cover"), on_delete=models.SET_NULL, blank=True, null=True
+    )
+
     name = models.CharField(max_length=100, db_index=True)
     description = models.TextField(_("Description"), null=True, blank=True)
-
     position = models.PositiveIntegerField(default=1)
+
+    objects = CategoryManager()
 
     def __str__(self):
         return capfirst(self.name)
 
-    def save(self, *args, **kwargs):
-        # if not hasattr(self, 'page') or not self.page:
-        #     self.page = CategoryPage.objects.create(
-        #         title=f'{self.name}', label=f'Product Category: {self.name}')
-        super().save(*args, **kwargs)
+    def detail_path(self) -> str:
+        if not self.page or not self.page.slug_public or not self.page.is_published:
+            return
+        return reverse_lazy('shop:category', args=[self.page.slug_public])
 
     class Meta:
-        ordering = ('position', 'name', '-created')
+        ordering = ('position', '-created', 'name')
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
