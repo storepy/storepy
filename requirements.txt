@@ -8,7 +8,6 @@ gunicorn==20.1.0
 iniconfig==1.1.1
 mccabe==0.6.1
 -e git+https://github.com/marqetintl/miq.git@main#egg=miq
--e git+https://${PERSONAL_ACCESS_TOKEN}@github.com/marqetintl/miqpay.git@main#egg=miq_pay
 packaging==20.9
 Pillow==8.2.0
 pluggy==0.13.1

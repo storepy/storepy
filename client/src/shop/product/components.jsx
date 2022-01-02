@@ -1,56 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
 
 import Form, { useForm, FormProvider } from "@miq/form";
 import { ImageAltTextInput } from "@miq/adminjs";
-import { Table, ItemTable, ImgUploadButton } from "@miq/components";
+import { ImgUploadButton } from "@miq/components";
 import { productServices } from "./utils";
-
-export const ProductRow = ({ product, ...props }) => {
-  if (!product) return null;
-
-  return (
-    <Table.Tr className="">
-      <Table.Td className="w-100">
-        <Link to={`/staff/shop/products/${product.slug}/`}>
-          <div className="mb-1" title={product.name}>
-            {product.name}
-          </div>
-        </Link>
-      </Table.Td>
-    </Table.Tr>
-  );
-};
-
-export const ProductTable = (props) => {
-  const { data = { results: [] } } = props;
-
-  const handlePreviousClick = (e) => {};
-  const handleNextClick = (e) => {};
-
-  return (
-    <div>
-      <ItemTable
-        className="w-100"
-        items={data.results}
-        renderItem={(item) => <ProductRow {...props} product={item} key={item.slug} />}
-        pagination={{
-          count: data.count,
-          next: data.next,
-          previous: data.previous,
-          onPreviousClick: handlePreviousClick,
-          onNextClick: handleNextClick,
-        }}
-      />
-    </div>
-  );
-};
-
-ProductTable.propTypes = {
-  data: PropTypes.shape({ results: PropTypes.array }).isRequired,
-  setData: PropTypes.func.isRequired,
-};
 
 //
 // ========================= FORM COMPONENTS ===================================================================
@@ -100,62 +54,6 @@ export const ProductNameInput = ({ onSuccess, onError, ...props }) => {
   );
 };
 
-export const ProductDescriptionInput = ({ onSuccess, onError, ...props }) => {
-  const { product, placeholder = "Give a description to the item", form, label, ...rest } = props;
-  if (!product || !form) return null;
-
-  return (
-    <>
-      {label && <Form.Label value="Description" className="mb-1" />}
-      <Form.TextAreaX
-        {...rest}
-        name="description"
-        onSave={({ name, value }) =>
-          productServices
-            .patch(product.slug, { [name]: value }, { [name]: product[name] })
-            .then((data) => {
-              if (onSuccess) return onSuccess(data);
-            })
-            .catch((err) => {
-              if (onError) return onError(err);
-            })
-        }
-        error={form.errors.description}
-        placeholder={placeholder}
-      />
-    </>
-  );
-};
-
-export const ProductSlugPublicInput = ({ onSuccess, onError, ...props }) => {
-  const { product, placeholder = "Seo slug ...", form, ...rest } = props;
-  if (!product || !form) return null;
-
-  return (
-    <>
-      <Form.Label value="Slug" className="mb-1" />
-      <Form.TextInput
-        {...rest}
-        required
-        name="slug_public"
-        onSave={({ value }) =>
-          productServices
-            .patch(product.slug, { slug_public: value }, { slug_public: product.slug_public })
-            .then((data) => {
-              if (onSuccess) return onSuccess(data);
-            })
-            .catch((err) => {
-              if (onError) return onError(err);
-            })
-        }
-        error={form.errors.slug_public}
-        placeholder={placeholder}
-        maxLength={99}
-      />
-    </>
-  );
-};
-
 export const ProductUpdateForm = ({ children, form, ...props }) => {
   if (!form) return null;
   return (
@@ -166,33 +64,6 @@ export const ProductUpdateForm = ({ children, form, ...props }) => {
 };
 
 ProductUpdateForm.NameInput = ProductNameInput;
-ProductUpdateForm.DescriptionInput = ProductDescriptionInput;
-ProductUpdateForm.SlugPublicInput = ProductSlugPublicInput;
-
-export const ProductCreateForm = ({ onSuccess, onError, ...props }) => {
-  const form = useForm({ name: "" });
-
-  return (
-    <Form
-      {...props}
-      context={form}
-      onSubmit={(e) => {
-        e.preventDefault();
-        return productServices
-          .post({ name: form.values.name })
-          .then((data) => {
-            if (onSuccess) return onSuccess(data);
-          })
-          .catch((err) => {
-            if (onError) return onError(err);
-            form.handleError(err);
-          });
-      }}
-    >
-      <ProductNameInput form={form} placeholder={"Give a name to the new item ..."} />
-    </Form>
-  );
-};
 
 export const ProductImageUploadButton = ({ product, ...props }) => {
   if (!product || !product.slug) return null;
@@ -200,10 +71,10 @@ export const ProductImageUploadButton = ({ product, ...props }) => {
   return (
     <ImgUploadButton
       multiple={true}
+      className="btn-primary-3"
       onCreate={(imgsArray) => {
         imgsArray = imgsArray.filter((img) => img && img.slug);
-
-        productServices
+        return productServices
           .patch(product.slug, { images: [...product.images, ...imgsArray.map((img) => img.slug)] })
           .then((data) => {
             if (props.onCreateSuccess) props.onCreateSuccess(data);
@@ -217,10 +88,12 @@ export const ProductImageUploadButton = ({ product, ...props }) => {
 };
 
 export const ProductImageAltTextInput = ({ image, ...props }) => {
-  const form = useForm({ alt_text: image.alt_text || "" });
+  const form = useForm({ alt_text: image?.alt_text || "" });
+
+  if (!image || !image.slug) return null;
 
   return (
-    <FormProvider value={form}>
+    <FormProvider value={form} className={props.className}>
       <ImageAltTextInput
         required
         image={image}
@@ -277,4 +150,39 @@ ProductCoverUploadButton.propTypes = {
   onCreateError: PropTypes.func,
   onUpdateSuccess: PropTypes.func,
   onUpdateError: PropTypes.func,
+};
+
+export const SupplierData = ({ product, ...props }) => {
+  if (!product) return null;
+
+  return (
+    <div className="product-supplier-data">
+      <ul>
+        <li>
+          <span className="">Supplier</span>
+          <span className="">{product.supplier_name}</span>
+        </li>
+        <li>
+          <span className="">Item id</span>
+          <span className="">{product.supplier_item_id}</span>
+        </li>
+        <li>
+          <span className="">Category</span>
+          <span className="">{product.supplier_item_category}</span>
+        </li>
+
+        <li>
+          <span className="">Item cost</span>
+          <span className="">
+            {product.supplier_item_cost} ({product.supplier_item_cost_currency})
+          </span>
+        </li>
+        <li>
+          <a href={product.supplier_item_url} className="text-underline" target="_blank" rel="noopener noreferrer">
+            View supplier page
+          </a>
+        </li>
+      </ul>
+    </div>
+  );
 };

@@ -1,14 +1,5 @@
 from miq.models import Page, Image
-
-
-# class ProductPrice(Price):
-#     class Meta:
-#         proxy = True
-
-#     def save(self, *args, **kwargs):
-#         self.source = 'product'
-
-#         super().save(*args, **kwargs)
+from .managers import ProductCategoryPageManager, ProductPageManager
 
 
 class ProductImage(Image):
@@ -20,7 +11,7 @@ class ProductPage(Page):
     class Meta:
         proxy = True
 
-    # objects = ProductPageManager()
+    objects = ProductPageManager()
 
     def save(self, *args, **kwargs):
         self.source = 'shop_product'
@@ -31,7 +22,7 @@ class CategoryPage(Page):
     class Meta:
         proxy = True
 
-    # objects = ProductCategoryPageManager()
+    objects = ProductCategoryPageManager()
 
     def save(self, *args, **kwargs):
         self.source = 'shop_category'

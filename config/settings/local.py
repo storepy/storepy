@@ -53,12 +53,6 @@ INSTALLED_APPS = [
     # CORE
     'miq.apps.MiqConfig',
     'shop.apps.ShopConfig',
-
-    # APPS
-    # 'apps.portfolio.apps.PortfolioConfig',
-    # 'apps.casting.apps.CastingConfig',
-
-
 ]
 
 DATABASES = {
@@ -71,22 +65,6 @@ DATABASES = {
         'PORT': '',
     }
 }
-
-"""
-# Testing with github actions
-"""
-
-if os.environ.get('GITHUB_WORKFLOW'):
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': env('GH_DB_NAME'),
-            'USER': env('GH_DB_USER'),
-            'PASSWORD': env('GH_DB_PWD'),
-            'HOST': env('GH_DB_HOST'),
-            'PORT': env('GH_DB_PORT'),
-        }
-    }
 
 
 """
@@ -108,10 +86,8 @@ MIDDLEWARE = (
 
     # CORS
     'miq.middleware.CORSMiddleware',
-
     #
     *DJANGO_MIDDLEWARES,
-
     #
     'miq.middleware.SiteMiddleware',
 )
@@ -207,3 +183,20 @@ STATIC_ROOT = BASE_DIR / 'static'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+
+"""
+# Testing with github actions
+"""
+
+if os.environ.get('GITHUB_WORKFLOW'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': env('GH_DB_NAME'),
+            'USER': env('GH_DB_USER'),
+            'PASSWORD': env('GH_DB_PWD'),
+            'HOST': env('GH_DB_HOST'),
+            'PORT': env('GH_DB_PORT'),
+        }
+    }

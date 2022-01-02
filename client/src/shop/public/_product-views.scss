@@ -1,0 +1,51 @@
+@use "@miq/styles/src/variables" as *;
+@use "@miq/styles/src/mixins" as *;
+
+@mixin shared {
+  a {
+    color: var(--gray-800, #464646);
+  }
+}
+
+.product-view {
+  @include shared;
+
+  .imgs-gallery-horizontal {
+    @include md-down {
+      img {
+        max-height: calc(100vh - 205px);
+
+        &.portrait {
+          max-width: calc(100vw - 16px);
+        }
+      }
+    }
+  }
+  .product-images-wrapper {
+    position: relative;
+    overflow: auto;
+    width: 100%;
+
+    .product-images {
+      max-height: calc(var(--vh) - 205px);
+      // min-width: 500px;
+      // width: 5000px;
+      width: 100%;
+      overflow: hidden;
+      height: auto;
+      display: flex;
+
+      img {
+        margin-right: 2px;
+      }
+    }
+  }
+}
+
+.products-view {
+  @include shared;
+
+  .products-grid {
+    gap: 8px;
+  }
+}

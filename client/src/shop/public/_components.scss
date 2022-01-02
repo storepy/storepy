@@ -1,0 +1,48 @@
+@use "@miq/styles/src/variables" as *;
+@use "@miq/styles/src/mixins" as *;
+
+.product-search-form {
+  .icon-wrapper {
+    --icon-size: 16px;
+
+    // width: var(--icon-size);
+    // height: var(--icon-size);
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.category-links {
+  overflow-x: auto;
+  overflow-y: hidden;
+  display: block;
+  white-space: nowrap;
+
+  .item {
+    display: inline-block;
+    margin-right: 8px;
+    vertical-align: bottom;
+    // vertical-align: top;
+
+    @include sm-down {
+      text-align: center;
+
+      img {
+        border-radius: 50%;
+      }
+    }
+
+    .info {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    &::after {
+      content: " ";
+    }
+  }
+}

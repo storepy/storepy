@@ -1,28 +1,37 @@
 
 {% extends 'shop/base.html' %}
 
+<style>
+{% block css %}{{ block.super }}
+{% endblock css %}
+</style>
 
-{% block title %}Shop{% endblock title %}
+
+{% block title %}
+{% firstof title 'Shop' %}
+{% endblock title %}
 
 {% block main %}
 
-<div class="d-fl flex-wrap flex-row justify-content-center">
-    {% for product in products %}
-        <div class="col-md-4 col-6 text-center">
-            <a href="{{product.detail_path}}"> 
-                {{product}}    
-            </a>
 
-            {# {% include 'shop/product/product-card.html' %} #}
+{% endblock main %}
+
+<div class="d-grid grid-2 grid-md-3 grid-lg-4 gap-1">
+    {% for product in products %}
+    <a href="{{product.detail_path}}" title="{{product.name}}"> 
+        <div class="">{{product.cover.render}}</div>
+        <div class="">
+            <h6>{{product.name}}</h6>
+            <span class="">{{ product.retail_price }}</span>
         </div>
 
+    </a>
     {% empty %}
     {# {% include 'components/empty.html' %} #}
     {% endfor %}
 </div>
 
 
-{% endblock main %}
 
 
 

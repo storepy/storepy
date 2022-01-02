@@ -1,6 +1,3 @@
-@use "@miq/styles/src/variables" as *;
-@use "@miq/styles/src/mixins" as mixins;
-
 .product-detail-view {
   display: grid;
   grid-template-columns: 1.3fr 1fr;
@@ -10,7 +7,7 @@
   width: 100%;
   column-gap: 40px;
 
-  @include mixins.md-down {
+  @include md-down {
     display: flex;
     flex-direction: column;
   }
@@ -19,7 +16,7 @@
     align-self: start;
     text-align: center;
 
-    @include mixins.md-down {
+    @include md-down {
       align-self: auto;
     }
   }
@@ -28,7 +25,7 @@
     text-align: center;
     align-self: start;
 
-    @include mixins.md-down {
+    @include md-down {
       align-self: auto;
       order: 2;
     }
@@ -46,7 +43,7 @@
     -webkit-box-align: center;
     align-items: center;
 
-    @include mixins.md-down {
+    @include md-down {
       align-self: auto;
       order: 1;
     }
@@ -55,7 +52,7 @@
       // display: flex;
 
       .thumbnails {
-        @include mixins.xs-screen {
+        @include xs-screen {
           // align-items: center;
           justify-content: space-between;
           max-height: 75px;
@@ -67,7 +64,7 @@
   .product-info-meta {
     align-self: start;
 
-    @include mixins.md-down {
+    @include md-down {
       align-self: auto;
       order: 3;
     }

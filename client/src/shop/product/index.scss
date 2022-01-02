@@ -1,3 +1,5 @@
+@use "./components";
+
 .product-cover {
   min-width: var(--img-thumb-size-lg, 64px);
   min-height: var(--img-thumb-size-lg, 64px);
@@ -39,10 +41,6 @@
 
 .product-update-view {
   .view-header {
-    .cover {
-      text-align: center;
-    }
-
     .miq-img-upload-btn {
       padding: 0;
       border: 0;
