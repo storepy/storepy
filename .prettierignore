@@ -1,3 +1,3 @@
 # Ignore all HTML files:
-*.html
+*.django.html
 *.yml

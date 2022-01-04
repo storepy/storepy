@@ -22,37 +22,9 @@ def serialize_section(section):
     return data
 
 
-class IndexView(TemplateView):
-    template_name = 'shop/index.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        site = get_current_site(self.request)
-        page = Index.objects.filter(site=site).first()
-        if not page:
-            return context
-
-        context['page'] = page
-        context['sections'] = page.sections.exclude(html='')
-        context['title'] = page.title
-
-        self.update_sharedData(context, {
-            'page': {
-                # 'sections': [get_section_serializer(section.type)(section).data for section in page.sections.all()[:10]]
-                'sections': [serialize_section(section) for section in page.sections.all()[:10]]
-            }
-        })
-
-        # context['articles'] = Article.objects.published().order_by(
-        #     '-page__dt_published')[:8]
-
-        return context
-
-
 class ProductView(DetailView):
     model = Product
-    template_name = 'shop/product.html'
+    template_name = 'shop/product.django.html'
 
     def get_object(self, *args, **kwargs):
         return get_object_or_404(
@@ -69,7 +41,17 @@ class ProductView(DetailView):
             context['title'] = obj.page.title
             context['description'] = obj.description
 
-            self.update_sharedData(context, {'product': product_to_dict(obj)})
+            self.update_sharedData(
+                context,
+                {
+                    'product': product_to_dict(obj),
+                    'breadcrumbs': [
+                        {'label': 'Accueil', 'path': '/'},
+                        {'label': 'Catalogue', 'path': '/shop/'},
+                        {'label': obj.category.name, 'path': obj.category.detail_path()},
+                    ],
+                }
+            )
 
         return context
 
@@ -84,7 +66,7 @@ class ListViewMixin:
 
 class ProductsView(ListViewMixin, ListView):
     model = Product
-    template_name = 'shop/products.html'
+    template_name = 'shop/products.django.html'
     context_object_name = 'products'
     paginate_by = 16
 
@@ -93,8 +75,14 @@ class ProductsView(ListViewMixin, ListView):
 
     def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
+
+        breadcrumbs = [{'label': 'Accueil', 'path': '/'}]
+        if self.request.GET.get('sale', self.request.GET.get('q')):
+            breadcrumbs.append({'label': 'Catalogue', 'path': '/shop/'},)
+
         data = self.object_list_pagination_to_dict(context)
         data.update({
+            'breadcrumbs': breadcrumbs,
             'categories': [category_to_dict(cat) for cat in Category.objects.published()[:20]]
         })
 
@@ -103,6 +91,10 @@ class ProductsView(ListViewMixin, ListView):
 
     def get_queryset(self):
         qs = super().get_queryset()
+        params = self.request.GET
+        if (sale := params.get('sale')) and sale == 'all':
+            qs = qs.is_on_sale()
+
         if (q := self.request.GET.get('q')) and q != '':
             qs = qs.by_name(q)
 
@@ -112,7 +104,7 @@ class ProductsView(ListViewMixin, ListView):
 class CategoryView(ListViewMixin, ListView):
     model = Product
     category = None
-    template_name = 'shop/products.html'
+    template_name = 'shop/products.django.html'
 
     def get_context_data(self, **kwargs) -> dict:
         ctx = super().get_context_data(**kwargs)
@@ -123,7 +115,11 @@ class CategoryView(ListViewMixin, ListView):
         # sD
         data = self.object_list_pagination_to_dict(ctx)
         data.update({
-            'page_label': self.category.name
+            'page_label': self.category.name,
+            'breadcrumbs': [
+                {'label': 'Accueil', 'path': '/'},
+                {'label': 'Catalogue', 'path': '/shop/'},
+            ],
         })
         self.update_sharedData(ctx, data)
 
@@ -132,8 +128,54 @@ class CategoryView(ListViewMixin, ListView):
     def get_queryset(self):
         sp = self.kwargs.get('category_page_slug_public')
         self.category = get_object_or_404(
-            Category, page__slug_public=sp, page__is_published=True)
+            Category.objects.published().has_products(),
+            page__slug_public=sp)
         return get_list_or_404(
             Product.objects.published(),
             category__page__slug_public=sp
         )
+
+
+class IndexView(TemplateView):
+    template_name = 'shop/index.django.html'
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+
+        site = get_current_site(self.request)
+        page = Index.objects.filter(site=site).first()
+        if not page:
+            return ctx
+
+        ctx['page'] = page
+        ctx['sections'] = page.sections.exclude(html='')
+        ctx['title'] = page.title
+
+        if new_products := Product.objects.published().is_new().slice(count=4):
+            ctx['new_products'] = new_products
+
+        if sale_products := Product.objects.published().is_on_sale().slice(count=4):
+            ctx['sale_products'] = sale_products
+
+        if categories := Category.objects.published().has_products().order_by('created')[:10]:
+            ctx['categories'] = categories
+
+        # ctx['occasions'] = Category.objects.published().order_by('created')[:10]
+
+        ctx['brands'] = [
+            {'name': 'Shein', 'logo': ''},
+            {'name': 'PrettyLittleThing', 'logo': ''},
+            {'name': 'Missguided', 'logo': ''},
+            {'name': 'Fashionnova', 'logo': ''},
+            {'asos': 'Macys', 'logo': ''},
+            {'name': 'Macys', 'logo': ''},
+        ]
+
+        # self.update_sharedData(ctx, {
+        #     'page': {
+        #         # 'sections': [get_section_serializer(section.type)(section).data for section in page.sections.all()[:10]]
+        #         'sections': [serialize_section(section) for section in page.sections.all()[:10]]
+        #     }
+        # })
+
+        return ctx

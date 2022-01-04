@@ -9,16 +9,16 @@ from miq.utils import clean_img_url, get_dict_key
 
 
 KEYS_MAP = {
-    'brand': {'asos': 'brand__name'},
-    'id': {'asos': 'id', 'shein': 'detail__goods_id'},
-    'sku': {'plt': 'sku'},
+    'brand': {'asos': 'brand__name', 'fnova': 'brand'},
+    'id': {'asos': 'id', 'shein': 'detail__goods_id', 'fnova': 'id'},
+    'sku': {'plt': 'sku', 'fnova': 'sku'},
     'productCode': {'asos': 'productCode'},
     #
-    'category': {'asos': 'productType__name', 'shein': 'currentCat__cat_name'},
-    'name': {'asos': 'name', 'plt': 'name', 'shein': 'detail__goods_name'},
+    'category': {'asos': 'productType__name', 'shein': 'currentCat__cat_name', 'fnova': 'product_type'},
+    'name': {'asos': 'name', 'plt': 'name', 'shein': 'detail__goods_name', 'fnova': 'title'},
     'description': {'plt': 'description'},
     #
-    'cover': {'plt': 'image', 'shein': 'detail__original_img'},
+    'cover': {'plt': 'image', 'shein': 'detail__original_img', 'fnova': 'featured_image'},
     #
     'gender': {'asos': 'gender'},
     'availability': {'plt': 'offers__availability'},
@@ -42,6 +42,13 @@ class Crawler:
     headers = {
         "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36"
     }
+
+    def fnova_url_to_data(self, url: str) -> dict:
+        r = self.get(f'{url}?view=pdp-json')
+        raw = r.json().get('products', [])[0]
+        data = self.load_raw_data(raw, 'fnova')
+        pprint(data, indent=4)
+        return data
 
 # PLT
 
@@ -174,7 +181,7 @@ class Crawler:
         return self._s.get(url, headers=self.headers)
 
 
-# c = Crawler()
+c = Crawler()
 
 # url = 'https://www.prettylittlething.fr/robe-moulante-gris-pierre-cotelee-a-col-rond.html'
 # # c.plt_url_to_data(url)
@@ -184,3 +191,6 @@ class Crawler:
 
 # url = 'https://fr.shein.com/Lapel-Neck-PU-Blazer-p-4968967-cat-1739.html'
 # # c.shein_url_to_data(url)
+
+# url = 'https://www.fashionnova.com/products/soothe-off-shoulder-jumpsuit-burgundy'
+# c.fnova_url_to_data(url)

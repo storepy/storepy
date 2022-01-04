@@ -1,11 +1,14 @@
+import datetime as dt
 
 from django.db import models
+from django.db.models import Count
 from django.db.models.functions import Concat
 
 from miq.models.page_mod import PageManager
 
 
 class ProductQueryset(models.QuerySet):
+    # for search
     def by_name(self, value):
         if not isinstance(value, str):
             return self.none()
@@ -19,6 +22,24 @@ class ProductQueryset(models.QuerySet):
             values=Concat(*keys, output_field=models.CharField())
         ).filter(values__icontains=value.lower())\
             .order_by('name').distinct('name')
+
+    def is_new(self, *, days: int = 30):
+        if not isinstance(days, int):
+            days = 30
+
+        days = dt.date.today() - dt.timedelta(days=days)
+        return self.filter(created__date__gte=days)
+
+    def is_on_sale(self):
+        return self.filter(is_on_sale=True, sale_price__gte=0)
+
+    def slice(self, *, count: int = None) -> list:
+        """
+        Return a list(not a queryset) of products. Empty list if count is not specified
+        """
+        if isinstance(count, int):
+            return self[:count]
+        return []
 
     def draft(self):
         return self.exclude(slug__in=self.published().values_list('slug', flat=True))
@@ -52,6 +73,13 @@ class ProductManager(ManagerMixin, models.Manager):
 
 
 class CategoryQuerySet(models.QuerySet):
+    def has_products(self):
+        """
+        Filter categories that have products
+        """
+        return self.annotate(num_products=Count('products'))\
+            .exclude(num_products=0)
+
     def draft(self):
         return self.exclude(slug__in=self.published().values_list('slug', flat=True))
 

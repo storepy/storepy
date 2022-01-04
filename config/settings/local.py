@@ -30,8 +30,8 @@ SECRET_KEY = env('SECRET_KEY')
 
 DEBUG = env('DEBUG')
 
-# CORS_ORIGIN = 'http://192.168.1.243:3000'
-CORS_ORIGIN = 'http://127.0.0.1:3000'
+CORS_ORIGIN = 'http://192.168.1.243:3000'
+# CORS_ORIGIN = 'http://127.0.0.1:3000'
 
 ALLOWED_HOSTS = ['*']
 
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
 
     #
     'django.contrib.sites',
@@ -178,7 +179,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 """
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BUILD_DIR / 'static']
+STATICFILES_DIRS = [BUILD_DIR / 'static', ]
 STATIC_ROOT = BASE_DIR / 'static'
 
 MEDIA_URL = '/media/'

@@ -1,0 +1,72 @@
+{% extends 'miq/public.django.html' %} {% load i18n %}
+{% load static %}
+
+
+{% block css_links %} {{ block.super }}
+<link href="{% static "shop.css" %}?{% now "U" %}" rel="stylesheet">
+{% endblock css_links %}
+    
+
+<div>[number, social accounts]</div>
+<div>[logo]/[nav]/[cart]</div>
+{% block navbar %}
+  <div class="navbar-banner p-1">
+    <div class="flag">
+      <img src="{% static 'bj-round.png' %}" alt="benin flag" title="Nos produits sont livrés partout dans Cotonou">
+      <span class="me-3">Livraison à Cotonou</span>
+    </div>
+
+    {% if contact_number %}
+      <div class="contact-number">
+      <a href="tel:{{contact_number}}" class="contact-number-link" title="{{contact_number_title}}" aria-label="{{contact_number_title}}">
+        {% firstof contact_number_display contact_number %}
+      </a>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="site-name px-1 px-md-2 text-md text-center">
+    <a href="/" class="site-name-link">{{site.name}}</a>
+  </div>
+
+{% endblock navbar %}
+
+
+[newsletter]
+<div class="">[footer]</div>
+{% block footer %}{% endblock footer %}
+
+
+<style>
+{% block css %}
+.navbar-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--gray-100);
+}
+
+.navbar-banner .flag{
+  display: flex;
+  align-items: center;
+}
+.navbar-banner .flag img{
+  margin-right: 8px;
+  width: 32px;
+  height: auto;
+}
+.navbar-banner .contact-number{}
+
+.navbar-banner .contact-number a{
+  text-decoration: underline;
+  color: var(--blue-700);
+
+}
+
+.site-name{
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+{% endblock css %}
+  
+</style>

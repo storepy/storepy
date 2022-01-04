@@ -1,19 +1,9 @@
 {% extends 'shop/base.html' %}
 
 {% block title %}{% if product.title %}{{product.title}} - {% endif %}{{product.category.name}}{% endblock title %}
-<style>
 
-
-{% block css %}
-{{block.super}}
-
-{% endblock css %}
-</style>
-  
 
 {% block main %}{% endblock main %}
-
-
 
 {% block meta %}{{ block.super }}
 
@@ -40,33 +30,3 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
   
 {% endblock meta %}
-  
-
-
-
-
-
-
-
-
-
-
-<div class="d-flex flex-column-reverse flex-md-row-reverse">
-  
-  {# PRODUCT INFO - comes first for crawlers #}
-  <div class="info">
-    
-  <h1 class="text-md fw-bold">{{ product.name | upper }}</h1>
-
-  {% if product.description %}
-    <div class="description my-4">
-        {{product.description}}
-    </div>
-  {% endif %}
-  </div>
-
-  {# PRODUCT IMAGES #}
-  
-  
-  
-</div>    
