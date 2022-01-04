@@ -30,7 +30,7 @@
     "sass": "^1.32.12"
   },
   "scripts": {
-    "start": "PORT=3000 HOST=127.0.0.1 craco start --config ../../../craco.config.js --workspace",
+    "start": "PORT=3000 HOST=192.168.1.243 craco start --config ../../../craco.config.js --workspace",
     "wbuild": "craco build --config ../../../craco.config.js --workspace",
     "build": "yarn workspace @store/client wbuild",
     "test": "craco test",

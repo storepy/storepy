@@ -46,3 +46,22 @@
     }
   }
 }
+
+.miq-breadcrumbs {
+  .item {
+    // margin-right: ;
+
+    &::after {
+      content: ">";
+      padding-right: 4px;
+      padding-left: 4px;
+    }
+
+    &:last-child {
+      &::after {
+        content: "";
+        padding: 0;
+      }
+    }
+  }
+}

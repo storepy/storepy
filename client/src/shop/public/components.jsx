@@ -2,8 +2,8 @@ import ReactDOM from "react-dom";
 import { useContext, useEffect, useRef, useState } from "react";
 
 import { SharedDataCtx } from "@miq/contexts";
-import Form, { useForm } from "@miq/form";
-import { Img, Picture, Icons, SearchTextInput } from "@miq/components";
+// import Form, { useForm } from "@miq/form";
+import { Img, Picture, SearchTextInput } from "@miq/components";
 import { IS_DEV, debounce } from "@miq/utils";
 
 export const ProductPriceDisplay = ({ product }) => {
@@ -13,11 +13,15 @@ export const ProductPriceDisplay = ({ product }) => {
     return (
       <div className="product-price-display d-flex align-items-center">
         <div className="text-danger fw-bold me-2">{product.sale_price.amountWithSymbol}</div>
-        <div className="">{product.retail_price.amountWithSymbol}</div>
+        <div className="text-line-through">{product.retail_price.amountWithSymbol}</div>
       </div>
     );
   }
-  return <div className="fw-bold">{product.retail_price.amountWithSymbol}</div>;
+  return (
+    <div className="product-price-display d-flex align-items-center">
+      <div className="fw-bold">{product.retail_price.amountWithSymbol}</div>
+    </div>
+  );
 };
 
 export const CategoryLinks = (props) => {
@@ -80,6 +84,26 @@ export function SearchForm(props) {
     </form>
   );
 }
+
+export const BreadCrumbs = (props) => {
+  const { isLoaded, breadcrumbs } = useContext(SharedDataCtx);
+
+  if (!isLoaded || !breadcrumbs) {
+    return null;
+  }
+
+  return (
+    <section className="miq-breadcrumbs" role={"navigation"} aria-label="breadcrumbs">
+      {breadcrumbs.map((item) => {
+        return (
+          <a href={item.path} className="item" key={item.label} title={item.title} aria-label={item.title}>
+            {item.label}
+          </a>
+        );
+      })}
+    </section>
+  );
+};
 
 //
 // NOT USED

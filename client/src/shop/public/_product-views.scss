@@ -10,6 +10,11 @@
 .product-view {
   @include shared;
 
+  .product-price-display {
+    margin: 1rem 0;
+    font-size: 1.25rem;
+  }
+
   .imgs-gallery-horizontal {
     @include md-down {
       img {

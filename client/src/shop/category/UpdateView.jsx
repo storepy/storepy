@@ -2,14 +2,7 @@ import { useContext, useEffect, useState } from "react";
 
 import { AdminView, StaffCoverUpdateForm, PublishedStatusSpan } from "@miq/adminjs";
 import Form, { useForm } from "@miq/form";
-import {
-  // Icons,
-  // IconNavLink,
-  ToastCtx,
-  ImgSquare,
-  // IconButton,
-  ImgDeleteIconButton,
-} from "@miq/components";
+import { ToastCtx } from "@miq/components";
 
 import { catServices } from "./utils";
 import { CatNameInput } from "./components";
@@ -34,12 +27,12 @@ export default function StaffCategoryUpdateView(props) {
           description: data.description || "",
           title: data.page.title || "",
           slug_public: data?.page?.slug_public || "",
-          is_published: data?.is_published || false,
+          is_published: data?.page?.is_published || false,
         });
       })
       .catch((err) => {
         if (err.response) {
-          toast.error({ message: "Something went wrong" });
+          // toast.error({ message: "Something went wrong" });
           if (err.response.status === 404) {
             return;
           }
@@ -61,8 +54,8 @@ export default function StaffCategoryUpdateView(props) {
 
   return (
     <AdminView back={props?.back} title="Modifier une catégorie" className="cat-update-view">
-      <div className="view-header d-flex flex-column flex-md-row mb-2">
-        <div className="mb-2 w-md-25">
+      <div className="d-grid grid-md-4 gap-2">
+        <div className="span-md-1">
           <StaffCoverUpdateForm
             slug={cat?.cover}
             data={cat.cover_data}
@@ -84,32 +77,31 @@ export default function StaffCategoryUpdateView(props) {
             }}
           />
         </div>
-        <div className="ms-1 ms-md-2 flex-1">
-          <AdminView.Section
-            title="Details"
-            actions={<PublishedStatusSpan is_published={cat?.page?.is_published} pill />}
-          >
-            <Form context={form} onSubmit={handleUpdate}>
-              <div className="mb-1">
-                <Form.Label value="Nom de la catégorie" className="mb-1" />
-                <CatNameInput error={form.errors.name} />
-              </div>
+        <AdminView.Section
+          title="Details"
+          actions={<PublishedStatusSpan is_published={cat?.page?.is_published} pill />}
+          className="span-md-3"
+        >
+          <Form context={form} onSubmit={handleUpdate}>
+            <div className="mb-1">
+              <Form.Label value="Nom de la catégorie" className="mb-1" />
+              <CatNameInput error={form.errors.name} />
+            </div>
 
-              <div className="mb-1">
-                <Form.Label value="Description de la catégorie" className="mb-1" />
-                <Form.TextAreaX
-                  name="description"
-                  error={form.errors.description}
-                  placeholder={"Decrivez la catégorie ..."}
-                />
-              </div>
+            <div className="mb-1">
+              <Form.Label value="Description de la catégorie" className="mb-1" />
+              <Form.TextAreaX
+                name="description"
+                error={form.errors.description}
+                placeholder={"Decrivez la catégorie ..."}
+              />
+            </div>
 
-              <div className="my-2">
-                <Form.Submit value="Sauvegarder" className="btn btn-primary" />
-              </div>
-            </Form>
-          </AdminView.Section>
-        </div>
+            <div className="my-2">
+              <Form.Submit value="Sauvegarder" className="btn btn-primary" />
+            </div>
+          </Form>
+        </AdminView.Section>
       </div>
 
       <Form
@@ -133,6 +125,13 @@ export default function StaffCategoryUpdateView(props) {
             });
         }}
       >
+        <AdminView.Section title="Status">
+          <div className="d-flex align-items-center">
+            <Form.CheckboxInput name="is_published" error={form.errors.is_published} className="me-2" />
+            <Form.Label value="Publier cette categorie" />
+          </div>
+        </AdminView.Section>
+
         <AdminView.Section title="Seo">
           <div className="mb-1">
             <Form.Label value="Title" className="mb-1" />
@@ -153,13 +152,6 @@ export default function StaffCategoryUpdateView(props) {
               placeholder={"Write slug ..."}
               maxLength={99}
             />
-          </div>
-        </AdminView.Section>
-
-        <AdminView.Section title="Status">
-          <div className="d-flex align-items-center">
-            <Form.CheckboxInput name="is_published" error={form.errors.is_published} className="me-2" />
-            <Form.Label value="Publier cette categorie" />
           </div>
         </AdminView.Section>
 

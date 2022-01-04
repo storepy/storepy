@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { SharedDataCtx } from "@miq/contexts";
 import { Picture, Pagination } from "@miq/components";
-import { CategoryLinks, ProductPriceDisplay, SearchForm } from "./components";
+import { CategoryLinks, ProductPriceDisplay, SearchForm, BreadCrumbs } from "./components";
 
 export const ProductsGrid = ({ items, ...props }) => {
   return (
@@ -34,18 +34,16 @@ export default function ProductsPublicView(props) {
   const query = new URLSearchParams(props.location.search);
   const q = query.get("q");
 
-  console.log(q);
-
   return (
     <div className="products-view p-1 p-md-3">
       <header>
         <div className="miq-container center">
-          <SearchForm history={props.history} match={props.match} location={props.location} />
+          <div className="mb-3">
+            <SearchForm history={props.history} match={props.match} location={props.location} />
+          </div>
         </div>
 
-        <section className="breadcrumbs mt-3" role={"navigation"} aria-label="breadcrumbs">
-          Accueil/bread/crumbs
-        </section>
+        <BreadCrumbs />
 
         <section className="my-2">{page_label && <h1 aria-label={page_label}>{page_label}</h1>}</section>
       </header>
@@ -53,7 +51,7 @@ export default function ProductsPublicView(props) {
       {!q && <CategoryLinks showCover />}
 
       <div className="my-3">
-        <div className="sort-bar">Trier par</div>
+        {/* <div className="sort-bar">Trier par</div> */}
         <ProductsGrid items={object_list} match={props.match} />
       </div>
 

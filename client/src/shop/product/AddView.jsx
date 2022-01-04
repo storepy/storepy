@@ -1,5 +1,5 @@
-import { useContext, useState } from "react";
-import { Switch, Route } from "react-router-dom";
+import { useState } from "react";
+// import { Switch, Route } from "react-router-dom";
 import { AdminView } from "@miq/adminjs";
 
 import Form, { useForm } from "@miq/form";
@@ -9,7 +9,7 @@ import { productServices } from "./utils";
 import { ProductNameInput } from "./components";
 
 const ExternalUrlForm = (props) => {
-  const [data, setData] = useState({});
+  // const [data, setData] = useState({});
   const [isLoading, setLoading] = useState(false);
 
   const form = useForm({ url: "" });

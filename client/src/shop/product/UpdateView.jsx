@@ -15,7 +15,6 @@ const ViewTabs = ({ tab, ...props }) => {
 
   switch (tab) {
     case "inventory":
-      const { supplier_name } = product;
       return (
         <div className="d-flex flex-column flex-md-row">
           <div className="flex-1">
@@ -225,7 +224,8 @@ export default function ProductUpdateView(props) {
       })
       .catch((err) => {
         if (err.response) {
-          toast.error({ message: "Something went wrong" });
+          // toast.error({ message: "Something went wrong" });
+          console.log(err.response);
           if (err.response.status === 404) {
             return;
           }

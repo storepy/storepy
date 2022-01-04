@@ -6,7 +6,7 @@ import "./index.scss";
 import { SharedDataCtx } from "@miq/contexts";
 import { AdminRoute, AdminNavLink, AdminView, hasPerms, PublishedStatusSpan } from "@miq/adminjs";
 import { addForwardSlash } from "@miq/utils";
-import { Table, ItemTable, Button, ImgSquare } from "@miq/components";
+import { Table, ItemTable, ImgSquare } from "@miq/components";
 
 import { productServices } from "./utils";
 

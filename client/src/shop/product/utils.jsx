@@ -1,10 +1,6 @@
 import { StaffService } from "@miq/utils";
 
 class StaffProductService extends StaffService {
-  constructor(path) {
-    super(path);
-  }
-
   publish(prodSlug) {
     return this.patchPath(`${this.path}${prodSlug}/publish/`, {});
   }

@@ -3,13 +3,7 @@ import { SharedDataCtx } from "@miq/contexts";
 import Form, { useForm } from "@miq/form";
 import { IconButton, Icons, ImgsHorizontalGallery } from "@miq/components";
 
-import { ProductPriceDisplay } from "./components";
-
-const CategoriesNavbar = (props) => {
-  return (
-    <div className="cat-navbar">Soldes Nouveautés Vêtements En vedette Marques The Super Puff Vestes et manteaux</div>
-  );
-};
+import { ProductPriceDisplay, BreadCrumbs } from "./components";
 
 const PreSaleForm = (props) => {
   const form = useForm({ name: "", number: "", email: "", ig: "" });
@@ -52,7 +46,7 @@ const PreSaleForm = (props) => {
                     form.setErrors({ ...form.errors, number: "Empty value" });
                     return false;
                   }
-                  console.log("valid", value);
+                  // console.log("valid", value);
                   return true;
                 }}
                 error={form.errors.number}
@@ -104,7 +98,9 @@ export default function ProductPublicView(props) {
 
   return (
     <div className="product-view" id="ProductView">
-      <CategoriesNavbar />
+      <div className="my-3 px-2">
+        <BreadCrumbs />
+      </div>
 
       <div className="d-flex flex-column flex-md-row justify-content-center">
         <div className="w-100 w-md-65">
@@ -149,22 +145,22 @@ export default function ProductPublicView(props) {
                   <br />
                   Le délai de traitement de la livraison standard pour cet article est estimé à 1 à 5 jours ouvrables.
                 </p>
-                <a href="" className="text-underline">
+                <a href="." className="text-underline">
                   Consultez notre page Livraison
                 </a>
               </li>
             </ul>
 
-            <div className="mb-3">
+            {/* <div className="mb-3">
               <div className="text-md">Porter avec</div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
 
-      <div className="">
+      {/* <div className="p-2">
         <p className="text-md">Voir les styles semblables</p>
-      </div>
+      </div> */}
     </div>
   );
 }

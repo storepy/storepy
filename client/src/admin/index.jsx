@@ -8,7 +8,7 @@ import { SharedDataCtx } from "@miq/contexts";
 
 const StaffShopRoutes = lazy(() => import("../shop"));
 
-const Dashboard = (props) => <AdminView title="Dashboard" actions={<>Add post</>} className=""></AdminView>;
+const Dashboard = (props) => <AdminView title="Dashboard"></AdminView>;
 
 export default function AdminLayout(props) {
   const toastCtx = useToast();

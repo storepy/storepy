@@ -28,7 +28,7 @@ export default function StaffShopRoutes(props) {
             requiredPerms={["shop.view_product"]}
           />
           <AdminRoute path={path} requiredPerms={["shop.view_product"]}>
-            <AdminView title="Store">
+            <AdminView title="Store" back={"/staff/"}>
               <AdminView.Section
                 title="Products"
                 actions={
