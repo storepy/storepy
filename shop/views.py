@@ -7,6 +7,8 @@ from miq.serializers import serialize_context_pagination
 
 from miq.views.generic import ListView, DetailView, TemplateView
 
+from shop.utils import product_to_jsonld
+
 from .serializers import product_to_dict, category_to_dict
 from .models import Product, Category
 
@@ -44,6 +46,9 @@ class ProductView(DetailView):
         if obj:
             context['title'] = obj.page.title
             context['description'] = obj.description
+            context['jsonld'] = product_to_jsonld(
+                obj, site=get_current_site(self.request)
+            )
 
             self.update_sharedData(
                 context,
