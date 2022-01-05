@@ -37,7 +37,7 @@ class CategorySerializer(CoverMixin, serializers.ModelSerializer):
         model = Category
         read_only_fields = (
             'slug', 'page', 'cover_data',
-            'products_count', 'created', 'updated'
+            'products_count', 'next_slug', 'prev_slug', 'created', 'updated'
         )
         fields = (
             'name', 'description', 'cover', 'position',
@@ -49,6 +49,8 @@ class CategorySerializer(CoverMixin, serializers.ModelSerializer):
         slug_field="slug", queryset=Image.objects.all(), required=False
     )
     cover_data = serializers.SerializerMethodField(required=False)
+    products_count = serializers.SerializerMethodField(required=False)
+    products_count = serializers.SerializerMethodField(required=False)
     products_count = serializers.SerializerMethodField(required=False)
 
     def get_products_count(self, obj):
@@ -98,7 +100,7 @@ class ProductSerializer(CoverMixin, serializers.ModelSerializer):
             'supplier_name', 'supplier_item_id', 'supplier_item_category',
             'supplier_item_url', 'supplier_item_cost', 'supplier_item_cost_currency',
             #
-            'created', 'updated',
+            'next_slug', 'prev_slug', 'created', 'updated',
         )
         fields = (
             *read_only_fields,

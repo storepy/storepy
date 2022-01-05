@@ -138,7 +138,10 @@ class StaffProductViewset(Mixin, viewsets.ModelViewSet):
                 product.images.add(img)
 
         product.save()
-        return Response(data=ProductSerializer(product).data)
+        data = ProductSerializer(product).data
+        data['categories'] = self.get_category_options()
+
+        return Response(data=data)
 
     @action(methods=['patch'], detail=True, url_path=r'publish')
     def publish(self, request, *args, **kwargs):
@@ -215,18 +218,7 @@ class StaffProductViewset(Mixin, viewsets.ModelViewSet):
 
     def retrieve(self, *args, **kwargs):
         r = super().retrieve(*args, **kwargs)
-
-        def serialize_category(cat):
-            return {
-                'label': cat.name,
-                'slug': cat.slug,
-                'value': cat.slug
-            }
-
-        cats = Category.objects.all()
-        r.data['categories'] = {
-            'count': cats.count(),
-            'items': [serialize_category(cat) for cat in cats]}
+        r.data['categories'] = self.get_category_options()
         return r
 
     def perform_create(self, ser):
@@ -237,6 +229,19 @@ class StaffProductViewset(Mixin, viewsets.ModelViewSet):
         page_ser = self.page_serializer(data={'label': label, 'title': title, })
         page_ser.is_valid(raise_exception=True)
         return page_ser.save()
+
+    def get_category_options(self) -> dict:
+        cats = Category.objects.all()
+        return {
+            'count': cats.count(),
+            'items': [
+                {
+                    'label': cat.name,
+                    'slug': cat.slug,
+                    'value': cat.slug
+                } for cat in cats
+            ]
+        }
 
 
 """

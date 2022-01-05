@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-
+import { Link } from "react-router-dom";
 import { AdminView, StaffCoverUpdateForm, PublishedStatusSpan } from "@miq/adminjs";
 import Form, { useForm } from "@miq/form";
 import { ToastCtx } from "@miq/components";
@@ -53,7 +53,25 @@ export default function StaffCategoryUpdateView(props) {
   };
 
   return (
-    <AdminView back={props?.back} title="Modifier une catégorie" className="cat-update-view">
+    <AdminView
+      back={props?.back}
+      title="Modifier une catégorie"
+      actions={
+        <div>
+          {cat?.prev_slug && (
+            <Link to={`${props?.back}${cat?.prev_slug}`} className="btn me-1" title="Voir la catégorie precedente">
+              Previous
+            </Link>
+          )}
+          {cat?.next_slug && (
+            <Link to={`${props?.back}${cat?.next_slug}`} className="btn" title="Voir la catégorie suivante">
+              Next
+            </Link>
+          )}
+        </div>
+      }
+      className="cat-update-view"
+    >
       <div className="d-grid grid-md-4 gap-2">
         <div className="span-md-1">
           <StaffCoverUpdateForm

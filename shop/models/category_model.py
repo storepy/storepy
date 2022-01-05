@@ -26,6 +26,18 @@ class Category(BaseModelMixin):
 
     objects = CategoryManager()
 
+    def next_slug(self):
+        try:
+            return self.get_next_by_created().slug
+        except Exception:
+            return
+
+    def prev_slug(self):
+        try:
+            return self.get_previous_by_created().slug
+        except Exception:
+            return
+
     def __str__(self):
         return capfirst(self.name)
 

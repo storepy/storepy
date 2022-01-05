@@ -6,13 +6,16 @@ import Form, { useForm } from "@miq/form";
 import { addForwardSlash } from "@miq/utils";
 
 import { productServices } from "./utils";
-import { ProductNameInput } from "./components";
+import { ProductQuickUpdateForm, productFormDefaultValues } from "./UpdateView";
+import { SupplierData } from "./components";
 
 const ExternalUrlForm = (props) => {
   // const [data, setData] = useState({});
   const [isLoading, setLoading] = useState(false);
 
-  const form = useForm({ url: "" });
+  const form = useForm({
+    url: "https://us.shein.com/Floral-Lace-Underwire-Garter-Lingerie-Set-p-1925944-cat-1862.html",
+  });
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -23,6 +26,17 @@ const ExternalUrlForm = (props) => {
       .then((data) => {
         setLoading(false);
         form.setValue("url", "");
+        props.productForm.setValues({
+          name: data.name || "",
+          description: data.description || "",
+          category: data.category || "",
+          retail_price: data?.retail_price || 0.0,
+          is_pre_sale: data.is_pre_sale || false,
+          is_pre_sale_text: data.is_pre_sale_text || "",
+          is_on_sale: data.is_on_sale || false,
+          sale_price: data?.sale_price || 0.0,
+        });
+        props.setProduct(data);
       })
       .catch((err) => {
         setLoading(false);
@@ -49,7 +63,8 @@ const ExternalUrlForm = (props) => {
 };
 
 export default function StaffProductAddView(props) {
-  const form = useForm({ name: "", img: "" });
+  const form = useForm(productFormDefaultValues);
+  const [product, setProduct] = useState({});
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -76,9 +91,26 @@ export default function StaffProductAddView(props) {
         className="my-2"
       />
 
-      <ExternalUrlForm productForm={form} />
+      <ExternalUrlForm productForm={form} setProduct={setProduct} />
 
-      <Form context={form} onSubmit={handleSubmit}>
+      {product.slug && (
+        <div className="d-grid grid-md-5 gap-2">
+          <div className="span-md-4">
+            <ProductQuickUpdateForm
+              form={form}
+              product={product}
+              setProduct={setProduct}
+              categories={product?.categories}
+            />
+          </div>
+
+          <div className="span-md-1">
+            <SupplierData product={product} />
+          </div>
+        </div>
+      )}
+
+      {/* <Form context={form} onSubmit={handleSubmit}>
         <AdminView.Section>
           <div className="mb-2">
             <ProductNameInput required form={form} placeholder={"Give a name to the new item ..."} />
@@ -86,7 +118,7 @@ export default function StaffProductAddView(props) {
         </AdminView.Section>
 
         <Form.Submit value="Add new product" className="btn btn-primary" />
-      </Form>
+      </Form> */}
     </AdminView>
   );
 }

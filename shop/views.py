@@ -83,7 +83,7 @@ class ProductsView(ListViewMixin, ListView):
         data = self.object_list_pagination_to_dict(context)
         data.update({
             'breadcrumbs': breadcrumbs,
-            'categories': [category_to_dict(cat) for cat in Category.objects.published()[:20]]
+            'categories': [category_to_dict(cat) for cat in Category.objects.published().has_products()[:20]]
         })
 
         self.update_sharedData(context, data)

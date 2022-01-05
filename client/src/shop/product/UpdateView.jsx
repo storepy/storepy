@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 import { AdminView, StaffCoverUpdateForm, PublishedStatusSpan } from "@miq/adminjs";
 import Form, { useForm } from "@miq/form";
@@ -178,7 +179,7 @@ const ViewTabs = ({ tab, ...props }) => {
   }
 };
 
-const productFormDefaultValues = {
+export const productFormDefaultValues = {
   name: "",
   description: "",
   title: "",
@@ -189,6 +190,162 @@ const productFormDefaultValues = {
   is_pre_sale_text: "",
   sale_price: 0.0,
   is_on_sale: false,
+};
+
+export const ProductQuickUpdateForm = ({ form, product, ...props }) => {
+  const { setProduct, toast, categories } = props;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const fD = {
+      retail_price: form.values.retail_price,
+      is_on_sale: form.values.is_on_sale,
+    };
+
+    if (form.values.category) fD.category = form.values.category;
+    if (form.values.is_on_sale) fD.sale_price = form.values.sale_price;
+
+    if (form.values.is_pre_sale) {
+      fD.is_pre_sale = form.values.is_pre_sale;
+      fD.is_pre_sale_text = form.values.is_pre_sale_text;
+    }
+
+    return productServices
+      .patch(product.slug, fD)
+      .then((data) => {
+        setProduct?.({ ...product, ...data });
+        toast?.success({ message: "Product updated." });
+      })
+      .catch((err) => {
+        toast?.error({ message: "Could not update product." });
+        return form.handleError(err);
+      });
+  };
+
+  return (
+    <Form context={form} onSubmit={handleSubmit}>
+      <div className="d-flex flex-column-reverse flex-md-row mb-2">
+        <div className="flex-1">
+          <AdminView.Section
+            title="Details"
+            actions={<PublishedStatusSpan is_published={product?.page?.is_published} pill />}
+          >
+            <div className="mb-1">
+              <ProductUpdateForm.NameInput
+                product={product}
+                form={form}
+                onSuccess={(data) => {
+                  setProduct?.({ ...product, ...data });
+                  toast?.success({ message: "Item updated." });
+                }}
+                onError={(err) => {
+                  form.handleError(err);
+                  toast?.error({ message: "Could not update item." });
+                }}
+              />
+            </div>
+
+            {categories && (
+              <div className="mb-1">
+                <Form.Label value="Category" />
+                <Form.SelectInput required name="category" nullValue={{ label: "Select category" }}>
+                  {categories?.items?.map((cat) => {
+                    return <Form.SelectInput.Option {...cat} key={cat.value} />;
+                  })}
+                </Form.SelectInput>
+              </div>
+            )}
+
+            <div className="mb-1">
+              <div className="mb-1">
+                <Form.Label value="Retail price" id="retail_price_label" />
+                <Form.TextInput
+                  required
+                  type="number"
+                  name="retail_price"
+                  error={form.errors.retail_price}
+                  aria-describedby="retail_price_label"
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+
+              {/* PRE SALE */}
+              <div className="mb-1">
+                <div className="d-flex align-items-center mb-1">
+                  <Form.CheckboxInput name="is_pre_sale" error={form.errors.is_pre_sale} className="me-2" />
+                  <Form.Label value="Pre-sale" />
+                </div>
+
+                {form.values.is_pre_sale && (
+                  <div className="mb-2">
+                    <Form.Label value="Pre sale text" id="is_pre_sale_text_label" className="miq-checkbox-label" />
+                    <Form.TextAreaX
+                      name="is_pre_sale_text"
+                      error={form.errors.is_pre_sale_text}
+                      aria-describedby="is_pre_sale_text_label"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* SALE  */}
+              <div className="d-flex align-items-center mb-1">
+                <Form.CheckboxInput name="is_on_sale" error={form.errors.is_on_sale} className="me-2" />
+                <Form.Label value="On Sale" />
+              </div>
+
+              {form.values.is_on_sale && (
+                <div className="mb-2">
+                  <Form.Label value="Sale price" id="sale_price_label" className="miq-checkbox-label" />
+                  <Form.TextInput
+                    required
+                    type="number"
+                    name="sale_price"
+                    error={form.errors.sale_price}
+                    aria-describedby="sale_price_label"
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="my-3">
+              <Form.Submit value="Update product" className="btn btn-primary-3" />
+            </div>
+          </AdminView.Section>
+        </div>
+
+        <div className=" ms-md-2 mb-2 w-md-35 w-lg-25">
+          <StaffCoverUpdateForm
+            slug={product?.cover}
+            data={product.cover_data}
+            onCreate={(imgData) => {
+              productServices
+                .patch(product.slug, { cover: imgData.slug })
+                .then((data) => {
+                  setProduct?.({ ...product, ...data });
+                  toast?.success({ message: "Product cover updated." });
+                })
+                .catch((err) => {
+                  toast?.error({ message: "Could not upload cover image." });
+                });
+            }}
+            onUpdate={(cover_data) => {
+              toast?.success({ message: "Product cover updated." });
+              return setProduct?.({ ...product, cover_data });
+            }}
+            onDelete={() => {
+              return setProduct?.({ ...product, cover_data: null, cover: null });
+            }}
+            className="mb-1"
+          />
+          <ProductImageAltTextInput image={product?.cover_data} />
+        </div>
+      </div>
+    </Form>
+  );
 };
 
 export default function ProductUpdateView(props) {
@@ -238,155 +395,31 @@ export default function ProductUpdateView(props) {
   console.log(product);
 
   return (
-    <AdminView back={props?.back} className="product-update-view">
-      <Form
-        context={form}
-        onSubmit={(e) => {
-          e.preventDefault();
-          const fD = {
-            retail_price: form.values.retail_price,
-            is_on_sale: form.values.is_on_sale,
-          };
-
-          if (form.values.category) fD.category = form.values.category;
-          if (form.values.is_on_sale) fD.sale_price = form.values.sale_price;
-
-          if (form.values.is_pre_sale) {
-            fD.is_pre_sale = form.values.is_pre_sale;
-            fD.is_pre_sale_text = form.values.is_pre_sale_text;
-          }
-
-          return productServices
-            .patch(product.slug, fD)
-            .then((data) => {
-              setProduct({ ...product, ...data });
-              toast.success({ message: "Product updated." });
-            })
-            .catch((err) => {
-              toast.error({ message: "Could not update product." });
-              return form.handleError(err);
-            });
-        }}
-      >
-        <div className="d-flex flex-column-reverse flex-md-row mb-2">
-          <div className="flex-1">
-            <AdminView.Section
-              title="Details"
-              actions={<PublishedStatusSpan is_published={product?.page?.is_published} pill />}
-            >
-              <div className="mb-1">
-                <ProductUpdateForm.NameInput
-                  product={product}
-                  form={form}
-                  onSuccess={(data) => {
-                    setProduct({ ...product, ...data });
-                    toast.success({ message: "Item updated." });
-                  }}
-                  onError={(err) => {
-                    form.handleError(err);
-                    toast.error({ message: "Could not update item." });
-                  }}
-                />
-              </div>
-
-              <div className="mb-1">
-                <Form.Label value="Category" />
-                <Form.SelectInput required name="category" nullValue={{ label: "Select category" }}>
-                  {product?.categories?.items?.map((cat) => {
-                    return <Form.SelectInput.Option {...cat} key={cat.value} />;
-                  })}
-                </Form.SelectInput>
-              </div>
-
-              <div className="mb-1">
-                <div className="mb-1">
-                  <Form.Label value="Retail price" id="retail_price_label" />
-                  <Form.TextInput
-                    required
-                    type="number"
-                    name="retail_price"
-                    error={form.errors.retail_price}
-                    aria-describedby="retail_price_label"
-                    min="0"
-                    step="0.01"
-                  />
-                </div>
-
-                {/* PRE SALE */}
-                <div className="mb-1">
-                  <div className="d-flex align-items-center mb-1">
-                    <Form.CheckboxInput name="is_pre_sale" error={form.errors.is_pre_sale} className="me-2" />
-                    <Form.Label value="Pre-sale" />
-                  </div>
-
-                  {form.values.is_pre_sale && (
-                    <div className="mb-2">
-                      <Form.Label value="Pre sale text" id="is_pre_sale_text_label" className="miq-checkbox-label" />
-                      <Form.TextAreaX
-                        name="is_pre_sale_text"
-                        error={form.errors.is_pre_sale_text}
-                        aria-describedby="is_pre_sale_text_label"
-                      />
-                    </div>
-                  )}
-                </div>
-
-                {/* SALE  */}
-                <div className="d-flex align-items-center mb-1">
-                  <Form.CheckboxInput name="is_on_sale" error={form.errors.is_on_sale} className="me-2" />
-                  <Form.Label value="On Sale" />
-                </div>
-
-                {form.values.is_on_sale && (
-                  <div className="mb-2">
-                    <Form.Label value="Sale price" id="sale_price_label" className="miq-checkbox-label" />
-                    <Form.TextInput
-                      required
-                      type="number"
-                      name="sale_price"
-                      error={form.errors.sale_price}
-                      aria-describedby="sale_price_label"
-                      min="0"
-                      step="0.01"
-                    />
-                  </div>
-                )}
-              </div>
-
-              <div className="my-3">
-                <Form.Submit value="Update product" className="btn btn-primary-3" />
-              </div>
-            </AdminView.Section>
-          </div>
-
-          <div className=" ms-md-2 mb-2 w-md-35 w-lg-25">
-            <StaffCoverUpdateForm
-              slug={product?.cover}
-              data={product.cover_data}
-              onCreate={(imgData) => {
-                productServices
-                  .patch(product.slug, { cover: imgData.slug })
-                  .then((data) => {
-                    setProduct({ ...product, ...data });
-                    toast.success({ message: "Product cover updated." });
-                  })
-                  .catch((err) => {
-                    toast.error({ message: "Could not upload cover image." });
-                  });
-              }}
-              onUpdate={(cover_data) => {
-                toast.success({ message: "Product cover updated." });
-                return setProduct({ ...product, cover_data });
-              }}
-              onDelete={() => {
-                return setProduct({ ...product, cover_data: null, cover: null });
-              }}
-              className="mb-1"
-            />
-            <ProductImageAltTextInput image={product?.cover_data} />
-          </div>
+    <AdminView
+      back={props?.back}
+      actions={
+        <div>
+          {product?.prev_slug && (
+            <Link to={`${props?.back}${product?.prev_slug}`} className="btn me-1" title="Voir le produit précédent">
+              Previous
+            </Link>
+          )}
+          {product?.next_slug && (
+            <Link to={`${props?.back}${product?.next_slug}`} className="btn" title="Voir le produit suivant">
+              Next
+            </Link>
+          )}
         </div>
-      </Form>
+      }
+      className="product-update-view"
+    >
+      <ProductQuickUpdateForm
+        form={form}
+        product={product}
+        categories={product?.categories}
+        setProduct={setProduct}
+        toast={toast}
+      />
 
       <div className="my-2">
         <div className="d-flex justify-content-center mb-3">
