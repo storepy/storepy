@@ -22,6 +22,10 @@ def serialize_section(section):
     return data
 
 
+def get_published_categories():
+    return Category.objects.published().has_products().order_by('position', 'created')
+
+
 class ProductView(DetailView):
     model = Product
     template_name = 'shop/product.django.html'
@@ -83,7 +87,7 @@ class ProductsView(ListViewMixin, ListView):
         data = self.object_list_pagination_to_dict(context)
         data.update({
             'breadcrumbs': breadcrumbs,
-            'categories': [category_to_dict(cat) for cat in Category.objects.published().has_products()[:20]]
+            'categories': [category_to_dict(cat) for cat in get_published_categories()]
         })
 
         self.update_sharedData(context, data)
@@ -157,7 +161,7 @@ class IndexView(TemplateView):
         if sale_products := Product.objects.published().is_on_sale().slice(count=4):
             ctx['sale_products'] = sale_products
 
-        if categories := Category.objects.published().has_products().order_by('created')[:10]:
+        if categories := get_published_categories():
             ctx['categories'] = categories
 
         # ctx['occasions'] = Category.objects.published().order_by('created')[:10]
