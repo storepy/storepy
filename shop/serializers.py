@@ -2,6 +2,7 @@ import re
 from django.db import models
 from django.utils.text import capfirst
 from django.utils.text import Truncator
+from .utils import intcomma
 # from django.contrib.humanize import intcomma
 
 from miq import models as miqModel
@@ -40,9 +41,7 @@ def serialize_product_image(product: 'models.Model', img: 'miqModel.Image') -> d
 
 
 def serialize_product_price(price):
-    def intcomma(value):
-        value = f'{value}'
-        return re.sub(r"^(-?\d+)(\d{3})", r'\g<1>,\g<2>', value)
+
     return {
         'amount': price,
         'amountWithSymbol': f'{intcomma(int(price))} CFA' if price else ''

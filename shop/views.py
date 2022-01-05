@@ -46,9 +46,7 @@ class ProductView(DetailView):
         if obj:
             context['title'] = obj.page.title
             context['description'] = obj.description
-            context['jsonld'] = product_to_jsonld(
-                obj, site=get_current_site(self.request)
-            )
+            context['jsonld'] = product_to_jsonld(obj, self.request)
 
             self.update_sharedData(
                 context,
