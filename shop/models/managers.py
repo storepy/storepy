@@ -78,9 +78,9 @@ class CategoryQuerySet(models.QuerySet):
         Filter categories that have products
         """
         qs = self.annotate(num_products=Count('products')).filter(num_products__gte=1)
-        if published:
-            qs = qs.filter(products__page__is_published=True)
-        return qs
+        if not published:
+            return qs
+        return qs.filter(products__page__is_published=True)
 
     def draft(self):
         return self.exclude(slug__in=self.published().values_list('slug', flat=True))
