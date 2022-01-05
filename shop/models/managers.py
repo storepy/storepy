@@ -73,12 +73,14 @@ class ProductManager(ManagerMixin, models.Manager):
 
 
 class CategoryQuerySet(models.QuerySet):
-    def has_products(self):
+    def has_products(self, *, published=True):
         """
         Filter categories that have products
         """
-        return self.annotate(num_products=Count('products'))\
-            .exclude(num_products=0)
+        qs = self.annotate(num_products=Count('products')).filter(num_products__gte=1)
+        if published:
+            qs = qs.filter(products__page__is_published=True)
+        return qs
 
     def draft(self):
         return self.exclude(slug__in=self.published().values_list('slug', flat=True))
