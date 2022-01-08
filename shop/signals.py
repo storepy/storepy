@@ -10,6 +10,12 @@ def on_product_will_be_deleted(sender, **kwargs):
     instance = kwargs.get('instance')
     instance.page.delete()
 
+    if (attrs := instance.attributes) and attrs.exists():
+        attrs.all().delete()
+
+    if (imgs := instance.images) and imgs.exists():
+        imgs.all().delete()
+
 
 @receiver(signals.post_delete, sender=Category)
 def on_cat_will_be_deleted(sender, **kwargs):

@@ -42,35 +42,26 @@ class TestStaffProductViewSet(ShopMixin, APITestCase):
         self.assertIsNone(r.data.get('category'))
 
         """
-        category
-        """
-        self.add_user_perm(self.user, 'add_category')
-        r = self.client.post(
-            self.get_category_list_path(), {'name': 'a cat'}, format="json"
-        )
-
-        cat_slug = r.data.get('slug')
-        r = self.client.post(
-            self.get_product_category_path(slug),
-            {'category': cat_slug}, format="json"
-        )
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertIsNotNone(r.data.get('category'))
-
-        r = self.client.patch(
-            self.get_product_category_path(slug), {'name': 'new cat', 'description': 'A desc'}, format="json"
-        )
-        self.assertEqual(r.data.get('category').get('description'), 'A desc')
-
-        """
         page
         """
         r = self.client.patch(
             self.get_product_page_path(slug),
             {'title': 'This is SEO'}, format="json"
         )
-        self.assertEqual(r.data.get('page').get('title'), 'This is SEO')
-        print(r.data)
+        page = r.data.get('page')
+        self.assertEqual(page.get('title'), 'This is SEO')
+
+        """
+        DELETE
+        """
+        page_slug = page.get('slug')
+        self.add_user_perm(self.user, 'delete_product')
+        self.assertEqual(
+            self.client.delete(self.get_product_detail_path(slug)).status_code,
+            status.HTTP_204_NO_CONTENT
+        )
+        self.assertEqual(ProductPage.objects.filter(slug=page_slug).count(), 0)
+        # self.assertEqual(r.data.get('page').get('title'), 'This is SEO')
 
     def test_post_product(self):
         self.assertEqual(

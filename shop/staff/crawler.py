@@ -121,6 +121,47 @@ class Crawler:
         if not goods_id:
             return
 
+        raw = self.shein_data_from_mobile(
+            goods_id, url) or self.shein_data_from_web(goods_id, url)
+
+        if not isinstance(raw, dict):
+            return
+
+        data = self.load_raw_data(raw, 'shein')
+        data['cost'] = min(data.get('retail_price', 0), data.get('sale_price', 0))
+
+        if currency := get_dict_key(raw, 'detail__retailPrice__amountWithSymbol'):  # type: str
+            amt = get_dict_key(raw, 'detail__retailPrice__amount')  # type: str
+            data['cost_currency'] = currency.replace(amt, '')
+
+        data['attrs'] = [
+            {
+                'name': attr.get('attr_name', attr.get('attr_name_en')),
+                'value': attr.get('attr_value', attr.get('attr_value_en')),
+            } for attr in raw.get('detail', {}).get('productDetails', [])
+        ]
+        data['imgs'] = [
+            clean_img_url(img.get('origin_image'))
+            for img in raw.get('goods_imgs').get('detail_image', [])
+        ]
+        if (cover := data.get('cover')) and isinstance(cover, str):
+            data['cover'] = clean_img_url(cover)
+
+        return data
+
+    def shein_data_from_mobile(self, goods_id: str, url: str):
+        api_url = f'https://m.shein.com/fr/product-xhr-{goods_id}.html?currency=USD&fromSpa=1&withI18n=0&_ver=1.1.8&_lang=fr'
+        r = self.get(api_url)
+        if r.status_code != 200:
+            print('Request failed with status code', r.status_code, '\n', url, '\n')
+            return
+
+        try:
+            return r.json()
+        except Exception:
+            pass
+
+    def shein_data_from_web(self, goods_id: str, url: str):
         api_url = f'https://us.shein.com/product-itemv2-{goods_id}.html?_lang=en&_ver=1.1.8'
         r = self.get(api_url)
         if r.status_code != 200:
@@ -139,30 +180,7 @@ class Crawler:
             return
 
         script = script[start.end():end.start()].strip()[:-1]
-        raw = json.loads(script)
-        data = self.load_raw_data(raw, 'shein')
-        data['cost'] = min(data.get('retail_price', 0), data.get('sale_price', 0))
-
-        if currency := get_dict_key(raw, 'detail__retailPrice__amountWithSymbol'):  # type: str
-            amt = get_dict_key(raw, 'detail__retailPrice__amount')  # type: str
-            data['cost_currency'] = currency.replace(amt, '')
-
-        data['attrs'] = [
-            {
-                'name': attr.get('attr_name_en', attr.get('attr_name')),
-                'value': attr.get('attr_value_en', attr.get('attr_value')),
-            } for attr in raw.get('detail', {}).get('productDetails', [])
-        ]
-        data['imgs'] = [
-            clean_img_url(img.get('origin_image'))
-            for img in raw.get('goods_imgs').get('detail_image', [])
-        ]
-        if (cover := data.get('cover')) and isinstance(cover, str):
-            data['cover'] = clean_img_url(cover)
-
-        # pprint(data, indent=4)
-
-        return data
+        return json.loads(script)
 
     def shein_goods_id_from_url(self, url: str):
         if (match := re.search(r'p-(\d+)', url)) and (groups := match.groups()):

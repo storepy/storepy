@@ -97,7 +97,7 @@ const ViewTabs = ({ tab, ...props }) => {
         </AdminView.Section>
       );
 
-    case "seo":
+    case "setting":
       return (
         <Form
           context={form}
@@ -142,6 +142,24 @@ const ViewTabs = ({ tab, ...props }) => {
             <div className="my-2">
               <Form.Submit value="Update" className="btn btn-primary-3" />
             </div>
+          </AdminView.Section>
+
+          <AdminView.Section>
+            <Button
+              className="btn-danger"
+              onClick={() => {
+                return productServices
+                  .delete(prodSlug || product.slug)
+                  .then((data) => {
+                    return props?.onDelete();
+                  })
+                  .catch((err) => {
+                    toast?.error({ message: "Something went wrong" });
+                  });
+              }}
+            >
+              Delete product
+            </Button>
           </AdminView.Section>
         </Form>
       );
@@ -442,12 +460,20 @@ export default function ProductUpdateView(props) {
             >
               Images
             </Button>
-            <Button onClick={() => setTab("seo")} className={getClassName([tab === "seo" && "btn-primary-3"])}>
+            <Button onClick={() => setTab("setting")} className={getClassName([tab === "setting" && "btn-primary-3"])}>
               Settings
             </Button>
           </div>
         </div>
-        <ViewTabs tab={tab} prodSlug={prodSlug} product={product} setProduct={setProduct} form={form} toast={toast} />
+        <ViewTabs
+          tab={tab}
+          prodSlug={prodSlug}
+          product={product}
+          setProduct={setProduct}
+          form={form}
+          toast={toast}
+          onDelete={() => props?.history?.push(props.back)}
+        />
       </div>
     </AdminView>
   );

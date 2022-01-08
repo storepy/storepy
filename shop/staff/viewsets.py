@@ -80,12 +80,11 @@ class StaffProductViewset(Mixin, viewsets.ModelViewSet):
         goods_id = p_data.get('id')
         if qs.filter(supplier_item_id=goods_id).exists():
             product = Product.objects.get(supplier_item_id=goods_id)
-            # product.name = p_name
-            # product.save()
         else:
             page = self.create_page(p_name, p_name)
             product = Product.objects.create(
-                page=page, name=p_name, supplier_item_id=goods_id)
+                page=page, name=p_name, supplier_item_id=goods_id,
+                retail_price=float(p_data.get('cost')) * (5 / 2) * 1000)
 
         product.description = p_data.get('description', '')
         product.supplier_name = p_data.get('brand', 'shein')
