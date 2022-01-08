@@ -216,6 +216,11 @@ class StaffProductViewset(Mixin, viewsets.ModelViewSet):
                 qs = qs.draft()
         return qs
 
+    def list(self, request, *args, **kwargs):
+        r = super().list(request, *args, **kwargs)
+        r.data['categories'] = self.get_category_options()
+        return r
+
     def retrieve(self, *args, **kwargs):
         r = super().retrieve(*args, **kwargs)
         r.data['categories'] = self.get_category_options()

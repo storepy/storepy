@@ -23,6 +23,12 @@ class ProductQueryset(models.QuerySet):
         ).filter(values__icontains=value.lower())\
             .order_by('name').distinct('name')
 
+    def by_price(self, amount: int):
+        return self.filter(
+            models.Q(retail_price__lte=amount)
+            | models.Q(sale_price__lte=amount)
+        ).distinct()
+
     def is_new(self, *, days: int = 30):
         if not isinstance(days, int):
             days = 30

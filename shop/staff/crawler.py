@@ -43,6 +43,15 @@ class Crawler:
         "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36"
     }
 
+# ZARA
+
+    def zara_url_to_data(self, url: str):
+        # https://www.zara.com/us/en/product/111677272/extra-detail?ajax=true
+        # jsonld
+        return
+
+# FNOVA
+
     def fnova_url_to_data(self, url: str) -> dict:
         r = self.get(f'{url}?view=pdp-json')
         raw = r.json().get('products', [])[0]

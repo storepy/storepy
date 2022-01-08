@@ -105,6 +105,9 @@ class ProductsView(ListViewMixin, ListView):
         if (q := self.request.GET.get('q')) and q != '':
             qs = qs.by_name(q)
 
+        if (price := self.request.GET.get('price')) and price in ['5000', '10000', '25000', '50000']:
+            qs = qs.by_price(price)
+
         return qs
 
 
