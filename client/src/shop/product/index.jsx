@@ -6,7 +6,7 @@ import "./index.scss";
 import { SharedDataCtx } from "@miq/contexts";
 import { AdminRoute, AdminNavLink, AdminView, hasPerms, PublishedStatusSpan } from "@miq/adminjs";
 import { addForwardSlash } from "@miq/utils";
-import { Table, ItemTable, ImgSquare } from "@miq/components";
+import { Table, ItemTable, ImgSquare, Loading, Button } from "@miq/components";
 
 import { productServices } from "./utils";
 
@@ -14,11 +14,14 @@ const StaffProductAddView = lazy(() => import("./AddView"));
 const StaffProductUpdateView = lazy(() => import("./UpdateView"));
 
 const StaffProductIndexView = (props) => {
-  const [data, setData] = useState({});
+  const [data, setData] = useState({ count: 0 });
+  const [status, setStatus] = useState("pending");
+  const [filter, setFilter] = useState(true);
   const { perms } = useContext(SharedDataCtx);
 
   const { search } = props.location;
   useEffect(() => {
+    // setStatus("pending");
     let params = new URLSearchParams(search);
     if (![...params.values()].filter((i) => i).length) {
       params = null;
@@ -28,15 +31,30 @@ const StaffProductIndexView = (props) => {
       .list(params)
       .then((data) => {
         setData(data);
+        setStatus("success");
       })
-      .catch((err) => {});
+      .catch((err) => {
+        setStatus("failed");
+      });
   }, [search]);
 
   const canAdd = hasPerms(perms.perms, ["shop.add_product"]);
 
+  if (status === "pending") return <Loading />;
+  if (status === "failed") return <div>Something went wrong. Please reload the page!</div>;
+
+  const query = new URLSearchParams(search);
+
+  console.log(data.categories);
+
+  const pushQuery = () => {
+    const path = new URL(window.location.href);
+    props.history.push(`${path.pathname}?${query}`);
+  };
+
   return (
     <AdminView
-      title="Products"
+      title={`Products (${data.count})`}
       back={props.back}
       actions={
         <AdminNavLink
@@ -47,6 +65,54 @@ const StaffProductIndexView = (props) => {
         />
       }
     >
+      <AdminView.Section actions={<Button onClick={() => setFilter(!filter)}>Filter</Button>}>
+        {filter && (
+          <form action="." method="GET">
+            <div className="d-flex p-2">
+              <input
+                type={"checkbox"}
+                className="miq-checkbox"
+                id="published"
+                className="me-2"
+                onChange={({ target }) => {
+                  const { checked } = target;
+                  if (!checked) {
+                    query.delete("status");
+                  } else {
+                    query.set("status", "published");
+                  }
+                  // query.set("published", !value);
+                  pushQuery();
+                }}
+                checked={Boolean(query.get("status")) || false}
+              />
+              <label htmlFor="published">Published</label>
+            </div>
+
+            <select
+              className="miq-select ms-1"
+              value={query.get("cat") || "all"}
+              onChange={(e) => {
+                const { value } = e.target;
+                if (!value || value === "all") {
+                  query.delete("cat");
+                } else {
+                  query.set("cat", value);
+                }
+                pushQuery();
+              }}
+            >
+              <option value="all">All categories</option>
+              {data?.categories?.items?.map((cat) => (
+                <option value={cat.value} key={cat.slug}>
+                  {cat.label}
+                </option>
+              ))}
+            </select>
+          </form>
+        )}
+      </AdminView.Section>
+
       {data?.results && (
         <AdminView.Section className="product-table mb-3">
           <ItemTable
@@ -91,8 +157,28 @@ const StaffProductIndexView = (props) => {
               count: data.count,
               next: data.next,
               previous: data.previous,
-              // onPreviousClick: handlePreviousClick,
-              // onNextClick: handleNextClick,
+              onPreviousClick: () => {
+                if (!data || !data.previous) return;
+                setStatus("pending");
+                return productServices
+                  .get(data.previous)
+                  .then((newData) => {
+                    setData(newData);
+                    return setStatus("succcess");
+                  })
+                  .catch((err) => setStatus("failed"));
+              },
+              onNextClick: () => {
+                if (!data || !data.next) return;
+                setStatus("pending");
+                return productServices
+                  .get(data.next)
+                  .then((newData) => {
+                    setData(newData);
+                    return setStatus("succcess");
+                  })
+                  .catch((err) => setStatus("failed"));
+              },
             }}
           />
         </AdminView.Section>

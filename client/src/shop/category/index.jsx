@@ -59,7 +59,7 @@ const StaffCategoryIndexView = (props) => {
 
   return (
     <AdminView
-      title="Categories"
+      title={`Categories (${data.count})`}
       back={props.back}
       actions={
         <Button
