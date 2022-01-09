@@ -106,6 +106,16 @@ export default function StaffProductAddView(props) {
 
           <div className="span-md-1">
             <SupplierData product={product} />
+
+            <div className="my-3">
+              <a
+                href={props.location.pathname.replace("new", product.slug)}
+                target="_blank"
+                className="btn btn-primary"
+              >
+                Go to update page
+              </a>
+            </div>
           </div>
         </div>
       )}
