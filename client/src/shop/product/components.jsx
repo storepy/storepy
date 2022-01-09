@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 
 import Form, { useForm, FormProvider } from "@miq/form";
@@ -25,6 +25,12 @@ export const ProductCategoryInput = ({ onSuccess, onError, ...props }) => {
 export const ProductNameInput = ({ onSuccess, onError, ...props }) => {
   const { product, placeholder = "Give a name to the item", form, ...rest } = props;
 
+  const productSlug = product?.slug;
+
+  // useEffect(() => {
+  //   return () => {};
+  // }, [productSlug]);
+
   if (!form) return null;
 
   return (
@@ -35,10 +41,10 @@ export const ProductNameInput = ({ onSuccess, onError, ...props }) => {
         required
         name="name"
         onSave={({ value }) => {
-          if (!value || !product || !product.slug) return;
+          if (!value || !product || !productSlug) return;
 
           return productServices
-            .patch(product.slug, { name: value }, { name: product.name })
+            .patch(productSlug, { name: value }, { name: product.name })
             .then((data) => {
               if (onSuccess) return onSuccess(data);
             })
@@ -89,6 +95,14 @@ export const ProductImageUploadButton = ({ product, ...props }) => {
 
 export const ProductImageAltTextInput = ({ image, ...props }) => {
   const form = useForm({ alt_text: image?.alt_text || "" });
+
+  const imgSlug = image?.slug;
+  const alt_text = image?.alt_text;
+  const setValues = form.setValues;
+
+  useEffect(() => {
+    setValues({ alt_text });
+  }, [imgSlug, setValues, alt_text]);
 
   if (!image || !image.slug) return null;
 

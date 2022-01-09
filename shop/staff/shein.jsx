@@ -1831,6 +1831,9 @@ const clothing = {
       },
     ],
   },
+
+  // """"""
+
   attrSizeList: {
     sale_attr_list: {
       4988627: {
@@ -1979,6 +1982,9 @@ const clothing = {
     },
     attrSize: [],
   },
+
+  // """"""
+
   afterPayInfo: {},
 };
 

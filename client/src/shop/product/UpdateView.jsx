@@ -14,6 +14,8 @@ const ViewTabs = ({ tab, ...props }) => {
   const { prodSlug, product, setProduct, form, toast } = props;
   const [addAtr, setAddAtr] = useState(false);
 
+  if (!product.slug) return null;
+
   switch (tab) {
     case "inventory":
       return (
@@ -57,6 +59,7 @@ const ViewTabs = ({ tab, ...props }) => {
           </div>
         </div>
       );
+
     case "imgs":
       return (
         <AdminView.Section
@@ -166,8 +169,8 @@ const ViewTabs = ({ tab, ...props }) => {
 
     default:
       return (
-        <div>
-          <AdminView.Section title="Description">
+        <div className="d-grid grid-md-3 gap-3">
+          <AdminView.Section title="Description" className="span-md-2">
             <ProductUpdateForm form={form}>
               <Form.TextAreaX
                 name="description"
@@ -189,9 +192,17 @@ const ViewTabs = ({ tab, ...props }) => {
             </ProductUpdateForm>
           </AdminView.Section>
 
-          <div className="">
+          <AdminView.Section
+            title="Status"
+            text={
+              product.page.is_published
+                ? "This item is published."
+                : "This item is not published. It does not show in your store."
+            }
+            className=""
+          >
             <ProductPublishButton product={product} setProduct={setProduct} toast={toast} />
-          </div>
+          </AdminView.Section>
         </div>
       );
   }
@@ -212,6 +223,9 @@ export const productFormDefaultValues = {
 
 export const ProductQuickUpdateForm = ({ form, product, ...props }) => {
   const { setProduct, toast, categories } = props;
+  const productSlug = product?.slug;
+
+  useEffect(() => {}, [productSlug]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -242,8 +256,8 @@ export const ProductQuickUpdateForm = ({ form, product, ...props }) => {
 
   return (
     <Form context={form} onSubmit={handleSubmit}>
-      <div className="d-flex flex-column-reverse flex-md-row mb-2">
-        <div className="flex-1">
+      <div className="d-grid grid-md-3 gap-3">
+        <div className="span-md-2">
           <AdminView.Section
             title="Details"
             actions={<PublishedStatusSpan is_published={product?.page?.is_published} pill />}
@@ -335,7 +349,7 @@ export const ProductQuickUpdateForm = ({ form, product, ...props }) => {
           </AdminView.Section>
         </div>
 
-        <div className=" ms-md-2 mb-2 w-md-35 w-lg-25">
+        <div className="">
           <StaffCoverUpdateForm
             slug={product?.cover}
             data={product.cover_data}
@@ -410,7 +424,7 @@ export default function ProductUpdateView(props) {
 
   if (!product) return null;
 
-  console.log(product);
+  // console.log(product);
 
   return (
     <AdminView
@@ -418,14 +432,14 @@ export default function ProductUpdateView(props) {
       actions={
         <div>
           {product?.prev_slug && (
-            <Link to={`${props?.back}${product?.prev_slug}`} className="btn me-1" title="Voir le produit précédent">
+            <a href={`${props?.back}${product?.prev_slug}/`} className="btn me-1" title="Voir le produit précédent">
               Previous
-            </Link>
+            </a>
           )}
           {product?.next_slug && (
-            <Link to={`${props?.back}${product?.next_slug}`} className="btn" title="Voir le produit suivant">
+            <a href={`${props?.back}${product?.next_slug}/`} className="btn" title="Voir le produit suivant">
               Next
-            </Link>
+            </a>
           )}
         </div>
       }
@@ -479,36 +493,57 @@ export default function ProductUpdateView(props) {
   );
 }
 
-export const ProductPublishButton = ({ product, setProduct, toast }) => {
-  return (
-    <Button
-      onClick={() => {
-        productServices
-          .publish(product.slug)
-          .then((data) => {
-            setProduct?.({ ...product, ...data });
-          })
-          .catch(({ response = {} }) => {
-            if (!response.data) {
-              return toast?.error({ message: "Something went awfully wrong!" });
-            }
-            const { retail_price, category, page } = response.data;
+const ERRMSG = {
+  retail_price: "You can not publish a product without price",
+  category: "You can not publish a product without category",
+  page: "You can not publish a product without page",
+  default: "Something went awfully wrong!",
+};
 
-            if (retail_price) {
-              return toast?.error({ message: "You can not publish a product without price" });
-            }
-            if (category) {
-              return toast?.error({ message: "You can not publish a product without category" });
-            }
-            if (page) {
-              return toast?.error({ message: "You can not publish a product without page" });
-            }
-            // console.log(response.data);
-          });
-      }}
-      className="btn-primary"
-    >
-      Publish product
+export const ProductPublishButton = ({ product, setProduct, toast }) => {
+  if (!product?.page) return null;
+
+  const { is_published } = product.page;
+
+  const handlePublish = () => {
+    if (is_published)
+      return productServices
+        .unpublish(product.slug)
+        .then((data) => {
+          setProduct({ ...product, ...data });
+          return toast?.success({ message: "Item unpublished" });
+        })
+        .catch((err) => {
+          return toast?.error({ message: ERRMSG.default });
+        });
+
+    return productServices
+      .publish(product.slug)
+      .then((data) => {
+        setProduct?.({ ...product, ...data });
+        return toast?.success({ message: "Item published" });
+      })
+      .catch(({ response = {} }) => {
+        if (!response.data) {
+          return toast?.error({ message: ERRMSG.default });
+        }
+        const { retail_price, category, page } = response.data;
+
+        if (retail_price) {
+          return toast?.error({ message: ERRMSG.retail_price });
+        }
+        if (category) {
+          return toast?.error({ message: ERRMSG.category });
+        }
+        if (page) {
+          return toast?.error({ message: ERRMSG.page });
+        }
+        // console.log(response.data);
+      });
+  };
+  return (
+    <Button onClick={handlePublish} className={is_published ? "btn-danger" : "btn-primary"}>
+      {is_published ? "Unpublish" : "Publish"} product
     </Button>
   );
 };

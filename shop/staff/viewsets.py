@@ -52,15 +52,7 @@ class Paginator(PageNumberPagination):
     page_size = 11
 
 
-class StaffProductViewset(Mixin, viewsets.ModelViewSet):
-    lookup_field = 'slug'  # type: str
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    parser_classes = (JSONParser, )
-    permission_classes = (IsAdminUser, DjangoModelPermissions)
-    page_serializer = ProductPageSerializer
-    pagination_class = Paginator
-    #
+class ProductSupplierMixin(Mixin):
     crawler = Crawler()
 
     @action(methods=['post'], detail=False, url_path=r'shein')
@@ -142,9 +134,26 @@ class StaffProductViewset(Mixin, viewsets.ModelViewSet):
 
         return Response(data=data)
 
+
+class StaffProductViewset(ProductSupplierMixin, viewsets.ModelViewSet):
+    lookup_field = 'slug'  # type: str
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    parser_classes = (JSONParser, )
+    permission_classes = (IsAdminUser, DjangoModelPermissions)
+    page_serializer = ProductPageSerializer
+    pagination_class = Paginator
+    #
+
     @action(methods=['patch'], detail=True, url_path=r'publish')
     def publish(self, request, *args, **kwargs):
         obj = self.get_object()
+        page = obj.page
+
+        if page and (unpublish := self.request.data.get('unpublish', False)) and unpublish is True:
+            page.is_published = False
+            page.save()
+            return self.retrieve(self, request, *args, **kwargs)
 
         if not obj.retail_price:
             raise serializers.ValidationError(
@@ -157,7 +166,6 @@ class StaffProductViewset(Mixin, viewsets.ModelViewSet):
         if not category.page.is_published:
             raise serializers.ValidationError({'category': _('Unpublished')})
 
-        page = obj.page
         if not page:
             raise serializers.ValidationError({'page': _('Page required')})
 

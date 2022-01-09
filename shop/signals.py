@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.dispatch import receiver
 from django.db.models import signals
 
@@ -32,6 +33,8 @@ def on_product_will_save(sender, instance, **kwargs):
                     instance.cover.alt_text = instance.name
                     instance.cover.save()
 
-
-#     if not Setting.objects.filter(site=instance).exists():
-#         Setting.objects.create(site=instance)
+                if (imgs := instance.images) and imgs.exists():
+                    with transaction.atomic():
+                        for img in imgs.all().select_for_update():
+                            img.alt_text = f'{instance.name} {img.position}'
+                            img.save()

@@ -62,7 +62,8 @@ export default function ProductPreSaleForm(props) {
               <Form.TextInput
                 required
                 name="number"
-                value={form.values.numer}
+                type="tel"
+                value={form.values.number}
                 onChange={handleNumberChange}
                 error={form.errors.number}
                 // minLength={8}

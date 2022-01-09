@@ -76,6 +76,7 @@ class ProductsView(ListViewMixin, ListView):
     template_name = 'shop/products.django.html'
     context_object_name = 'products'
     paginate_by = 16
+    page_label = None
 
     # TODO
     queryset = Product.objects.published()
@@ -88,6 +89,9 @@ class ProductsView(ListViewMixin, ListView):
             breadcrumbs.append({'label': 'Catalogue', 'path': '/shop/'},)
 
         data = self.object_list_pagination_to_dict(context)
+        if self.page_label:
+            data['page_label'] = self.page_label
+
         data.update({
             'breadcrumbs': breadcrumbs,
             'categories': [category_to_dict(cat) for cat in get_published_categories()]
@@ -101,6 +105,7 @@ class ProductsView(ListViewMixin, ListView):
         params = self.request.GET
         if (sale := params.get('sale')) and sale == 'all':
             qs = qs.is_on_sale()
+            self.page_label = 'Soldes'
 
         if (q := self.request.GET.get('q')) and q != '':
             qs = qs.by_name(q)

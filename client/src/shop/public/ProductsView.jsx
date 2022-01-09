@@ -43,21 +43,28 @@ export default function ProductsPublicView(props) {
           </div>
         </div>
 
-        <BreadCrumbs />
+        <div className="mb-2">
+          <BreadCrumbs />
+        </div>
 
-        <section className="my-2">{page_label && <h1 aria-label={page_label}>{page_label}</h1>}</section>
+        {!q && <CategoryLinks showCover />}
+
+        {page_label && (
+          <section className="my-2">
+            <h1 aria-label={page_label}>{page_label}</h1>
+          </section>
+        )}
       </header>
-
-      {!q && <CategoryLinks showCover />}
 
       <div className="my-3">
         {/* <div className="sort-bar">Trier par</div> */}
         <ProductsGrid items={object_list} match={props.match} />
       </div>
 
-      <div className="my-3">
-        <Pagination.PreviousAnchor pagination={pagination} className="btn me-2" />
-        <Pagination.NextAnchor pagination={pagination} label="next" className="btn" />
+      <div className="miq-container center d-flex">
+        <div className="mx-auto">
+          <Pagination.Links pagination={pagination} />
+        </div>
       </div>
     </div>
   );

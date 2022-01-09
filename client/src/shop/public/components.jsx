@@ -4,7 +4,8 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { SharedDataCtx } from "@miq/contexts";
 // import Form, { useForm } from "@miq/form";
 import { Img, Picture, SearchTextInput } from "@miq/components";
-import { IS_DEV, debounce } from "@miq/utils";
+import { IS_DEV } from "@miq/utils";
+import debounce from "lodash.debounce";
 
 export const ProductPriceDisplay = ({ product }) => {
   if (!product || !product.retail_price) return null;

@@ -5,6 +5,10 @@ class StaffProductService extends StaffService {
     return this.patchPath(`${this.path}${prodSlug}/publish/`, {});
   }
 
+  unpublish(prodSlug) {
+    return this.patchPath(`${this.path}${prodSlug}/publish/`, { unpublish: true });
+  }
+
   getSheinProductData(values) {
     return this.postPath(`${this.path}shein/`, values, { timeout: 10000 });
   }
