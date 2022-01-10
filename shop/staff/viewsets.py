@@ -1,3 +1,4 @@
+from django.utils.text import slugify
 from pprint import pprint
 from django import http
 from django.utils import timezone
@@ -27,10 +28,6 @@ from shop.staff.serializers import (
     CategorySerializer, CategoryPageSerializer,
 )
 
-# from .shein import (
-#     shein_product_id_from_url,
-#     get_shein_product_data, shein_data_to_product_dict
-# )
 
 from .crawler import Crawler
 
@@ -46,6 +43,12 @@ class Mixin(StaffLoginRequired):
         ser.is_valid(raise_exception=True)
         ser.save()
         return self.retrieve(self, request, *args, **kwargs)
+
+    def create_page(self, label, title):
+        page_ser = self.page_serializer(
+            data={'label': label, 'title': title, 'slug_public': slugify(title)})
+        page_ser.is_valid(raise_exception=True)
+        return page_ser.save()
 
 
 class Paginator(PageNumberPagination):
@@ -74,9 +77,13 @@ class ProductSupplierMixin(Mixin):
             product = Product.objects.get(supplier_item_id=goods_id)
         else:
             page = self.create_page(p_name, p_name)
+            # retail_price=float(p_data.get('cost')) * (5 / 4) * 1000
+            retail_price = int(float(p_data.get('cost')) * 2 * 1000)
+
             product = Product.objects.create(
                 page=page, name=p_name, supplier_item_id=goods_id,
-                retail_price=float(p_data.get('cost')) * (5 / 4) * 1000)
+                retail_price=retail_price
+            )
 
         product.description = p_data.get('description', '')
         product.supplier_name = p_data.get('brand', 'shein')
@@ -237,11 +244,6 @@ class StaffProductViewset(ProductSupplierMixin, viewsets.ModelViewSet):
         name = self.request.data.get('name')
         ser.save(page=self.create_page(name, name))
 
-    def create_page(self, label, title):
-        page_ser = self.page_serializer(data={'label': label, 'title': title, })
-        page_ser.is_valid(raise_exception=True)
-        return page_ser.save()
-
     def get_category_options(self) -> dict:
         cats = Category.objects.all()
         return {
@@ -271,10 +273,13 @@ class StaffCategoryViewset(Mixin, viewsets.ModelViewSet):
     page_serializer = CategoryPageSerializer
 
     def perform_create(self, ser):
-        page_ser = self.page_serializer(
-            data={
-                'label': self.request.data.get('name'), 'title': self.request.data.get('name'),
-            }
-        )
-        page_ser.is_valid(raise_exception=True)
-        ser.save(page=page_ser.save())
+        name = self.request.data.get('name')
+        ser.save(page=self.create_page(name, name))
+
+        # page_ser = self.page_serializer(
+        #     data={
+        #         'label': self.request.data.get('name'), 'title': self.request.data.get('name'),
+        #     }
+        # )
+        # page_ser.is_valid(raise_exception=True)
+        # ser.save(page=page_ser.save())
