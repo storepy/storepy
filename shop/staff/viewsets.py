@@ -1,5 +1,5 @@
 from django.utils.text import slugify
-from pprint import pprint
+# from pprint import pprint
 from django import http
 from django.utils import timezone
 from django.contrib.sites.shortcuts import get_current_site

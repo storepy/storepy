@@ -1,14 +1,14 @@
-import React, { useContext } from "react";
-import { SharedDataCtx } from "@miq/contexts";
+import React, { useContext } from 'react'
+import { SharedDataCtx } from '@miq/contexts'
 
-import "./detail-view.scss";
-import { IconButton, Icons } from "@miq/components";
-import { ProductDetailImages } from "./components";
+import './detail-view.scss'
+import { IconButton, Icons } from '@miq/components'
+import { ProductDetailImages } from './components'
 
 export default function ProductDetailView(props) {
-  const { product } = useContext(SharedDataCtx);
+  const { product } = useContext(SharedDataCtx)
 
-  if (!product) return null;
+  if (!product) return null
 
   return (
     <div>
@@ -26,5 +26,5 @@ export default function ProductDetailView(props) {
         </div>
       </div>
     </div>
-  );
+  )
 }

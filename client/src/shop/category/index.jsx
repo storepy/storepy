@@ -1,35 +1,35 @@
-import React, { lazy, useContext, useEffect, useState } from "react";
-import { Switch, Link } from "react-router-dom";
+import React, { lazy, useContext, useEffect, useState } from 'react'
+import { Switch, Link } from 'react-router-dom'
 
-import Form, { useForm } from "@miq/form";
-import { SharedDataCtx } from "@miq/contexts";
-import { AdminRoute, AdminView, hasPerms, PublishedStatusSpan } from "@miq/adminjs";
-import { Table, ItemTable, Button, ImgSquare } from "@miq/components";
-import { catServices } from "./utils";
-import { addForwardSlash } from "@miq/utils";
-import { CatNameInput } from "./components";
+import Form, { useForm } from '@miq/form'
+import { SharedDataCtx } from '@miq/contexts'
+import { AdminRoute, AdminView, hasPerms, PublishedStatusSpan } from '@miq/adminjs'
+import { Table, ItemTable, Button, ImgSquare } from '@miq/components'
+import { catServices } from './utils'
+import { addForwardSlash } from '@miq/utils'
+import { CatNameInput } from './components'
 
 // import "./category.scss";
 
-const StaffCategoryUpdateView = lazy(() => import("./UpdateView"));
+const StaffCategoryUpdateView = lazy(() => import('./UpdateView'))
 
 const CategoryCreateForm = (props) => {
-  const form = useForm({ name: "" });
+  const form = useForm({ name: '' })
 
   const handleSubmit = (e) => {
-    if (!props.canAdd) return;
+    if (!props.canAdd) return
 
-    e.preventDefault();
+    e.preventDefault()
 
-    catServices
+    return catServices
       .post(form.values)
-      .then((data) => {
-        props?.history?.push(`${addForwardSlash(props.match.url)}${data.slug}/`);
+      .then((data = { slug }) => {
+        return props.history.push(`${addForwardSlash(props.match?.url)}${data.slug}/`)
       })
       .catch((err) => {
-        form.handleError(err);
-      });
-  };
+        form.handleError(err)
+      })
+  }
   return (
     <Form context={form} onSubmit={handleSubmit}>
       <div className="">
@@ -38,24 +38,24 @@ const CategoryCreateForm = (props) => {
       </div>
 
       <div className="my-3">
-        <Form.Submit value={"Save category"} disabled={!props?.canAdd} className="btn btn-primary" />
+        <Form.Submit value={'Save category'} disabled={!props?.canAdd} className="btn btn-primary" />
       </div>
     </Form>
-  );
-};
+  )
+}
 
 const StaffCategoryIndexView = (props) => {
-  const [data, setData] = useState({});
-  const [isAdding, setAdding] = useState(false);
-  const { perms } = useContext(SharedDataCtx);
+  const [data, setData] = useState({})
+  const [isAdding, setAdding] = useState(false)
+  const { perms } = useContext(SharedDataCtx)
 
   useEffect(() => {
     catServices.list().then((data) => {
-      setData(data);
-    });
-  }, []);
+      setData(data)
+    })
+  }, [])
 
-  const canAdd = hasPerms(perms.perms, ["shop.add_category"]);
+  const canAdd = hasPerms(perms.perms, ['shop.add_category'])
 
   return (
     <AdminView
@@ -66,7 +66,7 @@ const StaffCategoryIndexView = (props) => {
           onClick={() => setAdding(!isAdding)}
           disabled={!canAdd}
           className="btn-primary-3"
-          title={canAdd ? "Add a new category" : "You cannot perform this action"}
+          title={canAdd ? 'Add a new category' : 'You cannot perform this action'}
         >
           Add category
         </Button>
@@ -107,7 +107,7 @@ const StaffCategoryIndexView = (props) => {
                     <PublishedStatusSpan is_published={cat?.page?.is_published} pill />
                   </Table.Td>
                 </Table.Tr>
-              );
+              )
             }}
             pagination={{
               count: data.count,
@@ -120,23 +120,23 @@ const StaffCategoryIndexView = (props) => {
         </AdminView.Section>
       )}
     </AdminView>
-  );
-};
+  )
+}
 
 export default function StaffCategoryRoutes(props) {
-  const { path, url } = props.match;
+  const { path, url } = props.match
 
   return (
     <Switch>
       <AdminRoute
         path={`${path}:catSlug/`}
         render={(args) => <StaffCategoryUpdateView {...args} back={addForwardSlash(url)} />}
-        requiredPerms={["shop.change_category"]}
+        requiredPerms={['shop.change_category']}
       />
       <AdminRoute
-        requiredPerms={["shop.view_category"]}
+        requiredPerms={['shop.view_category']}
         render={(args) => <StaffCategoryIndexView {...args} back={props.back} />}
       />
     </Switch>
-  );
+  )
 }

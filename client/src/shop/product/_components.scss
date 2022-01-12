@@ -6,7 +6,7 @@
       &:first-child {
         font-weight: 700;
         &::after {
-          content: ":";
+          content: ':';
           margin-right: 8px;
         }
       }

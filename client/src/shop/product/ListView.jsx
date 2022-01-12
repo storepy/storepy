@@ -1,32 +1,32 @@
-import React from "react";
+import React from 'react'
 
-import { useCallback, useContext, useEffect, useState } from "react";
-import { addForwardSlash } from "@miq/utils";
+import { useCallback, useContext, useEffect, useState } from 'react'
+import { addForwardSlash } from '@miq/utils'
 
 // import { SharedDataCtx } from "@miq/contexts";
-import { useForm } from "@miq/form";
-import { AdminView } from "@miq/adminjs";
-import { Button, ToastCtx, ImgSquare, Img } from "@miq/components";
-import { ProductCoverUploadButton, ProductUpdateForm } from "./components";
-import { productServices } from "./utils";
+import { useForm } from '@miq/form'
+import { AdminView } from '@miq/adminjs'
+import { Button, ToastCtx, ImgSquare, Img } from '@miq/components'
+import { ProductCoverUploadButton, ProductUpdateForm } from './components'
+import { productServices } from './utils'
 
 const ProductTabDisplay = (props) => {
-  const { product, form, tab, onProductUpdate } = props;
+  const { product, form, tab, onProductUpdate } = props
 
   switch (tab) {
-    case "price":
-      return <AdminView.Section title={form.values.name} text="Upload your item's price"></AdminView.Section>;
+    case 'price':
+      return <AdminView.Section title={form.values.name} text="Upload your item's price"></AdminView.Section>
 
-    case "imgs":
-      const { cover_data, cover } = product;
-      return <AdminView.Section title={form.values.name} className="product-item-images"></AdminView.Section>;
+    case 'imgs':
+      const { cover_data, cover } = product
+      return <AdminView.Section title={form.values.name} className="product-item-images"></AdminView.Section>
 
-    case "desc":
+    case 'desc':
       return (
         <AdminView.Section title={form.values.name} text="Update your item's description">
           {product.description}
         </AdminView.Section>
-      );
+      )
 
     default:
       return (
@@ -36,11 +36,11 @@ const ProductTabDisplay = (props) => {
               <ProductCoverUploadButton
                 product={product}
                 onCreateSuccess={(data) => {
-                  onProductUpdate(data);
+                  onProductUpdate(data)
                 }}
                 onCreateError={() => {}}
                 onUpdateSuccess={(imgData) => {
-                  onProductUpdate({ ...product, cover: imgData.slug, cover_data: imgData });
+                  onProductUpdate({ ...product, cover: imgData.slug, cover_data: imgData })
                 }}
                 onUpdateError={() => {}}
               >
@@ -56,45 +56,45 @@ const ProductTabDisplay = (props) => {
                   // toast.success({ message: "Item updated." });
                 }}
                 onError={(err) => {
-                  form.handleError(err);
+                  form.handleError(err)
                   // toast.error({ message: "Could not update item." });
                 }}
               />
             </div>
           </div>
         </AdminView.Section>
-      );
+      )
   }
-};
+}
 
 const ProductItem = ({ product, ...props }) => {
-  const [tab, setTab] = useState("product");
+  const [tab, setTab] = useState('product')
   const form = useForm({
-    name: product.name || "",
-    description: product.description || "",
-    slug_public: product?.page.slug_public || "",
+    name: product.name || '',
+    description: product.description || '',
+    slug_public: product?.page.slug_public || '',
     is_published: product.page.is_published || false,
-    title: "",
-  });
+    title: '',
+  })
 
-  if (!product || !product.slug) return null;
+  if (!product || !product.slug) return null
 
   return (
     <div className="product-item border-1 rounded">
       <ProductUpdateForm form={form} product={product}>
         <div className="d-flex align-items-center justify-content-between p-1 border-bottom">
           <div className="product-item-nav">
-            <Button onClick={() => setTab("product")}>Info</Button>
-            <Button onClick={() => setTab("desc")}>Description</Button>
-            <Button onClick={() => setTab("price")}>Price</Button>
-            <Button onClick={() => setTab("imgs")}>Images</Button>
+            <Button onClick={() => setTab('product')}>Info</Button>
+            <Button onClick={() => setTab('desc')}>Description</Button>
+            <Button onClick={() => setTab('price')}>Price</Button>
+            <Button onClick={() => setTab('imgs')}>Images</Button>
           </div>
 
           <div className="">
             <AdminNavLink
               to={addForwardSlash(`${props?.match?.path}${product.slug}`)}
               label="Update"
-              requiredPerms={["shop.change_product"]}
+              requiredPerms={['shop.change_product']}
               className="btn-primary-3"
             />
           </div>
@@ -105,35 +105,35 @@ const ProductItem = ({ product, ...props }) => {
         </div>
       </ProductUpdateForm>
     </div>
-  );
-};
+  )
+}
 
 export default function ProductListView(props) {
-  const [data, setData] = useState({ results: [] });
-  const toasts = useContext(ToastCtx);
+  const [data, setData] = useState({ results: [] })
+  const toasts = useContext(ToastCtx)
 
-  const getProducts = useCallback((...params) => productServices.list(...params), []);
+  const getProducts = useCallback((...params) => productServices.list(...params), [])
   //   const push = useRef(debounce((url) => props.history.push(url), 300));
 
   useEffect(() => {
     getProducts(params)
       .then((data) => {
-        setData(data);
+        setData(data)
       })
       .catch((err) => {
-        toasts.error({ message: "Something went wrong" });
-      });
-  }, [getProducts, search, toasts]);
+        toasts.error({ message: 'Something went wrong' })
+      })
+  }, [getProducts, search, toasts])
 
   const handleProductUpdate = (prodData) => {
     setData({
       ...data,
       results: data.results.map((i) => {
-        if (i.slug === prodData.slug) return prodData;
-        return i;
+        if (i.slug === prodData.slug) return prodData
+        return i
       }),
-    });
-  };
+    })
+  }
 
   return (
     <AdminView back={props?.back} title="Products">
@@ -150,5 +150,5 @@ export default function ProductListView(props) {
         ))}
       </div>
     </AdminView>
-  );
+  )
 }

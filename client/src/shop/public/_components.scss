@@ -1,5 +1,5 @@
-@use "@miq/styles/src/variables" as *;
-@use "@miq/styles/src/mixins" as *;
+@use '@miq/styles/src/variables' as *;
+@use '@miq/styles/src/mixins' as *;
 
 .product-search-form {
   .icon-wrapper {
@@ -42,7 +42,7 @@
     }
 
     &::after {
-      content: " ";
+      content: ' ';
     }
   }
 }
@@ -52,14 +52,14 @@
     // margin-right: ;
 
     &::after {
-      content: ">";
+      content: '>';
       padding-right: 4px;
       padding-left: 4px;
     }
 
     &:last-child {
       &::after {
-        content: "";
+        content: '';
         padding: 0;
       }
     }

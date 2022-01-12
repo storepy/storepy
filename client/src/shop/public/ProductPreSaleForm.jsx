@@ -1,40 +1,59 @@
-import React, { useState } from "react";
-import Form, { useForm } from "@miq/form";
-import { IconButton, Icons } from "@miq/components";
+import React, { useState } from 'react'
+import Form, { useForm } from '@miq/form'
 
-//
-// <br />
-// (dans environ 2 mois).
+import { IconButton, Icons } from '@miq/components'
+import { Service, formatDate } from '@miq/utils'
+
+const cartService = new Service('/shop/cart/')
 
 const ERROR_MSG = {
-  name_length: "Veuillez entrer votre nom et prénom.",
-  number_length: "Nous ne pouvons pas vous contatcter sans votre numéro.",
-  number_digit: "",
-};
+  name_length: 'Veuillez entrer votre nom et prénom.',
+  number_length: 'Nous ne pouvons pas vous contatcter sans votre numéro.',
+  number_digit: '',
+}
 
 export default function ProductPreSaleForm(props) {
-  const form = useForm({ name: "", number: "", email: "", ig_handle: "" });
-  const [isOpen, setOpen] = useState(false);
+  const form = useForm({ name: 'michael', number: '97170307', email: '', ig_handle: '' })
+  const [isOpen, setOpen] = useState(true)
+
+  const { product, ctx } = props
+  if (!product || !product.slug) return null
+
+  const { cart, cart_id, lead_id } = ctx
+
+  console.log(cart, cart_id, lead_id)
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    const { name, number } = form.values;
-    if (!name || name.length < 4) return form.setErrors({ ...form.errors, name: ERROR_MSG.name_length });
+    e.preventDefault()
+    const { name, number } = form.values
+    if (!name || name.length < 4) return form.setErrors({ ...form.errors, name: ERROR_MSG.name_length })
 
-    if (!number || number.length > 8) return form.setErrors({ ...form.errors, number: ERROR_MSG.number_length });
+    if (!number || number.length > 8) return form.setErrors({ ...form.errors, number: ERROR_MSG.number_length })
 
-    if (form.hasErrors()) return;
+    if (form.hasErrors()) return
 
-    console.log(name, number);
-  };
+    return cartService
+      .post({ ...form.values, product: product.slug })
+      .catch((err) => {
+        console.log(err?.response)
+        form.handleError(err)
+      })
+      .then((data) => {
+        window.location.reload()
+        console.log(data)
+      })
+  }
 
   const handleNumberChange = (e) => {
-    const { valueAsNumber } = e.target;
-    form.setValue("number", valueAsNumber);
-  };
+    const { valueAsNumber } = e.target
+    form.setValue('number', valueAsNumber)
+  }
+
+  const { is_pre_sale_dt } = product || {}
 
   return (
     <div className="">
+      <p className="text-danger">Ce produit sera disponible le {formatDate(is_pre_sale_dt)}</p>
       <p className="mb-3">Voulez-vous être contacté dès que ce produit sera disponible?</p>
 
       {!isOpen && (
@@ -86,5 +105,5 @@ export default function ProductPreSaleForm(props) {
         </div>
       )}
     </div>
-  );
+  )
 }

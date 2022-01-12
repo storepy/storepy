@@ -1,56 +1,56 @@
-import { useContext, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { AdminView, StaffCoverUpdateForm, PublishedStatusSpan } from "@miq/adminjs";
-import Form, { useForm } from "@miq/form";
-import { ToastCtx } from "@miq/components";
+import { useContext, useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { AdminView, StaffCoverUpdateForm, PublishedStatusSpan } from '@miq/adminjs'
+import Form, { useForm } from '@miq/form'
+import { ToastCtx } from '@miq/components'
 
-import { catServices } from "./utils";
-import { CatNameInput } from "./components";
+import { catServices } from './utils'
+import { CatNameInput } from './components'
 
 export default function StaffCategoryUpdateView(props) {
-  const { catSlug } = props.match.params;
+  const { catSlug } = props.match.params
 
-  const [cat, setCat] = useState(null);
-  const toast = useContext(ToastCtx);
+  const [cat, setCat] = useState(null)
+  const toast = useContext(ToastCtx)
 
-  const form = useForm({ name: "", description: "", title: "", slug_public: "", is_published: false });
-  const { setValues } = form;
+  const form = useForm({ name: '', description: '', title: '', slug_public: '', is_published: false })
+  const { setValues } = form
 
   useEffect(() => {
     catServices
       .detail(catSlug)
       .then((data) => {
-        setCat(data);
+        setCat(data)
 
         setValues({
-          name: data.name || "",
-          description: data.description || "",
-          title: data.page.title || "",
-          slug_public: data?.page?.slug_public || "",
+          name: data.name || '',
+          description: data.description || '',
+          title: data.page.title || '',
+          slug_public: data?.page?.slug_public || '',
           is_published: data?.page?.is_published || false,
-        });
+        })
       })
       .catch((err) => {
         if (err.response) {
           // toast.error({ message: "Something went wrong" });
           if (err.response.status === 404) {
-            return;
+            return
           }
         }
-      });
-  }, [catSlug, setValues]);
+      })
+  }, [catSlug, setValues])
 
-  if (!cat) return null;
+  if (!cat) return null
 
   const handleUpdate = (e) => {
-    e.preventDefault();
+    e.preventDefault()
     catServices
       .patch(cat.slug, { name: form.values.name, description: form.values.description })
       .then((data) => {})
       .catch((err) => {
-        form.handleError(err);
-      });
-  };
+        form.handleError(err)
+      })
+  }
 
   return (
     <AdminView
@@ -81,17 +81,17 @@ export default function StaffCategoryUpdateView(props) {
               catServices
                 .patch(cat.slug, { cover: imgData.slug })
                 .then((data) => {
-                  setCat(data);
+                  setCat(data)
                 })
                 .catch((err) => {
-                  console.log(err);
-                });
+                  console.log(err)
+                })
             }}
             onUpdate={(cover_data) => {
-              return setCat({ ...cat, cover_data });
+              return setCat({ ...cat, cover_data })
             }}
             onDelete={() => {
-              return setCat({ ...cat, cover_data: null, cover: null });
+              return setCat({ ...cat, cover_data: null, cover: null })
             }}
           />
         </div>
@@ -111,7 +111,7 @@ export default function StaffCategoryUpdateView(props) {
               <Form.TextAreaX
                 name="description"
                 error={form.errors.description}
-                placeholder={"Decrivez la catégorie ..."}
+                placeholder={'Decrivez la catégorie ...'}
               />
             </div>
 
@@ -125,8 +125,8 @@ export default function StaffCategoryUpdateView(props) {
       <Form
         context={form}
         onSubmit={(e) => {
-          e.preventDefault();
-          const { title, slug_public, is_published } = form.values;
+          e.preventDefault()
+          const { title, slug_public, is_published } = form.values
           return catServices
             .patchPage(
               catSlug,
@@ -135,12 +135,12 @@ export default function StaffCategoryUpdateView(props) {
             )
             .then((data) => {
               // setCat(data);
-              toast.success({ message: "Category updated." });
+              toast.success({ message: 'Category updated.' })
             })
             .catch((err) => {
-              form.handleError(err);
-              toast.error({ message: "Could not update item." });
-            });
+              form.handleError(err)
+              toast.error({ message: 'Could not update item.' })
+            })
         }}
       >
         <AdminView.Section title="Status">
@@ -167,7 +167,7 @@ export default function StaffCategoryUpdateView(props) {
               required
               name="slug_public"
               error={form.errors.slug_public}
-              placeholder={"Write slug ..."}
+              placeholder={'Write slug ...'}
               maxLength={99}
             />
           </div>
@@ -178,5 +178,5 @@ export default function StaffCategoryUpdateView(props) {
         </div>
       </Form>
     </AdminView>
-  );
+  )
 }

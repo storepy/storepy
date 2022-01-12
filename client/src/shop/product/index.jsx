@@ -1,56 +1,56 @@
-import React, { lazy, useState, useContext, useEffect } from "react";
-import { Switch, Link } from "react-router-dom";
+import React, { lazy, useState, useContext, useEffect } from 'react'
+import { Switch, Link } from 'react-router-dom'
 
-import "./index.scss";
+import './index.scss'
 
-import { SharedDataCtx } from "@miq/contexts";
-import { AdminRoute, AdminNavLink, AdminView, hasPerms, PublishedStatusSpan } from "@miq/adminjs";
-import { addForwardSlash } from "@miq/utils";
-import { Table, ItemTable, ImgSquare, Loading, Button } from "@miq/components";
+import { SharedDataCtx } from '@miq/contexts'
+import { AdminRoute, AdminNavLink, AdminView, hasPerms, PublishedStatusSpan } from '@miq/adminjs'
+import { addForwardSlash } from '@miq/utils'
+import { Table, ItemTable, ImgSquare, Loading, Button } from '@miq/components'
 
-import { productServices } from "./utils";
+import { productServices } from './utils'
 
-const StaffProductAddView = lazy(() => import("./AddView"));
-const StaffProductUpdateView = lazy(() => import("./UpdateView"));
+const StaffProductAddView = lazy(() => import('./AddView'))
+const StaffProductUpdateView = lazy(() => import('./UpdateView'))
 
 const StaffProductIndexView = (props) => {
-  const [data, setData] = useState({ count: 0 });
-  const [status, setStatus] = useState("pending");
-  const [filter, setFilter] = useState(true);
-  const { perms } = useContext(SharedDataCtx);
+  const [data, setData] = useState({ count: 0 })
+  const [status, setStatus] = useState('pending')
+  const [filter, setFilter] = useState(true)
+  const { perms } = useContext(SharedDataCtx)
 
-  const { search } = props.location;
+  const { search } = props.location
   useEffect(() => {
     // setStatus("pending");
-    let params = new URLSearchParams(search);
+    let params = new URLSearchParams(search)
     if (![...params.values()].filter((i) => i).length) {
-      params = null;
+      params = null
     }
 
     productServices
       .list(params)
       .then((data) => {
-        setData(data);
-        setStatus("success");
+        setData(data)
+        setStatus('success')
       })
       .catch((err) => {
-        setStatus("failed");
-      });
-  }, [search]);
+        setStatus('failed')
+      })
+  }, [search])
 
-  const canAdd = hasPerms(perms.perms, ["shop.add_product"]);
+  const canAdd = hasPerms(perms.perms, ['shop.add_product'])
 
-  if (status === "pending") return <Loading />;
-  if (status === "failed") return <div>Something went wrong. Please reload the page!</div>;
+  if (status === 'pending') return <Loading />
+  if (status === 'failed') return <div>Something went wrong. Please reload the page!</div>
 
-  const query = new URLSearchParams(search);
+  const query = new URLSearchParams(search)
 
-  console.log(data.categories);
+  console.log(data.categories)
 
   const pushQuery = () => {
-    const path = new URL(window.location.href);
-    props.history.push(`${path.pathname}?${query}`);
-  };
+    const path = new URL(window.location.href)
+    props.history.push(`${path.pathname}?${query}`)
+  }
 
   return (
     <AdminView
@@ -70,36 +70,36 @@ const StaffProductIndexView = (props) => {
           <form action="." method="GET">
             <div className="d-flex p-2">
               <input
-                type={"checkbox"}
+                type={'checkbox'}
                 className="miq-checkbox"
                 id="published"
                 className="me-2"
                 onChange={({ target }) => {
-                  const { checked } = target;
+                  const { checked } = target
                   if (!checked) {
-                    query.delete("status");
+                    query.delete('status')
                   } else {
-                    query.set("status", "published");
+                    query.set('status', 'published')
                   }
                   // query.set("published", !value);
-                  pushQuery();
+                  pushQuery()
                 }}
-                checked={Boolean(query.get("status")) || false}
+                checked={Boolean(query.get('status')) || false}
               />
               <label htmlFor="published">Published</label>
             </div>
 
             <select
               className="miq-select ms-1"
-              value={query.get("cat") || "all"}
+              value={query.get('cat') || 'all'}
               onChange={(e) => {
-                const { value } = e.target;
-                if (!value || value === "all") {
-                  query.delete("cat");
+                const { value } = e.target
+                if (!value || value === 'all') {
+                  query.delete('cat')
                 } else {
-                  query.set("cat", value);
+                  query.set('cat', value)
                 }
-                pushQuery();
+                pushQuery()
               }}
             >
               <option value="all">All categories</option>
@@ -151,61 +151,61 @@ const StaffProductIndexView = (props) => {
                     <PublishedStatusSpan is_published={prod?.page?.is_published} pill />
                   </Table.Td>
                 </Table.Tr>
-              );
+              )
             }}
             pagination={{
               count: data.count,
               next: data.next,
               previous: data.previous,
               onPreviousClick: () => {
-                if (!data || !data.previous) return;
-                setStatus("pending");
+                if (!data || !data.previous) return
+                setStatus('pending')
                 return productServices
                   .get(data.previous)
                   .then((newData) => {
-                    setData(newData);
-                    return setStatus("succcess");
+                    setData(newData)
+                    return setStatus('succcess')
                   })
-                  .catch((err) => setStatus("failed"));
+                  .catch((err) => setStatus('failed'))
               },
               onNextClick: () => {
-                if (!data || !data.next) return;
-                setStatus("pending");
+                if (!data || !data.next) return
+                setStatus('pending')
                 return productServices
                   .get(data.next)
                   .then((newData) => {
-                    setData(newData);
-                    return setStatus("succcess");
+                    setData(newData)
+                    return setStatus('succcess')
                   })
-                  .catch((err) => setStatus("failed"));
+                  .catch((err) => setStatus('failed'))
               },
             }}
           />
         </AdminView.Section>
       )}
     </AdminView>
-  );
-};
+  )
+}
 
 export default function StaffProductRoutes(props) {
-  const { path, url } = props.match;
+  const { path, url } = props.match
 
   return (
     <Switch>
       <AdminRoute
         path={`${path}new/`}
         render={(args) => <StaffProductAddView back={addForwardSlash(url)} {...args} />}
-        requiredPerms={["shop.add_product"]}
+        requiredPerms={['shop.add_product']}
       />
       <AdminRoute
         path={`${path}:prodSlug/`}
         render={(args) => <StaffProductUpdateView back={addForwardSlash(url)} {...args} />}
-        requiredPerms={["shop.change_product"]}
+        requiredPerms={['shop.change_product']}
       />
       <AdminRoute
-        requiredPerms={["shop.view_product"]}
+        requiredPerms={['shop.view_product']}
         render={(args) => <StaffProductIndexView {...args} back={props.back} />}
       />
     </Switch>
-  );
+  )
 }

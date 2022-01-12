@@ -1,37 +1,37 @@
-import React, { useEffect } from "react";
-import PropTypes from "prop-types";
+import React, { useEffect } from 'react'
+import PropTypes from 'prop-types'
 
-import Form, { useForm, FormProvider } from "@miq/form";
-import { ImageAltTextInput } from "@miq/adminjs";
-import { ImgUploadButton } from "@miq/components";
-import { productServices } from "./utils";
+import Form, { useForm, FormProvider } from '@miq/form'
+import { ImageAltTextInput } from '@miq/adminjs'
+import { ImgUploadButton } from '@miq/components'
+import { productServices } from './utils'
 
 //
 // ========================= FORM COMPONENTS ===================================================================
 //
 
 export const ProductCategoryInput = ({ onSuccess, onError, ...props }) => {
-  const { placeholder = "Give a name to the item", form } = props;
-  if (!form) return null;
+  const { placeholder = 'Give a name to the item', form } = props
+  if (!form) return null
 
   return (
     <>
       <Form.Label value="Name" className="mb-1" />
       <Form.TextInput {...props} name="name" error={form.errors.name} placeholder={placeholder} maxLength={99} />
     </>
-  );
-};
+  )
+}
 
 export const ProductNameInput = ({ onSuccess, onError, ...props }) => {
-  const { product, placeholder = "Give a name to the item", form, ...rest } = props;
+  const { product, placeholder = 'Give a name to the item', form, ...rest } = props
 
-  const productSlug = product?.slug;
+  const productSlug = product?.slug
 
   // useEffect(() => {
   //   return () => {};
   // }, [productSlug]);
 
-  if (!form) return null;
+  if (!form) return null
 
   return (
     <>
@@ -41,70 +41,70 @@ export const ProductNameInput = ({ onSuccess, onError, ...props }) => {
         required
         name="name"
         onSave={({ value }) => {
-          if (!value || !product || !productSlug) return;
+          if (!value || !product || !productSlug) return
 
           return productServices
             .patch(productSlug, { name: value }, { name: product.name })
             .then((data) => {
-              if (onSuccess) return onSuccess(data);
+              if (onSuccess) return onSuccess(data)
             })
             .catch((err) => {
-              if (onError) return onError(err);
-            });
+              if (onError) return onError(err)
+            })
         }}
         error={form.errors.name}
         placeholder={placeholder}
         maxLength={99}
       />
     </>
-  );
-};
+  )
+}
 
 export const ProductUpdateForm = ({ children, form, ...props }) => {
-  if (!form) return null;
+  if (!form) return null
   return (
     <Form {...props} context={form}>
       {children}
     </Form>
-  );
-};
+  )
+}
 
-ProductUpdateForm.NameInput = ProductNameInput;
+ProductUpdateForm.NameInput = ProductNameInput
 
 export const ProductImageUploadButton = ({ product, ...props }) => {
-  if (!product || !product.slug) return null;
+  if (!product || !product.slug) return null
 
   return (
     <ImgUploadButton
       multiple={true}
       className="btn-primary-3"
       onCreate={(imgsArray) => {
-        imgsArray = imgsArray.filter((img) => img && img.slug);
+        imgsArray = imgsArray.filter((img) => img && img.slug)
         return productServices
           .patch(product.slug, { images: [...product.images, ...imgsArray.map((img) => img.slug)] })
           .then((data) => {
-            if (props.onCreateSuccess) props.onCreateSuccess(data);
+            if (props.onCreateSuccess) props.onCreateSuccess(data)
           })
           .catch((err) => {
-            if (props.onCreateError) props.onCreateError(err);
-          });
+            if (props.onCreateError) props.onCreateError(err)
+          })
       }}
     />
-  );
-};
+  )
+}
 
 export const ProductImageAltTextInput = ({ image, ...props }) => {
-  const form = useForm({ alt_text: image?.alt_text || "" });
+  const form = useForm({ alt_text: image?.alt_text || '' })
 
-  const imgSlug = image?.slug;
-  const alt_text = image?.alt_text;
-  const setValues = form.setValues;
+  const imgSlug = image?.slug
+  const alt_text = image?.alt_text
+  const setValues = form.setValues
 
   useEffect(() => {
-    setValues({ alt_text });
-  }, [imgSlug, setValues, alt_text]);
+    setValues({ alt_text })
+  }, [imgSlug, setValues, alt_text])
 
-  if (!image || !image.slug) return null;
+  if (!image || !image.slug) return null
 
   return (
     <FormProvider value={form} className={props.className}>
@@ -116,8 +116,8 @@ export const ProductImageAltTextInput = ({ image, ...props }) => {
         placeholder="Add an alternative text ..."
       />
     </FormProvider>
-  );
-};
+  )
+}
 
 ProductImageAltTextInput.propTypes = {
   image: PropTypes.shape({
@@ -126,24 +126,24 @@ ProductImageAltTextInput.propTypes = {
 
   onUpdate: PropTypes.func,
   onError: PropTypes.func,
-};
+}
 
 export const ProductCoverUploadButton = ({ children, product, ...props }) => {
-  if (!product || !product.slug) return null;
+  if (!product || !product.slug) return null
 
   const handleCoverCreate = ({ slug }) => {
     productServices
       .patch(product.slug, { cover: slug })
       .then((data) => {
-        if (props.onCreateSuccess) props.onCreateSuccess(data);
+        if (props.onCreateSuccess) props.onCreateSuccess(data)
       })
       .catch((err) => {
-        if (props.onCreateError) props.onCreateError(err);
-      });
-  };
+        if (props.onCreateError) props.onCreateError(err)
+      })
+  }
   const handleCoverUpdate = (imgData) => {
-    if (props.onUpdateSuccess) props.onUpdateSuccess(imgData);
-  };
+    if (props.onUpdateSuccess) props.onUpdateSuccess(imgData)
+  }
 
   return (
     <ImgUploadButton
@@ -154,8 +154,8 @@ export const ProductCoverUploadButton = ({ children, product, ...props }) => {
     >
       {children}
     </ImgUploadButton>
-  );
-};
+  )
+}
 
 ProductCoverUploadButton.propTypes = {
   children: PropTypes.any.isRequired,
@@ -164,10 +164,10 @@ ProductCoverUploadButton.propTypes = {
   onCreateError: PropTypes.func,
   onUpdateSuccess: PropTypes.func,
   onUpdateError: PropTypes.func,
-};
+}
 
 export const SupplierData = ({ product, ...props }) => {
-  if (!product) return null;
+  if (!product) return null
 
   return (
     <div className="product-supplier-data">
@@ -198,5 +198,5 @@ export const SupplierData = ({ product, ...props }) => {
         </li>
       </ul>
     </div>
-  );
-};
+  )
+}

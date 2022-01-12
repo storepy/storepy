@@ -1,23 +1,22 @@
-import { useContext, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useContext, useEffect, useState } from 'react'
 
-import { AdminView, StaffCoverUpdateForm, PublishedStatusSpan } from "@miq/adminjs";
-import Form, { useForm } from "@miq/form";
-import { getClassName } from "@miq/utils";
-import { ToastCtx, Button, Img, ImgDeleteIconButton } from "@miq/components";
+import { AdminView, StaffCoverUpdateForm, PublishedStatusSpan } from '@miq/adminjs'
+import Form, { useForm } from '@miq/form'
+import { getClassName } from '@miq/utils'
+import { ToastCtx, Button, Img, ImgDeleteIconButton } from '@miq/components'
 
-import { productServices } from "./utils";
-import { ProductImageAltTextInput, ProductUpdateForm, ProductImageUploadButton, SupplierData } from "./components";
-import { AttributeCreateForm, AttributeUpdateForm } from "./Attribute";
+import { productServices } from './utils'
+import { ProductImageAltTextInput, ProductUpdateForm, ProductImageUploadButton, SupplierData } from './components'
+import { AttributeCreateForm, AttributeUpdateForm } from './Attribute'
 
 const ViewTabs = ({ tab, ...props }) => {
-  const { prodSlug, product, setProduct, form, toast } = props;
-  const [addAtr, setAddAtr] = useState(false);
+  const { prodSlug, product, setProduct, form, toast } = props
+  const [addAtr, setAddAtr] = useState(false)
 
-  if (!product.slug) return null;
+  if (!product.slug) return null
 
   switch (tab) {
-    case "inventory":
+    case 'inventory':
       return (
         <div className="d-flex flex-column flex-md-row">
           <div className="flex-1">
@@ -58,9 +57,9 @@ const ViewTabs = ({ tab, ...props }) => {
             <SupplierData product={product} />
           </div>
         </div>
-      );
+      )
 
-    case "imgs":
+    case 'imgs':
       return (
         <AdminView.Section
           title="Images"
@@ -69,7 +68,7 @@ const ViewTabs = ({ tab, ...props }) => {
             <ProductImageUploadButton
               product={product}
               onCreateSuccess={(data) => {
-                setProduct({ ...product, ...data });
+                setProduct({ ...product, ...data })
               }}
             />
           }
@@ -90,7 +89,7 @@ const ViewTabs = ({ tab, ...props }) => {
                         ...product,
                         images_data: product.images_data.filter((i) => i.slug !== img.slug),
                         images: product.images.filter((i) => i !== img.slug),
-                      });
+                      })
                     }}
                   />
                 </div>
@@ -98,26 +97,26 @@ const ViewTabs = ({ tab, ...props }) => {
             ))}
           </div>
         </AdminView.Section>
-      );
+      )
 
-    case "setting":
+    case 'setting':
       return (
         <Form
           context={form}
           onSubmit={(e) => {
-            e.preventDefault();
-            const fD = { title: form.values.title, slug_public: form.values.slug_public };
+            e.preventDefault()
+            const fD = { title: form.values.title, slug_public: form.values.slug_public }
 
             return productServices
               .patchPage(prodSlug, fD, { title: product?.page?.title, slug_public: product?.page?.slug_public })
               .then((data) => {
-                setProduct({ ...product, ...data });
-                toast.success({ message: "Product page updated." });
+                setProduct({ ...product, ...data })
+                toast.success({ message: 'Product page updated.' })
               })
               .catch((err) => {
-                form.handleError(err);
-                toast.error({ message: "Could not update." });
-              });
+                form.handleError(err)
+                toast.error({ message: 'Could not update.' })
+              })
           }}
         >
           <AdminView.Section title="Seo">
@@ -137,7 +136,7 @@ const ViewTabs = ({ tab, ...props }) => {
                 required
                 name="slug_public"
                 error={form.errors.slug_public}
-                placeholder={"Write slug ..."}
+                placeholder={'Write slug ...'}
                 maxLength={99}
               />
             </div>
@@ -154,18 +153,18 @@ const ViewTabs = ({ tab, ...props }) => {
                 return productServices
                   .delete(prodSlug || product.slug)
                   .then((data) => {
-                    return props?.onDelete();
+                    return props?.onDelete()
                   })
                   .catch((err) => {
-                    toast?.error({ message: "Something went wrong" });
-                  });
+                    toast?.error({ message: 'Something went wrong' })
+                  })
               }}
             >
               Delete product
             </Button>
           </AdminView.Section>
         </Form>
-      );
+      )
 
     default:
       return (
@@ -178,12 +177,12 @@ const ViewTabs = ({ tab, ...props }) => {
                   productServices
                     .patch(product.slug, { [name]: value }, { [name]: product[name] })
                     .then((data) => {
-                      setProduct({ ...product, ...data });
-                      toast.success({ message: "Product updated." });
+                      setProduct({ ...product, ...data })
+                      toast.success({ message: 'Product updated.' })
                     })
                     .catch((err) => {
-                      form.handleError(err);
-                      toast.error({ message: "Could not update item." });
+                      form.handleError(err)
+                      toast.error({ message: 'Could not update item.' })
                     })
                 }
                 error={form.errors.description}
@@ -196,63 +195,63 @@ const ViewTabs = ({ tab, ...props }) => {
             title="Status"
             text={
               product.page.is_published
-                ? "This item is published."
-                : "This item is not published. It does not show in your store."
+                ? 'This item is published.'
+                : 'This item is not published. It does not show in your store.'
             }
             className=""
           >
             <ProductPublishButton product={product} setProduct={setProduct} toast={toast} />
           </AdminView.Section>
         </div>
-      );
+      )
   }
-};
+}
 
 export const productFormDefaultValues = {
-  name: "",
-  description: "",
-  title: "",
-  category: "",
-  slug_public: "",
+  name: '',
+  description: '',
+  title: '',
+  category: '',
+  slug_public: '',
   retail_price: 0.0,
   is_pre_sale: false,
-  is_pre_sale_text: "",
+  is_pre_sale_text: '',
   sale_price: 0.0,
   is_on_sale: false,
-};
+}
 
 export const ProductQuickUpdateForm = ({ form, product, ...props }) => {
-  const { setProduct, toast, categories } = props;
-  const productSlug = product?.slug;
+  const { setProduct, toast, categories } = props
+  const productSlug = product?.slug
 
-  useEffect(() => {}, [productSlug]);
+  useEffect(() => {}, [productSlug])
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault()
     const fD = {
       retail_price: form.values.retail_price,
       is_on_sale: form.values.is_on_sale,
-    };
+    }
 
-    if (form.values.category) fD.category = form.values.category;
-    if (form.values.is_on_sale) fD.sale_price = form.values.sale_price;
+    if (form.values.category) fD.category = form.values.category
+    if (form.values.is_on_sale) fD.sale_price = form.values.sale_price
 
     if (form.values.is_pre_sale) {
-      fD.is_pre_sale = form.values.is_pre_sale;
-      fD.is_pre_sale_text = form.values.is_pre_sale_text;
+      fD.is_pre_sale = form.values.is_pre_sale
+      fD.is_pre_sale_text = form.values.is_pre_sale_text
     }
 
     return productServices
       .patch(product.slug, fD)
       .then((data) => {
-        setProduct?.({ ...product, ...data });
-        toast?.success({ message: "Product updated." });
+        setProduct?.({ ...product, ...data })
+        toast?.success({ message: 'Product updated.' })
       })
       .catch((err) => {
-        toast?.error({ message: "Could not update product." });
-        return form.handleError(err);
-      });
-  };
+        toast?.error({ message: 'Could not update product.' })
+        return form.handleError(err)
+      })
+  }
 
   return (
     <Form context={form} onSubmit={handleSubmit}>
@@ -267,12 +266,12 @@ export const ProductQuickUpdateForm = ({ form, product, ...props }) => {
                 product={product}
                 form={form}
                 onSuccess={(data) => {
-                  setProduct?.({ ...product, ...data });
-                  toast?.success({ message: "Item updated." });
+                  setProduct?.({ ...product, ...data })
+                  toast?.success({ message: 'Item updated.' })
                 }}
                 onError={(err) => {
-                  form.handleError(err);
-                  toast?.error({ message: "Could not update item." });
+                  form.handleError(err)
+                  toast?.error({ message: 'Could not update item.' })
                 }}
               />
             </div>
@@ -280,9 +279,9 @@ export const ProductQuickUpdateForm = ({ form, product, ...props }) => {
             {categories && (
               <div className="mb-1">
                 <Form.Label value="Category" />
-                <Form.SelectInput required name="category" nullValue={{ label: "Select category" }}>
+                <Form.SelectInput required name="category" nullValue={{ label: 'Select category' }}>
                   {categories?.items?.map((cat) => {
-                    return <Form.SelectInput.Option {...cat} key={cat.value} />;
+                    return <Form.SelectInput.Option {...cat} key={cat.value} />
                   })}
                 </Form.SelectInput>
               </div>
@@ -357,19 +356,19 @@ export const ProductQuickUpdateForm = ({ form, product, ...props }) => {
               productServices
                 .patch(product.slug, { cover: imgData.slug })
                 .then((data) => {
-                  setProduct?.({ ...product, ...data });
-                  toast?.success({ message: "Product cover updated." });
+                  setProduct?.({ ...product, ...data })
+                  toast?.success({ message: 'Product cover updated.' })
                 })
                 .catch((err) => {
-                  toast?.error({ message: "Could not upload cover image." });
-                });
+                  toast?.error({ message: 'Could not upload cover image.' })
+                })
             }}
             onUpdate={(cover_data) => {
-              toast?.success({ message: "Product cover updated." });
-              return setProduct?.({ ...product, cover_data });
+              toast?.success({ message: 'Product cover updated.' })
+              return setProduct?.({ ...product, cover_data })
             }}
             onDelete={() => {
-              return setProduct?.({ ...product, cover_data: null, cover: null });
+              return setProduct?.({ ...product, cover_data: null, cover: null })
             }}
             className="mb-1"
           />
@@ -377,52 +376,52 @@ export const ProductQuickUpdateForm = ({ form, product, ...props }) => {
         </div>
       </div>
     </Form>
-  );
-};
+  )
+}
 
 export default function ProductUpdateView(props) {
-  const { prodSlug } = props.match.params;
+  const { prodSlug } = props.match.params
 
-  const [product, setProduct] = useState(null);
-  const [tab, setTab] = useState("info");
-  const toast = useContext(ToastCtx);
+  const [product, setProduct] = useState(null)
+  const [tab, setTab] = useState('info')
+  const toast = useContext(ToastCtx)
 
-  const form = useForm(productFormDefaultValues);
-  const { setValues } = form;
+  const form = useForm(productFormDefaultValues)
+  const { setValues } = form
 
   useEffect(() => {
     productServices
       .detail(prodSlug)
       .then((data) => {
-        setProduct(data);
+        setProduct(data)
         setValues({
-          name: data.name || "",
-          description: data.description || "",
-          category: data.category || "",
+          name: data.name || '',
+          description: data.description || '',
+          category: data.category || '',
           retail_price: data?.retail_price || 0.0,
           // PRESALE
           is_pre_sale: data.is_pre_sale || false,
-          is_pre_sale_text: data.is_pre_sale_text || "",
+          is_pre_sale_text: data.is_pre_sale_text || '',
           // SALE
           is_on_sale: data.is_on_sale || false,
           sale_price: data?.sale_price || 0.0,
           // SEO
-          title: data.page.title || "",
-          slug_public: data?.page?.slug_public || "",
-        });
+          title: data.page.title || '',
+          slug_public: data?.page?.slug_public || '',
+        })
       })
       .catch((err) => {
         if (err.response) {
           // toast.error({ message: "Something went wrong" });
-          console.log(err.response);
+          console.log(err.response)
           if (err.response.status === 404) {
-            return;
+            return
           }
         }
-      });
-  }, [prodSlug, setValues]);
+      })
+  }, [prodSlug, setValues])
 
-  if (!product) return null;
+  if (!product) return null
 
   // console.log(product);
 
@@ -457,24 +456,24 @@ export default function ProductUpdateView(props) {
         <div className="d-flex justify-content-center mb-3">
           <div className="d-flex align-items-center">
             <Button
-              onClick={() => setTab("info")}
-              className={getClassName(["me-1", tab === "info" && "btn-primary-3"])}
+              onClick={() => setTab('info')}
+              className={getClassName(['me-1', tab === 'info' && 'btn-primary-3'])}
             >
               Info
             </Button>
             <Button
-              onClick={() => setTab("inventory")}
-              className={getClassName(["me-1", tab === "inventory" && "btn-primary-3"])}
+              onClick={() => setTab('inventory')}
+              className={getClassName(['me-1', tab === 'inventory' && 'btn-primary-3'])}
             >
               Inventory
             </Button>
             <Button
-              onClick={() => setTab("imgs")}
-              className={getClassName(["me-1", tab === "imgs" && "btn-primary-3"])}
+              onClick={() => setTab('imgs')}
+              className={getClassName(['me-1', tab === 'imgs' && 'btn-primary-3'])}
             >
               Images
             </Button>
-            <Button onClick={() => setTab("setting")} className={getClassName([tab === "setting" && "btn-primary-3"])}>
+            <Button onClick={() => setTab('setting')} className={getClassName([tab === 'setting' && 'btn-primary-3'])}>
               Settings
             </Button>
           </div>
@@ -490,60 +489,60 @@ export default function ProductUpdateView(props) {
         />
       </div>
     </AdminView>
-  );
+  )
 }
 
 const ERRMSG = {
-  retail_price: "You can not publish a product without price",
-  category: "You can not publish a product without category",
-  page: "You can not publish a product without page",
-  default: "Something went awfully wrong!",
-};
+  retail_price: 'You can not publish a product without price',
+  category: 'You can not publish a product without category',
+  page: 'You can not publish a product without page',
+  default: 'Something went awfully wrong!',
+}
 
 export const ProductPublishButton = ({ product, setProduct, toast }) => {
-  if (!product?.page) return null;
+  if (!product?.page) return null
 
-  const { is_published } = product.page;
+  const { is_published } = product.page
 
   const handlePublish = () => {
     if (is_published)
       return productServices
         .unpublish(product.slug)
         .then((data) => {
-          setProduct({ ...product, ...data });
-          return toast?.success({ message: "Item unpublished" });
+          setProduct({ ...product, ...data })
+          return toast?.success({ message: 'Item unpublished' })
         })
         .catch((err) => {
-          return toast?.error({ message: ERRMSG.default });
-        });
+          return toast?.error({ message: ERRMSG.default })
+        })
 
     return productServices
       .publish(product.slug)
       .then((data) => {
-        setProduct?.({ ...product, ...data });
-        return toast?.success({ message: "Item published" });
+        setProduct?.({ ...product, ...data })
+        return toast?.success({ message: 'Item published' })
       })
       .catch(({ response = {} }) => {
         if (!response.data) {
-          return toast?.error({ message: ERRMSG.default });
+          return toast?.error({ message: ERRMSG.default })
         }
-        const { retail_price, category, page } = response.data;
+        const { retail_price, category, page } = response.data
 
         if (retail_price) {
-          return toast?.error({ message: ERRMSG.retail_price });
+          return toast?.error({ message: ERRMSG.retail_price })
         }
         if (category) {
-          return toast?.error({ message: ERRMSG.category });
+          return toast?.error({ message: ERRMSG.category })
         }
         if (page) {
-          return toast?.error({ message: ERRMSG.page });
+          return toast?.error({ message: ERRMSG.page })
         }
         // console.log(response.data);
-      });
-  };
+      })
+  }
   return (
-    <Button onClick={handlePublish} className={is_published ? "btn-danger" : "btn-primary"}>
-      {is_published ? "Unpublish" : "Publish"} product
+    <Button onClick={handlePublish} className={is_published ? 'btn-danger' : 'btn-primary'}>
+      {is_published ? 'Unpublish' : 'Publish'} product
     </Button>
-  );
-};
+  )
+}

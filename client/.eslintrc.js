@@ -3,7 +3,7 @@ module.exports = {
     browser: true,
     es2021: true,
   },
-  extends: ['plugin:react/recommended', 'airbnb'],
+  extends: ['airbnb-base', 'plugin:react/recommended', 'plugin:import/errors', 'plugin:import/warnings'],
   parserOptions: {
     ecmaFeatures: {
       jsx: true,
@@ -11,6 +11,15 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: 'module',
   },
-  plugins: ['react'],
-  rules: {},
-};
+  plugins: ['react', 'jsx-a11y'],
+  rules: {
+    'template-curly-spacing': 'off',
+    indent: [
+      'error',
+      2,
+      {
+        ignoredNodes: ['TemplateLiteral'],
+      },
+    ],
+  },
+}

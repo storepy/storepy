@@ -1,37 +1,37 @@
-import { IBtnSave, ConfirmIconButton, Icons, Button } from "@miq/components";
+import { IBtnSave, ConfirmIconButton, Icons, Button } from '@miq/components'
 
-import Form, { useForm } from "@miq/form";
-import { productServices } from "./utils";
+import Form, { useForm } from '@miq/form'
+import { productServices } from './utils'
 
 const AttrNameInput = (props) => (
   <Form.TextInput placeholder="Nom de l'attribut" {...props} required name="name" maxLength={30} minLength={3} />
-);
+)
 
 const AttrValueInput = (props) => (
   <Form.TextInput placeholder="Valeur de l'attribut" {...props} required name="value" maxLength={99} minLength={3} />
-);
+)
 
 export const AttributeUpdateForm = ({ instance, product, ...props }) => {
-  const form = useForm({ name: instance?.name || "", value: instance?.value || "" });
+  const form = useForm({ name: instance?.name || '', value: instance?.value || '' })
 
-  if (!instance || !instance.slug || !product || !product.slug) return null;
+  if (!instance || !instance.slug || !product || !product.slug) return null
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
     return productServices
       .patchAttribute(product.slug, instance.slug, form.values)
       .then((data) => {
-        return props?.onSuccess(data);
+        return props?.onSuccess(data)
       })
       .catch((err) => {
-        return form.handleError(err);
-      });
-  };
+        return form.handleError(err)
+      })
+  }
 
   return (
     <Form context={form} onSubmit={handleSubmit}>
-      <div className="d-flex flex-column flex-md-row" style={{ alignItems: "end" }}>
+      <div className="d-flex flex-column flex-md-row" style={{ alignItems: 'end' }}>
         <div className="me-md-1">
           <AttrNameInput error={form.errors.name} />
         </div>
@@ -52,11 +52,11 @@ export const AttributeUpdateForm = ({ instance, product, ...props }) => {
                         productServices
                           .deleteAttribute(product.slug, instance.slug)
                           .then((data) => {
-                            args?.setOpen(false);
-                            return props?.onSuccess(data);
+                            args?.setOpen(false)
+                            return props?.onSuccess(data)
                           })
                           .catch(() => {
-                            props?.toast?.error({ message: "Could not delete attribute." });
+                            props?.toast?.error({ message: 'Could not delete attribute.' })
                           })
                       }
                       className="btn-danger"
@@ -75,7 +75,7 @@ export const AttributeUpdateForm = ({ instance, product, ...props }) => {
                 <div className="p-3">
                   <div className="fw-bold">Supprimer l'attribut "{instance.name}"</div>
                 </div>
-              );
+              )
             }}
             className="btn-danger-3 me-1"
           />
@@ -83,35 +83,35 @@ export const AttributeUpdateForm = ({ instance, product, ...props }) => {
         </div>
       </div>
     </Form>
-  );
-};
+  )
+}
 
 export function AttributeCreateForm({ product, ...props }) {
-  const initValues = { name: "", value: "" };
-  const form = useForm(initValues);
+  const initValues = { name: '', value: '' }
+  const form = useForm(initValues)
 
-  if (!product || !product.slug) return null;
+  if (!product || !product.slug) return null
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault()
     // if (form.hasErrors()) return;
 
     return productServices
       .postAttribute(product.slug, form.values)
       .then((data) => {
-        form.setValues(initValues);
-        return props?.onSuccess(data);
+        form.setValues(initValues)
+        return props?.onSuccess(data)
       })
       .catch((err) => {
-        return form.handleError(err);
-      });
-  };
+        return form.handleError(err)
+      })
+  }
 
   // const invalidAttrNames = product?.attributes?.map((at) => at.name) || [];
 
   return (
     <Form context={form} onSubmit={handleSubmit}>
-      <div className="d-flex flex-column flex-md-row" style={{ alignItems: "end" }}>
+      <div className="d-flex flex-column flex-md-row" style={{ alignItems: 'end' }}>
         <div className="me-md-1">
           <Form.Label value="Name" />
           <AttrNameInput error={form.errors.name} />
@@ -127,5 +127,5 @@ export function AttributeCreateForm({ product, ...props }) {
         </div>
       </div>
     </Form>
-  );
+  )
 }
