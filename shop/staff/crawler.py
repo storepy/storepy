@@ -12,7 +12,7 @@ KEYS_MAP = {
     'brand': {'asos': 'brand__name', 'fnova': 'brand'},
     'id': {'asos': 'id', 'shein': 'detail__goods_id', 'fnova': 'id'},
     'sku': {'plt': 'sku', 'fnova': 'sku'},
-    'productCode': {'asos': 'productCode'},
+    'productCode': {'asos': 'productCode', 'shein': 'detail__goods_sn'},
     #
     'category': {'asos': 'productType__name', 'shein': 'currentCat__cat_name', 'fnova': 'product_type'},
     'name': {'asos': 'name', 'plt': 'name', 'shein': 'detail__goods_name', 'fnova': 'title'},

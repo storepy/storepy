@@ -2,9 +2,6 @@
 
 {% block title %}{% if product.title %}{{product.title}} - {% endif %}{{product.category.name}}{% endblock title %}
 
-
-{% block main %}{% endblock main %}
-
 {% block meta %}{{ block.super }}
 
 <meta property="og:title" content="{{object.title}}" />

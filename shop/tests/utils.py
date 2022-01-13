@@ -2,10 +2,23 @@ from django.urls import reverse_lazy
 
 from miq.tests.mixins import TestMixin
 
-# from shop.models import Product, Category
+from shop.models import Product, ProductPage
+# from shop.models import Product, ProductPage, Category
 
 
 class ShopMixin(TestMixin):
+
+    def create_product(self, name='A product', published=False):
+        return Product.objects.create(
+            name=name,
+            page=ProductPage.objects.create(
+                site=self.site, title=name, is_published=published)
+        )
+
+    def get_cart_path(self, *, slug=None):
+        if slug:
+            return reverse_lazy('shop:cart_update', args=[slug])
+        return reverse_lazy('shop:cart', args=[])
 
     def get_product_category_path(self, slug):
         return reverse_lazy('shop:product-category', args=[slug])

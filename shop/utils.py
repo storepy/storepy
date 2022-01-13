@@ -85,8 +85,6 @@ def product_to_jsonld(product, request) -> str:
         "seller": brand_to_jsonld(request, site)
     }
 
-    print(mark_safe(json.dumps(info)))
-
     return mark_safe(json.dumps(info))
 
 

@@ -2,10 +2,6 @@
 from django.contrib.sites.middleware import CurrentSiteMiddleware
 from django.contrib.sites.shortcuts import get_current_site
 
-from miq.serializers import PublicImageSerializer
-
-from .models import Category
-
 
 class StoreMiddleware(CurrentSiteMiddleware):
     def __init__(self, get_response):
@@ -32,15 +28,12 @@ class StoreMiddleware(CurrentSiteMiddleware):
         if 'sharedData' not in ctx.keys():
             ctx['sharedData'] = {}
 
-        ctx.get('sharedData').update({
-            'store_categories': [
-                {
-                    'name': cat.name,
-                    'detail_url': cat.detail_url,
-                    'cover': PublicImageSerializer(cat.cover).data,
-                }
-                for cat in Category.objects.filter(page__is_published=True)
-            ]
-        })
+        sD = ctx.get('sharedData')
+        session = request.session or {}
+        if (cart_id := session.get('CID')):
+            sD['cart_id'] = cart_id
+
+        if (lead_id := session.get('LID')):
+            sD['lead_id'] = lead_id
 
         return response

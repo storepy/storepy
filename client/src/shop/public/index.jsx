@@ -1,18 +1,18 @@
-import React, { lazy } from 'react'
-import { Suspense } from 'react'
-import { Switch, Route } from 'react-router-dom'
+import React, { lazy } from 'react';
+import { Suspense } from 'react';
+import { Switch, Route } from 'react-router-dom';
 
-import { ToastProvider, useToast, Loading } from '@miq/components'
-import IndexView from './IndexView'
+import { ToastProvider, useToast, Loading } from '@miq/components';
+import IndexView from './IndexView';
 
-import './main.scss'
+import './main.scss';
 
-const CartPublicView = lazy(() => import('./CartView'))
-const ProductPublicView = lazy(() => import('./ProductView'))
-const ProductsPublicView = lazy(() => import('./ProductsView'))
+const CartPublicView = lazy(() => import('./CartView'));
+const ProductPublicView = lazy(() => import('./ProductView'));
+const ProductsPublicView = lazy(() => import('./ProductsView'));
 
 export default function PublicShopRoutes(props) {
-  const toastCtx = useToast()
+  const toastCtx = useToast();
   // const { path } = props.match;
 
   return (
@@ -28,5 +28,5 @@ export default function PublicShopRoutes(props) {
         </Switch>
       </Suspense>
     </ToastProvider>
-  )
+  );
 }

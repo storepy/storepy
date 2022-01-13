@@ -106,6 +106,16 @@ class CategoryManager(ManagerMixin, models.Manager):
             .select_related('page', 'cover')
 
 
+class SupplierOrderQuerySet(models.QuerySet):
+    pass
+
+
+class SupplierOrderManager(ManagerMixin, models.Manager):
+    def get_queryset(self):
+        return SupplierOrderQuerySet(self.model, using=self._db)\
+            .prefetch_related('items')
+
+
 class ProductPageManager(PageManager):
     pass
 

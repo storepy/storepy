@@ -1,6 +1,5 @@
 from decimal import Decimal
 
-
 from django.db import models
 from django.urls import reverse_lazy
 from django.utils.text import capfirst
@@ -9,15 +8,19 @@ from django.core.validators import MinValueValidator
 from django.utils.translation import gettext_lazy as _
 
 from miq.models import BaseModelMixin
+from miq.utils import get_text_choices
 
-from .managers import ProductManager
+from .managers import ProductManager, SupplierOrderManager
 from .category_model import Category
+from .cart_model import Lead, Cart, CartProduct
 from .proxies import ProductImage, ProductPage, CategoryPage
 
-__all__ = [
-    'Product', 'Category', 'ProductSize', 'ProductAttribute',
-    'ProductImage', 'ProductPage', 'CategoryPage'
-]
+__all__ = (
+    'Product', 'ProductSize', 'ProductAttribute', 'ProductImage', 'ProductPage', 'ProductStages',
+    'Category', 'CategoryPage',
+    'Lead', 'Cart', 'CartProduct',
+    'SupplierOrder'
+)
 
 
 class ProductSize(BaseModelMixin):
@@ -32,6 +35,10 @@ class ProductSize(BaseModelMixin):
             )
         ]
 
+    sku = models.CharField(
+        _("Sku"), max_length=99,
+        null=True, blank=True, unique=True
+    )
     product = models.ForeignKey(
         'Product', related_name='sizes', on_delete=models.CASCADE)
 
@@ -40,6 +47,17 @@ class ProductSize(BaseModelMixin):
     quantity = models.PositiveIntegerField(
         default=1, help_text='Enter quantity',
         validators=[MinValueValidator(0)])
+
+
+class ProductStage(models.TextChoices):
+    A_VIRTUAL = 'A_VIRTUAL', _('Virtual stock')  # just added to shop
+    B_SUPPLIER_TRANSIT = 'B_SUPPLIER_TRANSIT', _('Ordered from supplier')
+    C_INSTORE_WAREHOUSE = 'C_INSTORE_WAREHOUSE', _('Received from supplier')
+    D_INSTORE_TRANSIT = 'D_INSTORE_TRANSIT', _('In transit to store')
+    E_INSTORE = 'E_INSTORE', _('Available for purchase')
+
+
+ProductStages = get_text_choices(ProductStage)
 
 
 class Product(BaseModelMixin):
@@ -67,8 +85,8 @@ class Product(BaseModelMixin):
     is_pre_sale = models.BooleanField(_("Available for pre sale"), default=False)
     is_pre_sale_text = models.TextField(
         _("Pre sale description"), null=True, blank=True)
-    # is_pre_sale_dt = models.DateTimeField(
-    #     _("Availability date time"), blank=True, null=True)
+    is_pre_sale_dt = models.DateTimeField(
+        _("Availability date time"), blank=True, null=True)
 
     is_on_sale = models.BooleanField(_("Is on sale"), default=False)
     sale_price = models.DecimalField(
@@ -81,6 +99,10 @@ class Product(BaseModelMixin):
 
     name = models.CharField(_("Name"), max_length=99)
     description = models.TextField(_("Description"), null=True, blank=True)
+    stage = models.CharField(
+        verbose_name=_('Stage'),
+        max_length=50, choices=ProductStage.choices,
+        default=ProductStage.A_VIRTUAL)
 
     """
     IMAGES
@@ -114,7 +136,11 @@ class Product(BaseModelMixin):
         _("Supplier brand name"), max_length=99, null=True, blank=True)
 
     supplier_item_id = models.CharField(
-        _("Supplier identifier"), max_length=99,
+        _("Supplier item identifier"), max_length=99,
+        null=True, blank=True, unique=True
+    )
+    supplier_item_sn = models.CharField(
+        _("Supplier item serial number"), max_length=99,
         null=True, blank=True, unique=True
     )
     supplier_item_category = models.CharField(
@@ -126,6 +152,10 @@ class Product(BaseModelMixin):
         help_text='Single item cost')
     supplier_item_cost_currency = models.CharField(
         _("Currency"), max_length=10, null=True, blank=True)
+    supplier_order_id = models.CharField(
+        _("Supplier order ID"), max_length=99,
+        null=True, blank=True,
+    )
 
     cost = models.DecimalField(
         max_digits=10, decimal_places=2, null=True, blank=True,
@@ -133,6 +163,11 @@ class Product(BaseModelMixin):
         'and others costs')
 
     objects = ProductManager()
+
+    def get_price(self):
+        if self.is_on_sale:
+            return self.sale_price
+        return self.retail_price
 
     def next_slug(self):
         try:
@@ -158,7 +193,8 @@ class Product(BaseModelMixin):
         ]
 
     def detail_path(self):
-        if not self.category.page or not self.category.page.slug_public or not self.page.slug_public or not self.page.is_published:
+        if not self.category or not self.category.page or not self.category.page.slug_public \
+                or not self.page.slug_public or not self.page.is_published:
             return
         return reverse_lazy('shop:product', args=[self.category.page.slug_public, self.page.slug_public])
 
@@ -189,3 +225,32 @@ class ProductAttribute(BaseModelMixin):
     def save(self, *args, **kwargs):
         self.name = self.name.lower()
         super().save(*args, **kwargs)
+
+
+class SupplierOrder(BaseModelMixin):
+    order_id = models.CharField(_("Order ID"), max_length=99, blank=True, null=True)
+    currency = models.CharField(_("Currency"), max_length=50, null=True, blank=True)
+    items_stage = models.CharField(
+        verbose_name=_('Stage'),
+        max_length=50, choices=ProductStage.choices,
+        default=ProductStage.A_VIRTUAL)
+
+    is_paid = models.BooleanField(_("Is paid"), default=False)
+    is_paid_dt = models.DateTimeField(_("Date of payment"), blank=True, null=True)
+    is_fulfilled_dt = models.DateTimeField(
+        _("Date of fulfillment"), blank=True, null=True)
+
+    total_cost = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True,
+        help_text='FOB Price, excluding inbound shipping, taxes '
+        'and others costs')
+
+    items = models.ManyToManyField(
+        "shop.Product", verbose_name=_("Products"), blank=True)
+
+    objects = SupplierOrderManager()
+
+    class Meta:
+        verbose_name = _('Supplier Order')
+        verbose_name_plural = _('Supplier Orders')
+        ordering = ('-created',)

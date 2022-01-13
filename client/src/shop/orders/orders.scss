@@ -1,0 +1,17 @@
+@use './components';
+
+.supplier-order-update-view {
+  .order-items {
+    .order-item {
+      .order-item-form {
+        padding: 0.5rem;
+        border-top: 1px solid var(--border-color);
+      }
+
+      .quick-update-btn,
+      .update-btn {
+        border-color: transparent;
+      }
+    }
+  }
+}

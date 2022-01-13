@@ -19,13 +19,14 @@ from miq.mixins import StaffLoginRequired
 from miq.permissions import DjangoModelPermissions
 from miq.utils import download_img_from_url, img_file_from_response
 
-from shop.models import Category, Product, ProductAttribute, ProductImage
+from shop.models import Category, Product, ProductAttribute, ProductImage, SupplierOrder, ProductStages
 
 from shop.staff.serializers import (
     PageSerializer,
     ProductAttributeSerializer,
     ProductSerializer, ProductPageSerializer,
     CategorySerializer, CategoryPageSerializer,
+    SupplierOrderSerializer,
 )
 
 
@@ -50,99 +51,25 @@ class Mixin(StaffLoginRequired):
         page_ser.is_valid(raise_exception=True)
         return page_ser.save()
 
+    def get_category_options(self) -> dict:
+        cats = Category.objects.all()
+        return {
+            'count': cats.count(),
+            'items': [
+                {
+                    'label': cat.name,
+                    'slug': cat.slug,
+                    'value': cat.slug
+                } for cat in cats
+            ]
+        }
+
 
 class Paginator(PageNumberPagination):
     page_size = 11
 
 
-class ProductSupplierMixin(Mixin):
-    crawler = Crawler()
-
-    @action(methods=['post'], detail=False, url_path=r'shein')
-    def shein(self, request: 'http.HttpRequest', *args: tuple, **kwargs: dict) -> 'Response':
-        url = request.data.get('url')  # type: str
-        if not url:
-            raise serializers.ValidationError({'url': _('url required')})
-
-        p_data = self.crawler.shein_url_to_data(url)
-        if not isinstance(p_data, dict):
-            raise serializers.ValidationError(
-                {'data': _('can not perform this action')}
-            )
-
-        qs = Product.objects
-        p_name = p_data.get('name')
-        goods_id = p_data.get('id')
-        if qs.filter(supplier_item_id=goods_id).exists():
-            product = Product.objects.get(supplier_item_id=goods_id)
-        else:
-            page = self.create_page(p_name, p_name)
-            # retail_price=float(p_data.get('cost')) * (5 / 4) * 1000
-            retail_price = int(float(p_data.get('cost')) * 2 * 1000)
-
-            product = Product.objects.create(
-                page=page, name=p_name, supplier_item_id=goods_id,
-                retail_price=retail_price
-            )
-
-        product.description = p_data.get('description', '')
-        product.supplier_name = p_data.get('brand', 'shein')
-        product.supplier_item_cost = p_data.get('cost')
-        product.supplier_item_cost_currency = p_data.get('cost_currency')
-        product.supplier_item_category = p_data.get('category')
-        product.supplier_item_url = url
-
-        attrs = product.attributes
-        for _attr in p_data.get('attrs'):  # type: dict
-            name = _attr.get('name').lower()  # type: str
-            value = _attr.get('value')  # type: str
-            if attrs.filter(name=name).exists():
-                attr = attrs.get(name=name)  # type: ProductAttribute
-                if attr.value != value:
-                    attr.value = value
-                    attr.save()
-
-            else:
-                attr = ProductAttribute\
-                    .objects.create(product=product, name=name, value=value)
-
-        img_data = {
-            'site': get_current_site(self.request),
-            'user': self.request.user,
-        }
-        position = 1
-        if (cover := p_data.get('cover')) and (res := download_img_from_url(cover)) and res.status_code == 200:
-            if product.cover:
-                product.cover.delete()
-
-            product.cover = ProductImage.objects.create(
-                **img_data, alt_text=p_name, position=position,
-                src=img_file_from_response(res, None, get_file_ext(cover))
-            )
-
-        if imgs := p_data.get('imgs'):
-            product.images.all().delete()
-            position = 1
-            for url in imgs:
-                res = download_img_from_url(url)
-                if not res or res.status_code != 200:
-                    continue
-
-                position += 1
-                img = ProductImage.objects.create(
-                    **img_data, alt_text=f'{p_name} {position}', position=position,
-                    src=img_file_from_response(res, None, get_file_ext(url))
-                )
-                product.images.add(img)
-
-        product.save()
-        data = ProductSerializer(product).data
-        data['categories'] = self.get_category_options()
-
-        return Response(data=data)
-
-
-class StaffProductViewset(ProductSupplierMixin, viewsets.ModelViewSet):
+class StaffProductViewset(Mixin, viewsets.ModelViewSet):
     lookup_field = 'slug'  # type: str
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
@@ -223,6 +150,9 @@ class StaffProductViewset(ProductSupplierMixin, viewsets.ModelViewSet):
     def get_queryset(self):
         qs = super().get_queryset()
         params = self.request.query_params
+        if(cat := params.get('cat')) and cat != '':
+            qs = qs.filter(category__slug=cat)
+
         if(status := params.get('status')) and status != '':
             if status == 'published':
                 qs = qs.published()
@@ -244,19 +174,6 @@ class StaffProductViewset(ProductSupplierMixin, viewsets.ModelViewSet):
         name = self.request.data.get('name')
         ser.save(page=self.create_page(name, name))
 
-    def get_category_options(self) -> dict:
-        cats = Category.objects.all()
-        return {
-            'count': cats.count(),
-            'items': [
-                {
-                    'label': cat.name,
-                    'slug': cat.slug,
-                    'value': cat.slug
-                } for cat in cats
-            ]
-        }
-
 
 """
 CATEGORY
@@ -276,10 +193,113 @@ class StaffCategoryViewset(Mixin, viewsets.ModelViewSet):
         name = self.request.data.get('name')
         ser.save(page=self.create_page(name, name))
 
-        # page_ser = self.page_serializer(
-        #     data={
-        #         'label': self.request.data.get('name'), 'title': self.request.data.get('name'),
-        #     }
-        # )
-        # page_ser.is_valid(raise_exception=True)
-        # ser.save(page=page_ser.save())
+
+"""
+SUPPLIER ORDER
+"""
+
+
+class SupplierOrderViewset(Mixin, viewsets.ModelViewSet):
+    lookup_field = 'slug'
+    queryset = SupplierOrder.objects.all()
+    serializer_class = SupplierOrderSerializer
+    parser_classes = (JSONParser, )
+    permission_classes = (IsAdminUser, DjangoModelPermissions)
+
+    #
+
+    crawler = Crawler()
+
+    @action(methods=['post'], detail=True, url_path=r'shein')
+    def shein(self, request: 'http.HttpRequest', *args: tuple, **kwargs: dict) -> 'Response':
+        url = request.data.get('url')  # type: str
+        if not url:
+            raise serializers.ValidationError({'url': _('url required')})
+
+        p_data = self.crawler.shein_url_to_data(url)
+        if not isinstance(p_data, dict):
+            raise serializers.ValidationError(
+                {'data': _('can not perform this action')}
+            )
+
+        qs = Product.objects
+        p_name = p_data.get('name')
+        goods_id = p_data.get('id')
+        if qs.filter(supplier_item_id=goods_id).exists():
+            product = Product.objects.get(supplier_item_id=goods_id)
+        else:
+            page = self.create_page(p_name, p_name)
+            # retail_price=float(p_data.get('cost')) * (5 / 4) * 1000
+            retail_price = int(float(p_data.get('cost')) * 2 * 1000)
+
+            product = Product.objects.create(
+                page=page, name=p_name, supplier_item_id=goods_id,
+                supplier_item_sn=p_data.get('productCode', ''),
+                retail_price=retail_price
+            )
+
+        product.description = p_data.get('description', '')
+        product.supplier_name = p_data.get('brand', 'shein')
+        product.supplier_item_cost = p_data.get('cost')
+        product.supplier_item_cost_currency = p_data.get('cost_currency')
+        product.supplier_item_category = p_data.get('category')
+        product.supplier_item_url = url
+
+        attrs = product.attributes
+        for _attr in p_data.get('attrs'):  # type: dict
+            name = _attr.get('name').lower()  # type: str
+            value = _attr.get('value')  # type: str
+            if attrs.filter(name=name).exists():
+                attr = attrs.get(name=name)  # type: ProductAttribute
+                if attr.value != value:
+                    attr.value = value
+                    attr.save()
+
+            else:
+                attr = ProductAttribute\
+                    .objects.create(product=product, name=name, value=value)
+
+        img_data = {
+            'site': get_current_site(self.request),
+            'user': self.request.user,
+        }
+        position = 1
+        if (cover := p_data.get('cover')) and (res := download_img_from_url(cover)) and res.status_code == 200:
+            if product.cover:
+                product.cover.delete()
+
+            product.cover = ProductImage.objects.create(
+                **img_data, alt_text=p_name, position=position,
+                src=img_file_from_response(res, None, get_file_ext(cover))
+            )
+
+        if imgs := p_data.get('imgs'):
+            product.images.all().delete()
+            position = 1
+            for url in imgs:
+                res = download_img_from_url(url)
+                if not res or res.status_code != 200:
+                    continue
+
+                position += 1
+                img = ProductImage.objects.create(
+                    **img_data, alt_text=f'{p_name} {position}', position=position,
+                    src=img_file_from_response(res, None, get_file_ext(url))
+                )
+                product.images.add(img)
+
+        product.save()
+
+        order = self.get_object()
+        if not order.items.filter(slug=product.slug).exists():
+            order.items.add(product)
+
+        r = self.retrieve(request, *args, **kwargs)
+
+        return r
+
+    def retrieve(self, *args, **kwargs):
+        r = super().retrieve(*args, **kwargs)
+        r.data['categories'] = self.get_category_options()
+        r.data['stages'] = ProductStages
+        return r
