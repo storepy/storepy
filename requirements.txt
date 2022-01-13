@@ -5,7 +5,7 @@ Django==4.0.1
 django-environ==0.4.5
 djangorestframework==3.12.4
 gunicorn==20.1.0
--e git+https://github.com/marqetintl/miq.git@e38158b870cd1c4862dbd9670ff15f3040089cd9#egg=miq
+-e git+https://github.com/marqetintl/miq.git@main#egg=miq
 Pillow==9.0.0
 psycopg2-binary==2.8.6
 pytz==2021.1
