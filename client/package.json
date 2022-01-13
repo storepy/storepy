@@ -1,5 +1,5 @@
 {
-  "name": "@store/client",
+  "name": "@store/clientjs",
   "version": "0.0.1",
   "private": true,
   "dependencies": {
@@ -41,7 +41,7 @@
   "scripts": {
     "start": "PORT=3000 HOST=192.168.1.243 craco start --config ../../../craco.config.js --workspace",
     "wbuild": "craco build --config ../../../craco.config.js --workspace",
-    "build": "yarn workspace @store/client wbuild",
+    "build": "yarn workspace @store/clientjs wbuild",
     "test": "craco test",
     "eject": "craco eject"
   },

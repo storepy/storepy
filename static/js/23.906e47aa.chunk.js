@@ -1,0 +1,2 @@
+(this["webpackJsonp@store/clientjs"]=this["webpackJsonp@store/clientjs"]||[]).push([[23],{373:function(t,e,i){"use strict";i.r(e),i.d(e,"default",(function(){return c}));i(2);var n=i(35),s=i(0);function c(t){return Object(s.jsx)(n.a,{title:"Site Navigation Settings",back:null===t||void 0===t?void 0:t.back,children:Object(s.jsx)("div",{className:""})})}}}]);
+//# sourceMappingURL=23.906e47aa.chunk.js.map
