@@ -3,6 +3,7 @@ import { AdminView, StaffCoverUpdateForm, PublishedStatusSpan } from '@miq/admin
 import Form from '@miq/form';
 import { productServices } from './utils';
 import { ProductImageAltTextInput } from './components';
+import { SHOP_MSGS } from '../constants';
 
 export function ProductQuickUpdateForm({ form, product, ...props }) {
   const { setProduct, toast, categories } = props;
@@ -13,6 +14,7 @@ export function ProductQuickUpdateForm({ form, product, ...props }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     const fD = {
+      name: form.values.name,
       retail_price: form.values.retail_price,
       is_on_sale: form.values.is_on_sale,
       is_pre_sale: form.values.is_pre_sale,
@@ -27,10 +29,10 @@ export function ProductQuickUpdateForm({ form, product, ...props }) {
       .patch(product.slug, fD)
       .then((data) => {
         setProduct?.({ ...product, ...data });
-        toast?.success({ message: 'Product updated.' });
+        toast?.success({ message: SHOP_MSGS.product.update_success });
       })
       .catch((err) => {
-        toast?.error({ message: 'Could not update product.' });
+        toast?.error({ message: SHOP_MSGS.product.update_error });
         return form.handleError(err);
       });
   };
@@ -98,17 +100,18 @@ export function ProductQuickUpdateForm({ form, product, ...props }) {
                 .patch(product.slug, { cover: imgData.slug })
                 .then((data) => {
                   setProduct?.({ ...product, ...data });
-                  toast?.success({ message: 'Product cover updated.' });
+                  toast?.success({ message: SHOP_MSGS.product.cover_create_success });
                 })
                 .catch((err) => {
-                  toast?.error({ message: 'Could not upload cover image.' });
+                  toast?.error({ message: SHOP_MSGS.product.cover_update_error });
                 });
             }}
             onUpdate={(cover_data) => {
-              toast?.success({ message: 'Product cover updated.' });
+              toast?.success({ message: SHOP_MSGS.product.cover_update_success });
               return setProduct?.({ ...product, cover_data });
             }}
             onDelete={() => {
+              toast?.success({ message: SHOP_MSGS.product.cover_delete_success });
               return setProduct?.({ ...product, cover_data: null, cover: null });
             }}
             className="mb-1"
@@ -265,9 +268,9 @@ export const ProductForm = ({ children, context, fields = [], prodSlug, ...props
         props?.onSuccess?.(data);
       })
       .catch((err) => {
-        if (props.onError) return props?.onError?.(err);
-
-        return context?.handleError?.(err);
+        if (props.onError) return props.onError(err);
+        console.log('ehey');
+        return context.handleError(err);
       });
   };
   return (

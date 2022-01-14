@@ -14,21 +14,25 @@ const SupplierOrderStaffUpdateView = lazy(() => import('./UpdateView'));
 
 const SupplierOrderStaffIndexView = (props) => {
   const [data, setData] = useState({});
-  const [isAdding, setAdding] = useState(false);
+  const [isLoading, setLoading] = useState(true);
   const { perms } = useContext(SharedDataCtx);
 
   useEffect(() => {
     supOrderServices
       .list()
       .then((data) => {
+        setLoading(false);
         setData(data);
       })
       .catch((err) => {
+        setLoading(true);
         // console.log(err);
       });
   }, []);
 
   const canAdd = hasPerms(perms.perms, ['shop.add_supplierorder']);
+
+  if (isLoading) return null;
 
   return (
     <AdminView

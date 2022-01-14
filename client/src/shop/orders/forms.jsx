@@ -9,7 +9,7 @@ export const SupplierProductAddForm = ({ order_slug, ...props }) => {
 
   const form = useForm({
     supplier_name: 'shein',
-    url: 'https://us.shein.com/Floral-Lace-Underwire-Garter-Lingerie-Set-p-1925944-cat-1862.html',
+    url: '',
   });
 
   const handleSubmit = (e) => {
@@ -62,15 +62,3 @@ export const SupplierProductAddForm = ({ order_slug, ...props }) => {
     </AdminView.Section>
   );
 };
-
-// props.productForm.setValues({
-//   name: data.name || '',
-//   description: data.description || '',
-//   category: data.category || '',
-//   retail_price: data?.retail_price || 0.0,
-//   is_pre_sale: data.is_pre_sale || false,
-//   is_pre_sale_text: data.is_pre_sale_text || '',
-//   is_on_sale: data.is_on_sale || false,
-//   sale_price: data?.sale_price || 0.0,
-// });
-// props.setProduct(data);

@@ -1,40 +1,40 @@
 import { useContext, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 
 import { AdminView, PublishedStatusSpan } from '@miq/adminjs';
 import Form, { useForm } from '@miq/form';
 import { ToastCtx } from '@miq/components';
-import { addForwardSlash } from '@miq/utils';
-import { Table, ItemTable, ImgSquare, Loading, Button } from '@miq/components';
+import { ImgSquare, Button, Pagination } from '@miq/components';
+import { addOrUpdateArrayObject } from '@miq/utils';
 
 import { supOrderServices } from './utils';
 import { SupplierProductAddForm } from './forms';
 import { ProductForm } from '../product/forms';
 import { SupplierData } from './components';
-import { SHOP_PATHS } from '../constants';
+import { SHOP_MSGS, SHOP_PATHS } from '../constants';
+import { productServices } from '../product/utils';
 
 const formDefault = {
   order_id: '',
   items_stage: '',
   currency: '',
   is_paid: false,
-  // is_paid_dt: '',
-  // is_fulfilled_dt: '',
   total_cost: '',
 };
 
 export default function SupplierOrderStaffUpdateView(props) {
   const { sOrderSlug } = props.match.params;
 
-  const [order, setOrder] = useState(null);
-  const [selected, setSelected] = useState([]);
+  const [order, setOrder] = useState({});
+  const [products, setProducts] = useState({});
+
   const toast = useContext(ToastCtx);
 
   const form = useForm(formDefault);
   const { setValues } = form;
 
   useEffect(() => {
-    supOrderServices
+    if (!sOrderSlug) return;
+    return supOrderServices
       .detail(sOrderSlug)
       .then((data) => {
         setOrder(data);
@@ -44,8 +44,6 @@ export default function SupplierOrderStaffUpdateView(props) {
           items_stage: data.items_stage || '',
           currency: data.currency || '',
           is_paid: data.is_paid || false,
-          // is_paid_dt: data.is_paid_dt || '',
-          // is_fulfilled_dt: data.is_fulfilled_dt || '',
           total_cost: data.total_cost || '',
         });
       })
@@ -58,9 +56,20 @@ export default function SupplierOrderStaffUpdateView(props) {
       });
   }, [sOrderSlug, setValues]);
 
-  if (!order) return null;
+  useEffect(() => {
+    if (!sOrderSlug) return;
 
-  console.log(order.stages);
+    return productServices
+      .list({ supplier_order_slug: sOrderSlug })
+      .then((data) => {
+        setProducts(data);
+      })
+      .catch((err) => {
+        // console.log(err);
+      });
+  }, [sOrderSlug]);
+
+  if (!order) return null;
 
   const handleSubmit = (e, fields) => {
     e.preventDefault();
@@ -76,15 +85,18 @@ export default function SupplierOrderStaffUpdateView(props) {
 
     supOrderServices
       .patch(sOrderSlug, fD)
-      .then((data) => {})
+      .then(() => {
+        toast.success({ message: SHOP_MSGS.order.update_success });
+      })
       .catch((err) => {
+        toast.error({ message: SHOP_MSGS.order.update_error });
         form.handleError(err);
       });
   };
 
   return (
     <AdminView
-      back={props?.back}
+      back={SHOP_PATHS.orderList()}
       title="Modifier une commande"
       actions={<div></div>}
       className="supplier-order-update-view"
@@ -93,50 +105,32 @@ export default function SupplierOrderStaffUpdateView(props) {
         <div className="span-md-2">
           <SupplierProductAddForm
             order_slug={sOrderSlug}
-            onSuccess={(newOrder) => {
-              return setOrder(newOrder);
+            onSuccess={(product) => {
+              toast.success({ message: SHOP_MSGS.product.create_success });
+              return setProducts({
+                ...products,
+                count: products.count + 1,
+                results: addOrUpdateArrayObject(products.results, product),
+              });
             }}
           />
 
-          <AdminView.Section className="order-items mb-3">
-            {order.items.map((item) => {
-              const isSelected = selected.includes(item.slug);
-              return (
-                <div className="" key={item.slug}>
-                  <div className="">
-                    <input
-                      type={'checkbox'}
-                      checked={isSelected}
-                      onChange={() => {
-                        if (isSelected) setSelected(selected.filter((i) => i !== item.slug));
-                        else setSelected([...selected, item.slug]);
-                      }}
-                    />
-                  </div>
-
-                  <OrderItem
-                    item={item}
-                    categories={order.categories}
-                    onUpdate={(data) => {
-                      setOrder({
-                        ...order,
-                        items: order.items.map((i) => {
-                          if (i.slug === data.slug) return data;
-                          return i;
-                        }),
-                      });
-                    }}
-                  />
-                </div>
-              );
-            })}
-          </AdminView.Section>
+          <OrderItemListSection
+            {...props}
+            order={order}
+            products={products}
+            setProducts={setProducts}
+            orderSlug={order.slug}
+          />
         </div>
 
         <div className="">
           <div className="" style={{ position: 'sticky', top: 0 }}>
             <Form context={form} onSubmit={handleSubmit} className="order-update-form">
               <AdminView.Section title="Order details">
+                <ul className="mb-3">
+                  <li className="">Product: {products.count}</li>
+                </ul>
                 <div className="mb-1">
                   <Form.Label value="Order Id" className="mb-1" />
                   <Form.TextInput
@@ -193,19 +187,80 @@ export default function SupplierOrderStaffUpdateView(props) {
   );
 }
 
+const OrderItemListSection = ({ order, products, setProducts, ...props }) => {
+  const [selected, setSelected] = useState([]);
+
+  const { toast } = props;
+
+  return (
+    <AdminView.Section className="order-items mb-3">
+      {products?.results?.map((item) => {
+        const isSelected = selected.includes(item.slug);
+
+        return (
+          <div className="" key={item.slug}>
+            <div className="">
+              <input
+                type="checkbox"
+                checked={isSelected}
+                onChange={() => {
+                  if (isSelected) setSelected(selected.filter((i) => i !== item.slug));
+                  else setSelected([...selected, item.slug]);
+                }}
+              />
+            </div>
+
+            <OrderItem
+              item={item}
+              toast={toast}
+              categories={order.categories}
+              onUpdate={(data) => {
+                setProducts({
+                  ...products,
+                  results: products.results.map((i) => {
+                    if (i.slug === data.slug) return data;
+                    return i;
+                  }),
+                });
+              }}
+            />
+          </div>
+        );
+      })}
+      <Pagination
+        count={products.count}
+        next={products.next}
+        previous={products.previous}
+        onPreviousClick={() => {
+          productServices
+            .get(products.previous)
+            .then((data) => {
+              setProducts(data);
+            })
+            .catch((err) => {
+              toast?.error({ message: SHOP_MSGS.default });
+            });
+        }}
+        onNextClick={() => {
+          productServices
+            .get(products.next)
+            .then((data) => {
+              setProducts(data);
+            })
+            .catch((err) => {
+              toast?.error({ message: SHOP_MSGS.default });
+            });
+        }}
+      />
+    </AdminView.Section>
+  );
+};
+
 const OrderItem = ({ item, ...props }) => {
   const [isEdit, setEdit] = useState(props.isEdit || false);
-  const form = useForm({
-    name: item.name || '',
-    category: item.category || '',
-    retail_price: item?.retail_price || 0.0,
-    supplier_item_cost: item?.supplier_item_cost || 0.0,
-    is_pre_sale: item.is_pre_sale || false,
-    is_pre_sale_text: item.is_pre_sale_text || '',
-  });
+
   if (!item?.slug) return null;
 
-  const { values, errors } = form;
   return (
     <div className="order-item mb-2 border-1 rounded ">
       <div className="d-flex p-1">
@@ -218,70 +273,90 @@ const OrderItem = ({ item, ...props }) => {
             <span className="me-2">{item.name}</span>
             {item?.page?.is_published && <PublishedStatusSpan is_published={item?.page?.is_published} pill short />}
           </div>
-          <div className="">
-            {item.is_on_sale ? (
-              <span className="text-danger">{item.sale_price}</span>
-            ) : (
-              <span className="">{item.retail_price}</span>
-            )}
-          </div>
+
+          <div className="">{item.retail_price}</div>
 
           <div className="mb-1 text-sm">
-            {item.category_data && <span className="">{item.category_data.name}</span>}
-            {item.is_pre_sale && <span className="">Pre sale</span>}/ {item.add_to_cart_count}
+            {item.category_data && <span className="me-1">{item.category_data.name} /</span>}
+            {item.is_pre_sale && <span className="me-1">Pre sale /</span>}
+            <span className="me-1">atc: {item.add_to_cart_count}</span>
           </div>
 
           <div className="actions d-flex justify-content-between align-items-center">
+            <a href={SHOP_PATHS.productUpdate(item.slug)} target="_blank" className="update-btn btn btn-primary-2">
+              Update
+            </a>
+
             <div>
               <Button onClick={() => setEdit(!isEdit)} className="quick-update-btn btn-secondary-3">
-                {`Quick update`}
+                Quick update
               </Button>
             </div>
-
-            <a href={SHOP_PATHS.productUpdate(item.slug)} target="_blank" className="update-btn btn btn-primary-2">
-              {`Update »`}
-            </a>
           </div>
         </div>
       </div>
 
-      {isEdit && (
-        <ProductForm
-          context={form}
-          prodSlug={item.slug}
-          fields={['name', 'category', 'retail_price', 'is_pre_sale', 'is_pre_sale_text', 'supplier_item_cost']}
-          className="order-item-form mb-2"
-          onSuccess={props.onUpdate}
-        >
-          <div className="d-grid grid-md-5 gap-2">
-            <div className="span-md-3 mb-2">
-              <ProductForm.NameInput error={errors.name} className="mb-1" />
-              <ProductForm.CategoryInput categories={props?.categories} error={errors.category} className="mb-1" />
-              <ProductForm.RetailPriceInput error={errors.retail_price} className="mb-1" />
-
-              <Form.Label value={`Supplier item cost (${item.supplier_item_cost_currency})`} />
-              <Form.TextInput name="supplier_item_cost" className="" />
-            </div>
-
-            <div className="span-md-2">
-              <div className="mb-3">
-                <div className="mb-1">
-                  <ProductForm.PresaleCheckboxInput error={errors.is_pre_sale} className="mb-1" />
-                </div>
-
-                {form.values.is_pre_sale && (
-                  <div className="mb-1">
-                    <ProductForm.PresaleTextInput error={errors.is_pre_sale_text} />
-                  </div>
-                )}
-
-                <Form.Submit value="Update" className="btn btn-primary-3 w-100" />
-              </div>
-              <SupplierData product={item} />
-            </div>
-          </div>
-        </ProductForm>
-      )}
+      {isEdit && <OrderProductUpdateForm {...props} isEdit={isEdit} product={item} />}
     </div>
+  );
+};
+
+const OrderProductUpdateForm = ({ isEdit, product, ...props }) => {
+  const form = useForm({
+    name: product.name || '',
+    category: product.category || '',
+    retail_price: product?.retail_price || 0.0,
+    supplier_item_cost: product?.supplier_item_cost || 0.0,
+    is_pre_sale: product.is_pre_sale || false,
+    is_pre_sale_text: product.is_pre_sale_text || '',
+  });
+
+  if (!isEdit) return null;
+
+  const handleUpdate = (data) => {
+    props?.toast?.success?.({ message: SHOP_MSGS.product.update_success });
+    return props?.onUpdate(data);
+  };
+
+  const { errors } = form;
+  return (
+    <ProductForm
+      context={form}
+      prodSlug={product.slug}
+      fields={['name', 'category', 'retail_price', 'is_pre_sale', 'is_pre_sale_text', 'supplier_item_cost']}
+      className="order-item-form mb-2"
+      onSuccess={handleUpdate}
+      onError={(err) => {
+        return form.handleError(err);
+      }}
+    >
+      <div className="d-grid grid-md-5 gap-2">
+        <div className="span-md-3 mb-2">
+          <ProductForm.NameInput error={errors.name} className="mb-1" />
+          <ProductForm.CategoryInput categories={props?.categories} className="mb-1" />
+          <ProductForm.RetailPriceInput error={errors.retail_price} className="mb-1" />
+
+          <Form.Label value={`Supplier item cost (${product.supplier_item_cost_currency})`} />
+          <Form.TextInput name="supplier_item_cost" className="" />
+        </div>
+
+        <div className="span-md-2">
+          <div className="mb-3">
+            <div className="mb-1">
+              <ProductForm.PresaleCheckboxInput error={errors.is_pre_sale} className="mb-1" />
+            </div>
+
+            {form.values.is_pre_sale && (
+              <div className="mb-1">
+                <ProductForm.PresaleTextInput error={errors.is_pre_sale_text} />
+              </div>
+            )}
+
+            <Form.Submit value="Update" className="btn btn-primary-3 w-100" />
+          </div>
+          <SupplierData product={product} />
+        </div>
+      </div>
+    </ProductForm>
   );
 };

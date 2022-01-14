@@ -1,35 +1,35 @@
-import React, { lazy, useContext, useEffect, useState } from 'react'
-import { Switch, Link } from 'react-router-dom'
+import React, { lazy, useContext, useEffect, useState } from 'react';
+import { Switch, Link } from 'react-router-dom';
 
-import Form, { useForm } from '@miq/form'
-import { SharedDataCtx } from '@miq/contexts'
-import { AdminRoute, AdminView, hasPerms, PublishedStatusSpan } from '@miq/adminjs'
-import { Table, ItemTable, Button, ImgSquare } from '@miq/components'
-import { catServices } from './utils'
-import { addForwardSlash } from '@miq/utils'
-import { CatNameInput } from './components'
+import Form, { useForm } from '@miq/form';
+import { SharedDataCtx } from '@miq/contexts';
+import { AdminRoute, AdminView, hasPerms, PublishedStatusSpan } from '@miq/adminjs';
+import { Table, ItemTable, Button, ImgSquare } from '@miq/components';
+import { catServices } from './utils';
+import { addForwardSlash } from '@miq/utils';
+import { CatNameInput } from './components';
 
 // import "./category.scss";
 
-const StaffCategoryUpdateView = lazy(() => import('./UpdateView'))
+const StaffCategoryUpdateView = lazy(() => import('./UpdateView'));
 
 const CategoryCreateForm = (props) => {
-  const form = useForm({ name: '' })
+  const form = useForm({ name: '' });
 
   const handleSubmit = (e) => {
-    if (!props.canAdd) return
+    if (!props.canAdd) return;
 
-    e.preventDefault()
+    e.preventDefault();
 
     return catServices
       .post(form.values)
       .then((data = { slug }) => {
-        return props.history.push(`${addForwardSlash(props.match?.url)}${data.slug}/`)
+        return props.history.push(`${addForwardSlash(props.match?.url)}${data.slug}/`);
       })
       .catch((err) => {
-        form.handleError(err)
-      })
-  }
+        form.handleError(err);
+      });
+  };
   return (
     <Form context={form} onSubmit={handleSubmit}>
       <div className="">
@@ -41,21 +41,21 @@ const CategoryCreateForm = (props) => {
         <Form.Submit value={'Save category'} disabled={!props?.canAdd} className="btn btn-primary" />
       </div>
     </Form>
-  )
-}
+  );
+};
 
 const StaffCategoryIndexView = (props) => {
-  const [data, setData] = useState({})
-  const [isAdding, setAdding] = useState(false)
-  const { perms } = useContext(SharedDataCtx)
+  const [data, setData] = useState({});
+  const [isAdding, setAdding] = useState(false);
+  const { perms } = useContext(SharedDataCtx);
 
   useEffect(() => {
     catServices.list().then((data) => {
-      setData(data)
-    })
-  }, [])
+      setData(data);
+    });
+  }, []);
 
-  const canAdd = hasPerms(perms.perms, ['shop.add_category'])
+  const canAdd = hasPerms(perms.perms, ['shop.add_category']);
 
   return (
     <AdminView
@@ -107,24 +107,42 @@ const StaffCategoryIndexView = (props) => {
                     <PublishedStatusSpan is_published={cat?.page?.is_published} pill />
                   </Table.Td>
                 </Table.Tr>
-              )
+              );
             }}
             pagination={{
               count: data.count,
               next: data.next,
               previous: data.previous,
-              // onPreviousClick: handlePreviousClick,
-              // onNextClick: handleNextClick,
+              onPreviousClick: () => {
+                catServices
+                  .get(data.previous)
+                  .then((data) => {
+                    setData(data);
+                  })
+                  .catch((err) => {
+                    toast?.error({ message: SHOP_MSGS.default });
+                  });
+              },
+              onNextClick: () => {
+                catServices
+                  .get(products.next)
+                  .then((data) => {
+                    setData(data);
+                  })
+                  .catch((err) => {
+                    toast?.error({ message: SHOP_MSGS.default });
+                  });
+              },
             }}
           />
         </AdminView.Section>
       )}
     </AdminView>
-  )
-}
+  );
+};
 
 export default function StaffCategoryRoutes(props) {
-  const { path, url } = props.match
+  const { path, url } = props.match;
 
   return (
     <Switch>
@@ -138,5 +156,5 @@ export default function StaffCategoryRoutes(props) {
         render={(args) => <StaffCategoryIndexView {...args} back={props.back} />}
       />
     </Switch>
-  )
+  );
 }

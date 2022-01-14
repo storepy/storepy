@@ -11,204 +11,7 @@ import { productServices } from './utils';
 import { ProductImageAltTextInput, ProductImageUploadButton } from './components';
 import { AttributeCreateForm, AttributeUpdateForm } from './Attribute';
 import { ProductQuickUpdateForm, ProductForm } from './forms';
-
-const ViewTabs = ({ tab, ...props }) => {
-  const { prodSlug, product, setProduct, form, toast } = props;
-  const [addAtr, setAddAtr] = useState(false);
-
-  if (!product.slug) return null;
-
-  switch (tab) {
-    case 'inventory':
-      return (
-        <div className="d-flex flex-column flex-md-row">
-          <div className="flex-1">
-            <AdminView.Section title="Sizes" text="Add sizes"></AdminView.Section>
-            <AdminView.Section
-              title="Attributes"
-              actions={
-                <Button onClick={() => setAddAtr(!addAtr)} className="btn-primary-3">
-                  Ajouter attribut
-                </Button>
-              }
-            >
-              {addAtr && (
-                <div className="border-bottom mb-2 pb-3">
-                  <p className="text-center mb-3">Ajouter un attribut au produit.</p>
-                  <AttributeCreateForm
-                    product={product}
-                    onSuccess={(productData) => setProduct({ ...product, ...productData })}
-                  />
-                </div>
-              )}
-
-              <div className="my-3">
-                {product.attributes.map((attr) => (
-                  <div className="mb-1" key={attr.slug}>
-                    <AttributeUpdateForm
-                      instance={attr}
-                      product={product}
-                      onSuccess={(pData) => setProduct({ ...product, ...pData })}
-                    />
-                  </div>
-                ))}
-              </div>
-            </AdminView.Section>
-          </div>
-
-          <div className="w-md-35 ms-md-2">
-            <SupplierData product={product} />
-          </div>
-        </div>
-      );
-
-    case 'imgs':
-      return (
-        <AdminView.Section
-          title="Images"
-          text="Add images to your product"
-          actions={
-            <ProductImageUploadButton
-              product={product}
-              onCreateSuccess={(data) => {
-                setProduct({ ...product, ...data });
-              }}
-            />
-          }
-        >
-          <div className="d-grid grid-md-3 grid-lg-4" style={{ gap: 4 }}>
-            {product.images_data.map((img) => (
-              <div className="mb-1" key={img.slug}>
-                <Img {...img} className="product-img" />
-
-                <div className="d-flex">
-                  <ProductImageAltTextInput image={img} />
-                  <ImgDeleteIconButton
-                    slug={img.slug}
-                    label=""
-                    className="btn-danger-3 ms-1"
-                    onSuccess={() => {
-                      setProduct({
-                        ...product,
-                        images_data: product.images_data.filter((i) => i.slug !== img.slug),
-                        images: product.images.filter((i) => i !== img.slug),
-                      });
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </AdminView.Section>
-      );
-
-    case 'setting':
-      return (
-        <Form
-          context={form}
-          onSubmit={(e) => {
-            e.preventDefault();
-            const fD = { title: form.values.title, slug_public: form.values.slug_public };
-
-            return productServices
-              .patchPage(prodSlug, fD, { title: product?.page?.title, slug_public: product?.page?.slug_public })
-              .then((data) => {
-                setProduct({ ...product, ...data });
-                toast.success({ message: 'Product page updated.' });
-              })
-              .catch((err) => {
-                form.handleError(err);
-                toast.error({ message: 'Could not update.' });
-              });
-          }}
-        >
-          <AdminView.Section title="Seo">
-            <div className="mb-1">
-              <Form.Label value="Meta title" className="mb-1" />
-              <Form.TextInput
-                required
-                name="title"
-                error={form.errors.title}
-                placeholder="Give a name to the item"
-                maxLength={99}
-              />
-            </div>
-            <div className="mb-1">
-              <Form.Label value="Slug" className="mb-1" />
-              <Form.TextInput
-                required
-                name="slug_public"
-                error={form.errors.slug_public}
-                placeholder={'Write slug ...'}
-                maxLength={99}
-              />
-            </div>
-
-            <div className="my-2">
-              <Form.Submit value="Update" className="btn btn-primary-3" />
-            </div>
-          </AdminView.Section>
-
-          <AdminView.Section>
-            <Button
-              className="btn-danger"
-              onClick={() => {
-                return productServices
-                  .delete(prodSlug || product.slug)
-                  .then((data) => {
-                    return props?.onDelete();
-                  })
-                  .catch((err) => {
-                    toast?.error({ message: 'Something went wrong' });
-                  });
-              }}
-            >
-              Delete product
-            </Button>
-          </AdminView.Section>
-        </Form>
-      );
-
-    default:
-      return (
-        <div className="d-grid grid-md-3 gap-3">
-          <AdminView.Section title="Description" className="span-md-2">
-            <ProductForm context={form}>
-              <Form.TextAreaX
-                name="description"
-                onSave={({ name, value }) =>
-                  productServices
-                    .patch(product.slug, { [name]: value }, { [name]: product[name] })
-                    .then((data) => {
-                      setProduct({ ...product, ...data });
-                      toast.success({ message: 'Product updated.' });
-                    })
-                    .catch((err) => {
-                      form.handleError(err);
-                      toast.error({ message: 'Could not update item.' });
-                    })
-                }
-                error={form.errors.description}
-                placeholder="Give a description to the item"
-              />
-            </ProductForm>
-          </AdminView.Section>
-
-          <AdminView.Section
-            title="Status"
-            text={
-              product.page.is_published
-                ? 'This item is published.'
-                : 'This item is not published. It does not show in your store.'
-            }
-            className=""
-          >
-            <ProductPublishButton product={product} setProduct={setProduct} toast={toast} />
-          </AdminView.Section>
-        </div>
-      );
-  }
-};
+import { SHOP_MSGS, SHOP_PATHS } from '../constants';
 
 export const productFormDefaultValues = {
   name: '',
@@ -223,10 +26,10 @@ export const productFormDefaultValues = {
   is_on_sale: false,
 };
 
-export default function ProductUpdateView(props) {
+export default function ProductUpdateStaffView(props) {
   const { prodSlug } = props.match.params;
 
-  const [product, setProduct] = useState(null);
+  const [product, setProduct] = useState({});
   const [tab, setTab] = useState('info');
   const toast = useContext(ToastCtx);
 
@@ -267,20 +70,20 @@ export default function ProductUpdateView(props) {
 
   if (!product) return null;
 
-  // console.log(product);
+  const { prev_slug, next_slug } = product;
 
   return (
     <AdminView
       back={props?.back}
       actions={
         <div>
-          {product?.prev_slug && (
-            <a href={`${props?.back}${product?.prev_slug}/`} className="btn me-1" title="Voir le produit précédent">
+          {prev_slug && (
+            <a href={SHOP_PATHS.productUpdate(prev_slug)} className="btn me-1" title="Voir le produit précédent">
               Previous
             </a>
           )}
-          {product?.next_slug && (
-            <a href={`${props?.back}${product?.next_slug}/`} className="btn" title="Voir le produit suivant">
+          {next_slug && (
+            <a href={SHOP_PATHS.productUpdate(next_slug)} className="btn" title="Voir le produit suivant">
               Next
             </a>
           )}
@@ -322,6 +125,7 @@ export default function ProductUpdateView(props) {
             </Button>
           </div>
         </div>
+
         <ViewTabs
           tab={tab}
           prodSlug={prodSlug}
@@ -336,13 +140,6 @@ export default function ProductUpdateView(props) {
   );
 }
 
-const ERRMSG = {
-  retail_price: 'You can not publish a product without price',
-  category: 'You can not publish a product without category',
-  page: 'You can not publish a product without page',
-  default: 'Something went awfully wrong!',
-};
-
 export const ProductPublishButton = ({ product, setProduct, toast }) => {
   if (!product?.page) return null;
 
@@ -354,39 +151,248 @@ export const ProductPublishButton = ({ product, setProduct, toast }) => {
         .unpublish(product.slug)
         .then((data) => {
           setProduct({ ...product, ...data });
-          return toast?.success({ message: 'Item unpublished' });
+          return toast?.success({ message: SHOP_MSGS.product.unpublish_success });
         })
         .catch((err) => {
-          return toast?.error({ message: ERRMSG.default });
+          return toast?.error({ message: SHOP_MSGS.default });
         });
 
     return productServices
       .publish(product.slug)
       .then((data) => {
         setProduct?.({ ...product, ...data });
-        return toast?.success({ message: 'Item published' });
+        return toast?.success({ message: SHOP_MSGS.product.publish_success });
       })
       .catch(({ response = {} }) => {
         if (!response.data) {
-          return toast?.error({ message: ERRMSG.default });
+          return toast?.error({ message: SHOP_MSGS.default });
         }
         const { retail_price, category, page } = response.data;
 
         if (retail_price) {
-          return toast?.error({ message: ERRMSG.retail_price });
+          return toast?.error({ message: SHOP_MSGS.product.publish_error_retail_price });
         }
         if (category) {
-          return toast?.error({ message: ERRMSG.category });
+          return toast?.error({ message: SHOP_MSGS.product.publish_error_category });
         }
         if (page) {
-          return toast?.error({ message: ERRMSG.page });
+          return toast?.error({ message: SHOP_MSGS.product.publish_error_page });
         }
-        // console.log(response.data);
       });
   };
+
   return (
     <Button onClick={handlePublish} className={is_published ? 'btn-danger' : 'btn-primary'}>
       {is_published ? 'Unpublish' : 'Publish'} product
     </Button>
+  );
+};
+
+const ViewTabs = ({ tab, ...props }) => {
+  const { product, setProduct, form, toast } = props;
+
+  if (!product.slug) return null;
+
+  switch (tab) {
+    case 'inventory':
+      return <InventoryViewTab {...props} />;
+
+    case 'imgs':
+      return <ImagesViewTab {...props} />;
+
+    case 'setting':
+      return <SettingViewTab {...props} />;
+
+    default:
+      return (
+        <div className="d-grid grid-md-3 gap-3">
+          <AdminView.Section title="Description" className="span-md-2">
+            <ProductForm context={form}>
+              <Form.TextAreaX
+                name="description"
+                fields={['description']}
+                error={form.errors.description}
+                placeholder="Give a description to the item"
+              />
+              <div className="my-2">
+                <Form.Submit value="Save" className="btn btn-primary-2" />
+              </div>
+            </ProductForm>
+          </AdminView.Section>
+
+          <AdminView.Section
+            title="Status"
+            text={
+              product.page.is_published
+                ? 'This item is published.'
+                : 'This item is not published. It does not show in your store.'
+            }
+            className=""
+          >
+            <ProductPublishButton product={product} setProduct={setProduct} toast={toast} />
+          </AdminView.Section>
+        </div>
+      );
+  }
+};
+
+const InventoryViewTab = (props) => {
+  const [addAtr, setAddAtr] = useState(false);
+  const { product, setProduct } = props;
+
+  return (
+    <div className="d-flex flex-column flex-md-row">
+      <div className="flex-1">
+        <AdminView.Section title="Sizes" text="Add sizes"></AdminView.Section>
+        <AdminView.Section
+          title="Attributes"
+          actions={
+            <Button onClick={() => setAddAtr(!addAtr)} className="btn-primary-3">
+              Ajouter attribut
+            </Button>
+          }
+        >
+          {addAtr && (
+            <div className="border-bottom mb-2 pb-3">
+              <p className="text-center mb-3">Ajouter un attribut au produit.</p>
+              <AttributeCreateForm
+                product={product}
+                onSuccess={(productData) => setProduct({ ...product, ...productData })}
+              />
+            </div>
+          )}
+
+          <div className="my-3">
+            {product.attributes.map((attr) => (
+              <div className="mb-1" key={attr.slug}>
+                <AttributeUpdateForm
+                  instance={attr}
+                  product={product}
+                  onSuccess={(pData) => setProduct({ ...product, ...pData })}
+                />
+              </div>
+            ))}
+          </div>
+        </AdminView.Section>
+      </div>
+
+      <div className="w-md-35 ms-md-2">
+        <SupplierData product={product} />
+      </div>
+    </div>
+  );
+};
+
+const ImagesViewTab = (props) => {
+  const { product, setProduct } = props;
+
+  return (
+    <AdminView.Section
+      title="Images"
+      text="Add images to your product"
+      actions={
+        <ProductImageUploadButton
+          product={product}
+          onCreateSuccess={(data) => {
+            setProduct({ ...product, ...data });
+          }}
+        />
+      }
+    >
+      <div className="d-grid grid-md-3 grid-lg-4" style={{ gap: 4 }}>
+        {product.images_data.map((img) => (
+          <div className="mb-1" key={img.slug}>
+            <Img {...img} className="product-img" />
+
+            <div className="d-flex">
+              <ProductImageAltTextInput image={img} />
+              <ImgDeleteIconButton
+                slug={img.slug}
+                label=""
+                className="btn-danger-3 ms-1"
+                onSuccess={() => {
+                  setProduct({
+                    ...product,
+                    images_data: product.images_data.filter((i) => i.slug !== img.slug),
+                    images: product.images.filter((i) => i !== img.slug),
+                  });
+                }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </AdminView.Section>
+  );
+};
+
+const SettingViewTab = (props) => {
+  const { prodSlug, product, setProduct, form, toast } = props;
+
+  return (
+    <Form
+      context={form}
+      onSubmit={(e) => {
+        e.preventDefault();
+        const fD = { title: form.values.title, slug_public: form.values.slug_public };
+
+        return productServices
+          .patchPage(prodSlug, fD, { title: product?.page?.title, slug_public: product?.page?.slug_public })
+          .then((data) => {
+            setProduct({ ...product, ...data });
+            toast.success({ message: SHOP_MSGS.product.page_update_success });
+          })
+          .catch((err) => {
+            form.handleError(err);
+            toast.error({ message: SHOP_MSGS.product.page_update_error });
+          });
+      }}
+    >
+      <AdminView.Section title="Seo">
+        <div className="mb-1">
+          <Form.Label value="Meta title" className="mb-1" />
+          <Form.TextInput
+            required
+            name="title"
+            error={form.errors.title}
+            placeholder="Give a name to the item"
+            maxLength={99}
+          />
+        </div>
+        <div className="mb-1">
+          <Form.Label value="Slug" className="mb-1" />
+          <Form.TextInput
+            required
+            name="slug_public"
+            error={form.errors.slug_public}
+            placeholder={'Write slug ...'}
+            maxLength={99}
+          />
+        </div>
+
+        <div className="my-2">
+          <Form.Submit value="Update" className="btn btn-primary-3" />
+        </div>
+      </AdminView.Section>
+
+      <AdminView.Section>
+        <Button
+          className="btn-danger"
+          onClick={() => {
+            return productServices
+              .delete(prodSlug || product.slug)
+              .then((data) => {
+                toast?.success({ message: SHOP_MSGS.product.delete_success });
+                return props?.onDelete();
+              })
+              .catch((err) => {
+                return toast?.error({ message: SHOP_MSGS.product.delete_error });
+              });
+          }}
+        >
+          Delete product
+        </Button>
+      </AdminView.Section>
+    </Form>
   );
 };
