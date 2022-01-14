@@ -1,1 +1,1 @@
-# MarqetIntl Boilerplate Client app
+# MarqetIntl Store Client app
