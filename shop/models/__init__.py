@@ -246,7 +246,9 @@ class SupplierOrder(BaseModelMixin):
         'and others costs')
 
     items = models.ManyToManyField(
-        "shop.Product", verbose_name=_("Products"), blank=True)
+        "shop.Product", verbose_name=_("Products"),
+        related_name='supplier_orders',
+        blank=True)
 
     objects = SupplierOrderManager()
 

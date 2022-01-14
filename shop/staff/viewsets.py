@@ -20,11 +20,10 @@ from miq.permissions import DjangoModelPermissions
 from miq.utils import download_img_from_url, img_file_from_response
 
 from shop.models import Category, Product, ProductAttribute, ProductImage, SupplierOrder, ProductStages
-
+from miq.staff.serializers import PageSerializer
 from shop.staff.serializers import (
-    PageSerializer,
-    ProductAttributeSerializer,
-    ProductSerializer, ProductPageSerializer,
+    ProductSerializer, ProductListSerializer,
+    ProductAttributeSerializer, ProductPageSerializer,
     CategorySerializer, CategoryPageSerializer,
     SupplierOrderSerializer,
 )
@@ -147,11 +146,22 @@ class StaffProductViewset(Mixin, viewsets.ModelViewSet):
 
         return self.retrieve(self, request, *args, **kwargs)
 
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return ProductSerializer
+        return ProductListSerializer
+
     def get_queryset(self):
         qs = super().get_queryset()
         params = self.request.query_params
         if(cat := params.get('cat')) and cat != '':
             qs = qs.filter(category__slug=cat)
+
+        if(order_slug := params.get('supplier_order_slug')):
+            if order_slug == '':
+                return qs.none()
+
+            qs = qs.filter(supplier_orders__slug=order_slug)
 
         if(status := params.get('status')) and status != '':
             if status == 'published':
@@ -294,9 +304,7 @@ class SupplierOrderViewset(Mixin, viewsets.ModelViewSet):
         if not order.items.filter(slug=product.slug).exists():
             order.items.add(product)
 
-        r = self.retrieve(request, *args, **kwargs)
-
-        return r
+        return Response(ProductSerializer(instance=product).data, status=201)
 
     def retrieve(self, *args, **kwargs):
         r = super().retrieve(*args, **kwargs)

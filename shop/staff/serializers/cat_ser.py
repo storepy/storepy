@@ -4,7 +4,7 @@ from miq.models import Image
 from miq.staff.serializers import PageSerializer
 
 from shop.models import Category, CategoryPage
-from .mixins import CoverMixin
+from .serializers import CoverMixin
 
 
 class CategoryPageSerializer(PageSerializer):
