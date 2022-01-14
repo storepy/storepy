@@ -1,4 +1,5 @@
 import datetime as dt
+from pyexpat import model
 
 from django.db import models
 from django.db.models import Count
@@ -83,10 +84,24 @@ class CategoryQuerySet(models.QuerySet):
         """
         Filter categories that have products
         """
-        qs = self.annotate(num_products=Count('products')).filter(num_products__gte=1)
+        qs = self.products_count()
         if not published:
-            return qs
-        return qs.filter(products__page__is_published=True)
+            return qs.filter(products_count__gte=1)
+        return qs.filter(published_count__gte=1)
+
+    def products_count(self):
+        """
+        Annotates queryset items with 'products_count','published_count' and 'draft_count' fields
+        """
+        return self.annotate(
+            products_count=Count('products'),
+            published_count=Count(
+                'products', filter=models.Q(products__page__is_published=True)
+            ),
+            draft_count=Count(
+                'products', filter=models.Q(products__page__is_published=False)
+            ),
+        )
 
     def draft(self):
         return self.exclude(slug__in=self.published().values_list('slug', flat=True))

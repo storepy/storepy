@@ -169,6 +169,11 @@ class Product(BaseModelMixin):
             return self.sale_price
         return self.retail_price
 
+    def is_published(self):
+        if self.page:
+            return self.page.is_published
+        return False
+
     def next_slug(self):
         try:
             return self.get_next_by_created().slug

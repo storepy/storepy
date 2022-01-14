@@ -147,9 +147,10 @@ class StaffProductViewset(Mixin, viewsets.ModelViewSet):
         return self.retrieve(self, request, *args, **kwargs)
 
     def get_serializer_class(self):
-        if self.action == 'retrieve':
-            return ProductSerializer
-        return ProductListSerializer
+        if self.action == 'list':
+            return ProductListSerializer
+
+        return ProductSerializer
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -160,7 +161,6 @@ class StaffProductViewset(Mixin, viewsets.ModelViewSet):
         if(order_slug := params.get('supplier_order_slug')):
             if order_slug == '':
                 return qs.none()
-
             qs = qs.filter(supplier_orders__slug=order_slug)
 
         if(status := params.get('status')) and status != '':
@@ -198,6 +198,9 @@ class StaffCategoryViewset(Mixin, viewsets.ModelViewSet):
     permission_classes = (IsAdminUser, DjangoModelPermissions)
 
     page_serializer = CategoryPageSerializer
+
+    def get_queryset(self):
+        return super().get_queryset().products_count().order_by('-created')
 
     def perform_create(self, ser):
         name = self.request.data.get('name')
@@ -241,62 +244,18 @@ class SupplierOrderViewset(Mixin, viewsets.ModelViewSet):
             page = self.create_page(p_name, p_name)
             # retail_price=float(p_data.get('cost')) * (5 / 4) * 1000
             retail_price = int(float(p_data.get('cost')) * 2 * 1000)
-
             product = Product.objects.create(
-                page=page, name=p_name, supplier_item_id=goods_id,
+                page=page, name=p_name, description=p_data.get('description', ''),
+                supplier_item_id=goods_id, retail_price=retail_price,
                 supplier_item_sn=p_data.get('productCode', ''),
-                retail_price=retail_price
+                supplier_item_cost=p_data.get('cost'),
+                supplier_name=p_data.get('brand', 'shein'),
+                supplier_item_cost_currency=p_data.get('cost_currency'),
+                supplier_item_url=url, supplier_item_category=p_data.get('category')
             )
 
-        product.description = p_data.get('description', '')
-        product.supplier_name = p_data.get('brand', 'shein')
-        product.supplier_item_cost = p_data.get('cost')
-        product.supplier_item_cost_currency = p_data.get('cost_currency')
-        product.supplier_item_category = p_data.get('category')
-        product.supplier_item_url = url
-
-        attrs = product.attributes
-        for _attr in p_data.get('attrs'):  # type: dict
-            name = _attr.get('name').lower()  # type: str
-            value = _attr.get('value')  # type: str
-            if attrs.filter(name=name).exists():
-                attr = attrs.get(name=name)  # type: ProductAttribute
-                if attr.value != value:
-                    attr.value = value
-                    attr.save()
-
-            else:
-                attr = ProductAttribute\
-                    .objects.create(product=product, name=name, value=value)
-
-        img_data = {
-            'site': get_current_site(self.request),
-            'user': self.request.user,
-        }
-        position = 1
-        if (cover := p_data.get('cover')) and (res := download_img_from_url(cover)) and res.status_code == 200:
-            if product.cover:
-                product.cover.delete()
-
-            product.cover = ProductImage.objects.create(
-                **img_data, alt_text=p_name, position=position,
-                src=img_file_from_response(res, None, get_file_ext(cover))
-            )
-
-        if imgs := p_data.get('imgs'):
-            product.images.all().delete()
-            position = 1
-            for url in imgs:
-                res = download_img_from_url(url)
-                if not res or res.status_code != 200:
-                    continue
-
-                position += 1
-                img = ProductImage.objects.create(
-                    **img_data, alt_text=f'{p_name} {position}', position=position,
-                    src=img_file_from_response(res, None, get_file_ext(url))
-                )
-                product.images.add(img)
+        self.add_product_attributes(product, p_data)
+        self.add_product_images(product, p_data)
 
         product.save()
 
@@ -311,3 +270,49 @@ class SupplierOrderViewset(Mixin, viewsets.ModelViewSet):
         r.data['categories'] = self.get_category_options()
         r.data['stages'] = ProductStages
         return r
+
+    def add_product_images(self, product, product_data: dict):
+        name = product_data.get('name')
+        img_data = {
+            'site': get_current_site(self.request),
+            'user': self.request.user,
+        }
+        position = 1
+        if (cover := product_data.get('cover')) and (res := download_img_from_url(cover)) and res.status_code == 200:
+            if product.cover:
+                product.cover.delete()
+
+            product.cover = ProductImage.objects.create(
+                **img_data, alt_text=name, position=position,
+                src=img_file_from_response(res, None, get_file_ext(cover))
+            )
+
+        if imgs := product_data.get('imgs'):
+            product.images.all().delete()
+            position = 1
+            for url in imgs:
+                res = download_img_from_url(url)
+                if not res or res.status_code != 200:
+                    continue
+
+                position += 1
+                img = ProductImage.objects.create(
+                    **img_data, alt_text=f'{name} {position}', position=position,
+                    src=img_file_from_response(res, None, get_file_ext(url))
+                )
+                product.images.add(img)
+
+    def add_product_attributes(self, product, product_data: dict):
+        attrs = product.attributes
+        for _attr in product_data.get('attrs'):  # type: dict
+            name = _attr.get('name').lower()  # type: str
+            value = _attr.get('value')  # type: str
+            if attrs.filter(name=name).exists():
+                attr = attrs.get(name=name)  # type: ProductAttribute
+                if attr.value != value:
+                    attr.value = value
+                    attr.save()
+
+            else:
+                attr = ProductAttribute\
+                    .objects.create(product=product, name=name, value=value)

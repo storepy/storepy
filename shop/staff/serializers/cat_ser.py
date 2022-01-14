@@ -1,10 +1,10 @@
 from rest_framework import serializers
 
 from miq.models import Image
+from miq.auth.serializers import ImageSerializer
 from miq.staff.serializers import PageSerializer
 
 from shop.models import Category, CategoryPage
-from .serializers import CoverMixin
 
 
 class CategoryPageSerializer(PageSerializer):
@@ -17,12 +17,13 @@ class CategoryPageSerializer(PageSerializer):
         )
 
 
-class CategorySerializer(CoverMixin, serializers.ModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         read_only_fields = (
             'slug', 'page', 'cover_data',
-            'products_count', 'next_slug', 'prev_slug', 'created', 'updated'
+            'products_count', 'published_count', 'draft_count',
+            'next_slug', 'prev_slug', 'created', 'updated'
         )
         fields = (
             'name', 'description', 'cover', 'position',
@@ -33,14 +34,7 @@ class CategorySerializer(CoverMixin, serializers.ModelSerializer):
     cover = serializers.SlugRelatedField(
         slug_field="slug", queryset=Image.objects.all(), required=False
     )
-    cover_data = serializers.SerializerMethodField(required=False)
-    products_count = serializers.SerializerMethodField(required=False)
-    products_count = serializers.SerializerMethodField(required=False)
-    products_count = serializers.SerializerMethodField(required=False)
-
-    def get_products_count(self, obj):
-        products = obj.products.all()
-        return {
-            'total': products.count(),
-            'published': products.published().count()
-        }
+    cover_data = ImageSerializer(source='cover', read_only=True)
+    products_count = serializers.IntegerField(read_only=True)
+    published_count = serializers.IntegerField(read_only=True)
+    draft_count = serializers.IntegerField(read_only=True)

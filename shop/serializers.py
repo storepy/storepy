@@ -41,6 +41,8 @@ def serialize_product_image(product: 'models.Model', img: 'miqModel.Image') -> d
 
 
 def serialize_product_price(price):
+    if not price:
+        return
 
     return {
         'amount': price,
