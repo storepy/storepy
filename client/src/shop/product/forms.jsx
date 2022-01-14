@@ -38,7 +38,7 @@ export function ProductQuickUpdateForm({ form, product, ...props }) {
   };
 
   return (
-    <ProductForm context={form} onSubmit={handleSubmit}>
+    <ProductForm context={form} onSubmit={handleSubmit} className="quick-product-update-form">
       <div className="d-grid grid-md-3 gap-3">
         <div className="span-md-2">
           <AdminView.Section

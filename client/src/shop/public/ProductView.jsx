@@ -1,9 +1,10 @@
-import React, { useContext, useEffect } from 'react'
-import { SharedDataCtx } from '@miq/contexts'
-import { ImgsHorizontalGallery } from '@miq/components'
+import React, { useContext, useEffect } from 'react';
+import { SharedDataCtx } from '@miq/contexts';
+import { ImgsHorizontalGallery } from '@miq/components';
 
-import { ProductPriceDisplay, BreadCrumbs, ProductAttributeList } from './components'
-import ProductPreSaleForm from './ProductPreSaleForm'
+import { formatDate } from '@miq/utils';
+import { ProductPriceDisplay, BreadCrumbs, ProductAttributeList } from './components';
+import ProductPreSaleForm from './ProductPreSaleForm';
 
 export const ContactNavLink = (props) => {
   return (
@@ -12,12 +13,12 @@ export const ContactNavLink = (props) => {
         Contactez nous
       </a>
     </div>
-  )
-}
+  );
+};
 
 export default function ProductPublicView(props) {
-  const ctx = useContext(SharedDataCtx)
-  const { product } = ctx
+  const ctx = useContext(SharedDataCtx);
+  const { product } = ctx;
 
   useEffect(() => {
     // navigator.geolocation.getCurrentPosition(
@@ -26,9 +27,9 @@ export default function ProductPublicView(props) {
     //   },
     //   (err) => console.warn("permission was rejected", err)
     // );
-  }, [])
+  }, []);
 
-  if (!product) return null
+  if (!product) return null;
 
   return (
     <div className="product-view" id="ProductView">
@@ -46,7 +47,12 @@ export default function ProductPublicView(props) {
         <div className="w-100 w-md-35 p-1">
           <div style={{ position: 'sticky', top: 0 }}>
             <h1 className="text-md fw-lighter">{product.name}</h1>
+
             <ProductPriceDisplay product={product} />
+            <ProductPreSaleDate product={product} />
+            {product && product.is_pre_sale && product.is_pre_sale_text && (
+              <div className="presale-text mb-3">{is_pre_sale_text}</div>
+            )}
 
             {/* {product?.is_pre_sale ? <ProductPreSaleForm product={product} /> : <ContactNavLink />} */}
             {/* {product?.is_pre_sale && ( */}
@@ -94,5 +100,17 @@ export default function ProductPublicView(props) {
         <p className="text-md">Voir les styles semblables</p>
       </div> */}
     </div>
-  )
+  );
 }
+
+const ProductPreSaleDate = ({ product }) => {
+  if (!product || !product.is_pre_sale || !product.is_pre_sale_dt) return null;
+  return (
+    <div className="product-pre-sale-dt">
+      Ce produit sera disponible le{' '}
+      <span className="dt">
+        {formatDate(product.is_pre_sale_dt, { day: 'numeric', month: 'short', year: 'numeric' }, 'fr')}
+      </span>
+    </div>
+  );
+};

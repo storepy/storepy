@@ -16,14 +16,15 @@ import { SHOP_MSGS, SHOP_PATHS } from '../constants';
 export const productFormDefaultValues = {
   name: '',
   description: '',
-  title: '',
   category: '',
-  slug_public: '',
   retail_price: 0.0,
   is_pre_sale: false,
   is_pre_sale_text: '',
   sale_price: 0.0,
   is_on_sale: false,
+  //
+  title: '',
+  slug_public: '',
 };
 
 export default function ProductUpdateStaffView(props) {
@@ -140,7 +141,7 @@ export default function ProductUpdateStaffView(props) {
   );
 }
 
-export const ProductPublishButton = ({ product, setProduct, toast }) => {
+export const ProductPublishButton = ({ product, setProduct, toast, form }) => {
   if (!product?.page) return null;
 
   const { is_published } = product.page;
@@ -163,7 +164,9 @@ export const ProductPublishButton = ({ product, setProduct, toast }) => {
         setProduct?.({ ...product, ...data });
         return toast?.success({ message: SHOP_MSGS.product.publish_success });
       })
-      .catch(({ response = {} }) => {
+      .catch((err) => {
+        const { response = {} } = err;
+
         if (!response.data) {
           return toast?.error({ message: SHOP_MSGS.default });
         }
@@ -173,6 +176,7 @@ export const ProductPublishButton = ({ product, setProduct, toast }) => {
           return toast?.error({ message: SHOP_MSGS.product.publish_error_retail_price });
         }
         if (category) {
+          if (form) form.handleError(err);
           return toast?.error({ message: SHOP_MSGS.product.publish_error_category });
         }
         if (page) {
@@ -189,7 +193,7 @@ export const ProductPublishButton = ({ product, setProduct, toast }) => {
 };
 
 const ViewTabs = ({ tab, ...props }) => {
-  const { product, setProduct, form, toast } = props;
+  const { prodSlug, product, setProduct, form, toast } = props;
 
   if (!product.slug) return null;
 
@@ -206,30 +210,80 @@ const ViewTabs = ({ tab, ...props }) => {
     default:
       return (
         <div className="d-grid grid-md-3 gap-3">
-          <AdminView.Section title="Description" className="span-md-2">
-            <ProductForm context={form}>
-              <Form.TextAreaX
-                name="description"
-                fields={['description']}
-                error={form.errors.description}
-                placeholder="Give a description to the item"
-              />
-              <div className="my-2">
-                <Form.Submit value="Save" className="btn btn-primary-2" />
-              </div>
-            </ProductForm>
-          </AdminView.Section>
+          <div className="span-md-2">
+            <AdminView.Section title="Description">
+              <ProductForm context={form}>
+                <Form.TextAreaX
+                  required
+                  name="description"
+                  fields={['description']}
+                  error={form.errors.description}
+                  placeholder="Give a description to the item"
+                />
+                <div className="my-2">
+                  <Form.Submit value="Save" className="btn btn-primary-2" />
+                </div>
+              </ProductForm>
+            </AdminView.Section>
+
+            <Form
+              context={form}
+              onSubmit={(e) => {
+                e.preventDefault();
+                const fD = { title: form.values.title, slug_public: form.values.slug_public };
+
+                return productServices
+                  .patchPage(prodSlug, fD, { title: product?.page?.title, slug_public: product?.page?.slug_public })
+                  .then((data) => {
+                    setProduct({ ...product, ...data });
+                    toast.success({ message: SHOP_MSGS.product.page_update_success });
+                  })
+                  .catch((err) => {
+                    form.handleError(err);
+                    toast.error({ message: SHOP_MSGS.product.page_update_error });
+                  });
+              }}
+            >
+              <AdminView.Section title="Seo">
+                <div className="mb-1">
+                  <Form.Label value="Meta title" className="mb-1" />
+                  <Form.TextInput
+                    required
+                    name="title"
+                    error={form.errors.title}
+                    placeholder="Give a name to the item"
+                    maxLength={99}
+                  />
+                </div>
+
+                <div className="mb-1">
+                  <Form.Label value="Slug" className="mb-1" />
+                  <Form.TextInput
+                    required
+                    name="slug_public"
+                    error={form.errors.slug_public}
+                    placeholder={'Write slug ...'}
+                    maxLength={99}
+                  />
+                </div>
+
+                <div className="my-2">
+                  <Form.Submit value="Update" className="btn btn-primary-3" />
+                </div>
+              </AdminView.Section>
+            </Form>
+          </div>
 
           <AdminView.Section
             title="Status"
             text={
               product.page.is_published
-                ? 'This item is published.'
-                : 'This item is not published. It does not show in your store.'
+                ? 'This product is published.'
+                : 'This product is not published. It does not show in your store.'
             }
             className=""
           >
-            <ProductPublishButton product={product} setProduct={setProduct} toast={toast} />
+            <ProductPublishButton product={product} setProduct={setProduct} toast={toast} form={form} />
           </AdminView.Section>
         </div>
       );
@@ -330,51 +384,7 @@ const SettingViewTab = (props) => {
   const { prodSlug, product, setProduct, form, toast } = props;
 
   return (
-    <Form
-      context={form}
-      onSubmit={(e) => {
-        e.preventDefault();
-        const fD = { title: form.values.title, slug_public: form.values.slug_public };
-
-        return productServices
-          .patchPage(prodSlug, fD, { title: product?.page?.title, slug_public: product?.page?.slug_public })
-          .then((data) => {
-            setProduct({ ...product, ...data });
-            toast.success({ message: SHOP_MSGS.product.page_update_success });
-          })
-          .catch((err) => {
-            form.handleError(err);
-            toast.error({ message: SHOP_MSGS.product.page_update_error });
-          });
-      }}
-    >
-      <AdminView.Section title="Seo">
-        <div className="mb-1">
-          <Form.Label value="Meta title" className="mb-1" />
-          <Form.TextInput
-            required
-            name="title"
-            error={form.errors.title}
-            placeholder="Give a name to the item"
-            maxLength={99}
-          />
-        </div>
-        <div className="mb-1">
-          <Form.Label value="Slug" className="mb-1" />
-          <Form.TextInput
-            required
-            name="slug_public"
-            error={form.errors.slug_public}
-            placeholder={'Write slug ...'}
-            maxLength={99}
-          />
-        </div>
-
-        <div className="my-2">
-          <Form.Submit value="Update" className="btn btn-primary-3" />
-        </div>
-      </AdminView.Section>
-
+    <div className="">
       <AdminView.Section>
         <Button
           className="btn-danger"
@@ -393,6 +403,6 @@ const SettingViewTab = (props) => {
           Delete product
         </Button>
       </AdminView.Section>
-    </Form>
+    </div>
   );
 };

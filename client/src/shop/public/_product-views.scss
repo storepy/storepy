@@ -7,15 +7,37 @@
   }
 }
 
+.product-size-radio-input {
+  display: flex;
+  align-items: center;
+
+  .radio {
+    margin-right: 0.5rem;
+    position: relative;
+    min-width: 32px;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 16px;
+
+    background-color: var(--gray-200);
+
+    &:hover {
+      background-color: var(--blue-100);
+    }
+
+    &.checked {
+      background-color: var(--blue-700);
+      color: white;
+    }
+  }
+}
+
 .product-view {
   @include shared;
-
-  .contact-toggle-btn {
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    padding: 0.5rem 0.75rem;
-  }
 
   .contact-form {
     .contact-submit-btn {

@@ -98,8 +98,9 @@ const StaffCategoryIndexView = (props) => {
                       </div>
                     </Link>
                     <div className="text-muted text-sm">
-                      <span className="me-1">Products: {cat?.products_count?.total ?? 0}</span>
-                      <span>Published: {cat?.products_count?.published ?? 0}</span>
+                      <span className="me-1">Products: {cat?.products_count}</span>
+                      <span className="me-1">Published: {cat?.published_count}</span>
+                      <span>Unpublished: {cat?.draft_count}</span>
                     </div>
                   </Table.Td>
 

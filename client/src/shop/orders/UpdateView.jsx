@@ -12,6 +12,7 @@ import { ProductForm } from '../product/forms';
 import { SupplierData } from './components';
 import { SHOP_MSGS, SHOP_PATHS } from '../constants';
 import { productServices } from '../product/utils';
+import { ProductPriceDisplay } from '../public/components';
 
 const formDefault = {
   order_id: '',
@@ -274,7 +275,11 @@ const OrderItem = ({ item, ...props }) => {
             {item?.page?.is_published && <PublishedStatusSpan is_published={item?.page?.is_published} pill short />}
           </div>
 
-          <div className="">{item.retail_price}</div>
+          <div className="">
+            <ProductPriceDisplay
+              product={{ ...item, retail_price: item.retail_price_data, sale_price: item.sale_price_data }}
+            />
+          </div>
 
           <div className="mb-1 text-sm">
             {item.category_data && <span className="me-1">{item.category_data.name} /</span>}

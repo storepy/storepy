@@ -33,10 +33,11 @@ export const ProductImageUploadButton = ({ product, ...props }) => {
 };
 
 export const ProductImageAltTextInput = ({ image, ...props }) => {
-  const form = useForm({ alt_text: image?.alt_text || '' });
+  const alt_text = image?.alt_text || '';
+
+  const form = useForm({ alt_text });
 
   const imgSlug = image?.slug;
-  const alt_text = image?.alt_text;
   const setValues = form.setValues;
 
   useEffect(() => {

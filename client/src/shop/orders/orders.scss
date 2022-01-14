@@ -8,6 +8,12 @@
         border-top: 1px solid var(--border-color);
       }
 
+      .product-price-display {
+        .fw-bold {
+          font-weight: 500;
+        }
+      }
+
       .quick-update-btn,
       .update-btn {
         border-color: transparent;
