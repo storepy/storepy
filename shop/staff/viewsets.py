@@ -78,6 +78,38 @@ class StaffProductViewset(Mixin, viewsets.ModelViewSet):
     pagination_class = Paginator
     #
 
+    @action(methods=['patch'], detail=True, url_path=r'swap-cover')
+    def swap_cover(self, request, *args, **kwargs):
+        obj = self.get_object()
+        img_slug = request.data.get('slug')
+        if not img_slug:
+            raise serializers.ValidationError({'slug': _('Image slug required')})
+
+        img = obj.images.filter(slug=img_slug).first()
+        if img:
+            cover = obj.cover
+            if cover:
+                cover_alt_text = cover.alt_text
+                cover_position = cover.position
+                cover_caption = cover.caption
+
+                cover.alt_text = img.alt_text
+                cover.position = img.position
+                cover.caption = img.caption
+                cover.save()
+                obj.images.add(cover)
+
+                img.alt_text = cover_alt_text
+                img.position = cover_position
+                img.caption = cover_caption
+                img.save()
+                obj.images.remove(img)
+
+            obj.cover = img
+            obj.save()
+
+        return self.retrieve(self, request, *args, **kwargs)
+
     @action(methods=['patch'], detail=True, url_path=r'publish')
     def publish(self, request, *args, **kwargs):
         obj = self.get_object()

@@ -1,4 +1,4 @@
-from django.db import transaction
+
 from django.dispatch import receiver
 from django.db.models import signals
 
@@ -27,14 +27,11 @@ def on_cat_will_be_deleted(sender, **kwargs):
 @receiver(signals.pre_save, sender=Product)
 def on_product_will_save(sender, instance, **kwargs):
     if instance.pk:
-        if(old := sender.objects.get(pk=instance.pk)):
-            if (old.name != instance.name):
-                if instance.cover:
-                    instance.cover.alt_text = instance.name
-                    instance.cover.save()
+        name = instance.name
+        if((old := sender.objects.get(pk=instance.pk)) and old.name != name):
+            if instance.cover:
+                instance.cover.alt_text = name
+                instance.cover.save()
 
-                if (imgs := instance.images) and imgs.exists():
-                    with transaction.atomic():
-                        for img in imgs.all().select_for_update():
-                            img.alt_text = f'{instance.name} {img.position}'
-                            img.save()
+            if (img_qs := instance.images) and img_qs.exists():
+                img_qs.update_alt_texts(name, with_position=True)

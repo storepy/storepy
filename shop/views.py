@@ -45,6 +45,12 @@ MIXINS
 
 
 class ViewMixin:
+    def get_cart_items(self):
+        session = self.get_session()
+
+        if cart := Cart.objects.filter(slug=session.get('CID', '')).first():
+            return cart_to_dict(cart)
+
     def get_session(self):
         session = self.request.session
         if not session.session_key:
@@ -68,7 +74,7 @@ PRODUCT VIEWS
 """
 
 
-class ProductView(DetailView):
+class ProductView(ViewMixin, DetailView):
     model = Product
     template_name = 'shop/product.django.html'
 
@@ -83,22 +89,26 @@ class ProductView(DetailView):
         context = super().get_context_data(**kwargs)
 
         obj = context.get('object')
-        if obj:
-            context['title'] = obj.page.title
-            context['description'] = obj.description
-            context['jsonld'] = product_to_jsonld(obj, self.request)
+        if not obj:
+            return context
 
-            self.update_sharedData(
-                context,
-                {
-                    'product': product_to_dict(obj),
-                    'breadcrumbs': [
-                        {'label': 'Accueil', 'path': '/'},
-                        {'label': 'Catalogue', 'path': '/shop/'},
-                        {'label': obj.category.name, 'path': obj.category.detail_path()},
-                    ],
-                }
-            )
+        context['title'] = obj.page.title
+        context['description'] = obj.description
+        context['jsonld'] = product_to_jsonld(obj, self.request)
+
+        data = {
+            'product': product_to_dict(obj),
+            'breadcrumbs': [
+                {'label': 'Accueil', 'path': '/'},
+                {'label': 'Catalogue', 'path': '/shop/'},
+                {'label': obj.category.name, 'path': obj.category.detail_path()},
+            ],
+        }
+
+        if cart := self.get_cart_items():
+            data['cart'] = cart
+
+        self.update_sharedData(context, data)
 
         return context
 
@@ -111,7 +121,7 @@ class ProductsView(ViewMixin, ListView):
     page_label = None
 
     # TODO
-    queryset = Product.objects.published()
+    queryset = Product.objects.published().order_by('stage', 'position', '-created', 'name')
 
     def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
@@ -336,10 +346,8 @@ class CartView(ViewMixin, TemplateView):
             return ctx
 
         data = {}
-        session = self.get_session()
-
-        if cart := Cart.objects.filter(slug=session.get('CID', '')).first():
-            data['cart'] = cart_to_dict(cart)
+        if cart := self.get_cart_items():
+            data['cart'] = cart
 
         self.update_sharedData(ctx, data)
         return ctx

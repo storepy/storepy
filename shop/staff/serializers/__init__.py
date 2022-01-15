@@ -66,7 +66,6 @@ class SupplierOrderSerializer(ModelSerializer):
             *read_only_fields
         )
 
-    # items = ProductSerializer(many=True, required=False)
     items = SlugRelatedField(
         slug_field="slug", queryset=Product.objects.all(),
         many=True, required=False

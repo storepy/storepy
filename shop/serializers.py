@@ -41,12 +41,12 @@ def serialize_product_image(product: 'models.Model', img: 'miqModel.Image') -> d
 
 
 def serialize_product_price(price):
-    if not price:
+    if not price and price != 0:
         return
 
     return {
         'amount': price,
-        'amountWithSymbol': f'{intcomma(int(price))} CFA' if price else ''
+        'amountWithSymbol': f'{intcomma(int(price))} CFA'
     }
 
 
@@ -115,5 +115,6 @@ def cart_to_dict(cart):
     return {
         'slug': cart.slug,
         'items': items,
+        'product_slugs': [p.page.slug_public for p in cart.products.all()],
         'subtotal': serialize_product_price(cart.get_subtotal())
     }
