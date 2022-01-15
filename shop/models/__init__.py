@@ -99,10 +99,6 @@ class Product(BaseModelMixin):
 
     name = models.CharField(_("Name"), max_length=99)
     description = models.TextField(_("Description"), null=True, blank=True)
-    stage = models.CharField(
-        verbose_name=_('Stage'),
-        max_length=50, choices=ProductStage.choices,
-        default=ProductStage.A_VIRTUAL)
 
     """
     IMAGES
@@ -126,6 +122,10 @@ class Product(BaseModelMixin):
         _("Color group identifier"), max_length=99,
         null=True, blank=True
     )
+    stage = models.CharField(
+        verbose_name=_('Stage'),
+        max_length=50, choices=ProductStage.choices,
+        default=ProductStage.A_VIRTUAL)
     position = models.PositiveIntegerField(default=1)
 
     """
@@ -134,7 +134,6 @@ class Product(BaseModelMixin):
 
     supplier_name = models.CharField(
         _("Supplier brand name"), max_length=99, null=True, blank=True)
-
     supplier_item_id = models.CharField(
         _("Supplier item identifier"), max_length=99,
         null=True, blank=True, unique=True

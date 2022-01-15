@@ -14,14 +14,15 @@
   .radio {
     margin-right: 0.5rem;
     position: relative;
-    min-width: 32px;
-    min-height: 32px;
+    min-width: 42px;
+    min-height: 42px;
+    border-radius: 21px;
+
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 600;
     cursor: pointer;
-    border-radius: 16px;
 
     background-color: var(--gray-200);
 
@@ -53,6 +54,22 @@
     font-size: 1.25rem;
   }
 
+  .product-pre-sale {
+    .lead-success-msg {
+      align-items: flex-start;
+      color: var(--green-700, green);
+      background-color: var(--green-50, white);
+      padding: 0.5rem;
+      border-radius: var(--border-radius, 6px);
+
+      svg {
+        width: 32px;
+        height: 32px;
+        margin-right: 0.5rem;
+      }
+    }
+  }
+
   .product-pre-sale-dt {
     text-align: center;
     background-color: var(--red-100);
@@ -65,7 +82,7 @@
     }
   }
 
-  .presale-text {
+  .pre-sale-text {
     text-align: center;
   }
 

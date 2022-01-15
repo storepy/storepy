@@ -14,17 +14,19 @@ import debounce from 'lodash.debounce';
 export const ProductPriceDisplay = ({ product }) => {
   if (!product || !product.retail_price) return null;
 
-  if (product.is_on_sale) {
+  const { retail_price, sale_price } = product;
+
+  if (product.is_on_sale && sale_price != null) {
     return (
       <div className="product-price-display d-flex align-items-center">
-        <div className="text-danger fw-bold me-2">{product.sale_price.amountWithSymbol}</div>
-        <div className="text-line-through">{product.retail_price.amountWithSymbol}</div>
+        <div className="text-danger fw-bold me-2">{sale_price.amountWithSymbol}</div>
+        <div className="text-line-through">{retail_price.amountWithSymbol}</div>
       </div>
     );
   }
   return (
     <div className="product-price-display d-flex align-items-center">
-      <div className="fw-bold">{product.retail_price.amountWithSymbol}</div>
+      <div className="fw-bold">{retail_price.amountWithSymbol}</div>
     </div>
   );
 };

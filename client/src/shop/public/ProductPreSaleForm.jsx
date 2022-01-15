@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Form, { useForm } from '@miq/form';
 
-import { Button } from '@miq/components/';
+import { Button, Icons } from '@miq/components/';
 import { getClassName, Service } from '@miq/utils';
 
 const cartService = new Service('/shop/cart/');
@@ -20,10 +20,6 @@ const LeadFormFragment = ({ form, ...props }) => {
 
   return (
     <>
-      <p className="mb-2">
-        Veuillez entrer votre nom et numéro et nous vous contacterons dès que cet article sera disponible.
-      </p>
-
       <div className="mb-1">
         <Form.Label value="Nom et prénom" />
         <Form.TextInput required name="name" error={form.errors.name} maxLength={99} minLength={4} />
@@ -75,6 +71,7 @@ const ProductSizeRadio = (props) => {
 
   return (
     <>
+      <div className="mb-2">Sélectionez votre taille.</div>
       <div className="product-size-radio-input">
         {sizes.map((size) => {
           const checked = form.values.size === size.value;
@@ -100,27 +97,43 @@ const ProductSizeRadio = (props) => {
 };
 
 export default function ProductPreSaleForm(props) {
-  const form = useForm({ name: '', number: '', email: '', ig_handle: '', size: '' });
-
   const { product, ctx } = props;
+  const { cart, cart_id, lead_id } = ctx;
+
+  const cartItem = cart?.items?.find((i) => i.slug === product.slug);
+  const cartItemSlug = cartItem?.item_slug;
+
+  const form = useForm({ name: '', number: '', email: '', ig_handle: '', size: cartItem?.size || '' });
 
   if (!product || !product.slug || !product.is_pre_sale) return null;
 
-  const { cart, cart_id, lead_id } = ctx;
-
   console.log(cart, cart_id, lead_id);
+  console.log(cartItem?.size, cartItem);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     if (!form.values.size) return form.setErrors({ ...form.errors, size: ERROR_MSG.size_empty });
 
-    const { name } = form.values;
-    if (!name || name.length < 4) return form.setErrors({ ...form.errors, name: ERROR_MSG.name_length });
+    if (!lead_id) {
+      const { name } = form.values;
+      if (!name || name.length < 4) return form.setErrors({ ...form.errors, name: ERROR_MSG.name_length });
 
-    const number = stripNonDigits(form.values.number);
-    if (!number || number.length > 8) return form.setErrors({ ...form.errors, number: ERROR_MSG.number_length });
+      const number = stripNonDigits(form.values.number);
+      console.log(number, number.length);
+      if (!number || number.length < 6) return form.setErrors({ ...form.errors, number: ERROR_MSG.number_length });
+    }
 
-    if (form.hasErrors()) return;
+    if (cartItemSlug) {
+      return cartService
+        .patch(cart.slug, { action: 'update', slug: cartItemSlug, size: form.values.size })
+        .catch((err) => {
+          form.handleError(err);
+        })
+        .then((data) => {
+          window.location.reload();
+        });
+    }
 
     return cartService
       .post({ ...form.values, product: product.slug })
@@ -129,6 +142,7 @@ export default function ProductPreSaleForm(props) {
         form.handleError(err);
       })
       .then((data) => {
+        console.log(data);
         window.location.reload();
         console.log(data);
       });
@@ -136,6 +150,19 @@ export default function ProductPreSaleForm(props) {
 
   return (
     <div className="product-pre-sale">
+      {!lead_id && (
+        <div className="mb-2">
+          Veuillez entrer votre nom et numéro et nous vous contacterons dès que cet article sera disponible.
+        </div>
+      )}
+
+      {cartItemSlug && (
+        <div className="lead-success-msg d-flex">
+          <Icons.InfoCircle className="icon" />
+          <div>Nous vous contaterons dès que cet article sera disponible.</div>
+        </div>
+      )}
+
       <Form context={form} method="POST" onSubmit={handleSubmit} className="contact-form">
         <div className="my-3">
           <ProductSizeRadio form={form} />
@@ -145,7 +172,7 @@ export default function ProductPreSaleForm(props) {
 
         <div className="mb-3">
           <Button type="submit" className="contact-submit-btn btn btn-primary w-100">
-            Contactez-moi
+            {cartItemSlug ? 'Changer ma taille' : 'Contactez-moi'}
           </Button>
         </div>
       </Form>

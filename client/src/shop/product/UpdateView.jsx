@@ -90,7 +90,7 @@ export default function ProductUpdateStaffView(props) {
           )}
         </div>
       }
-      className="product-update-view"
+      className="miq-container-1024 product-update-view"
     >
       <ProductQuickUpdateForm
         form={form}
@@ -356,6 +356,20 @@ const ImagesViewTab = (props) => {
       <div className="d-grid grid-md-3 grid-lg-4" style={{ gap: 4 }}>
         {product.images_data.map((img) => (
           <div className="mb-1" key={img.slug}>
+            <Button
+              onClick={() =>
+                productServices
+                  .swapCover(product.slug, img.slug)
+                  .then((data) => {
+                    setProduct(data);
+                  })
+                  .catch((err) => {})
+              }
+              className="mb-1"
+            >
+              Set as cover
+            </Button>
+
             <Img {...img} className="product-img" />
 
             <div className="d-flex">

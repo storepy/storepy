@@ -49,9 +49,13 @@ export default function ProductPublicView(props) {
             <h1 className="text-md fw-lighter">{product.name}</h1>
 
             <ProductPriceDisplay product={product} />
-            <ProductPreSaleDate product={product} />
+
+            <div className="mb-3">
+              <ProductPreSaleDate product={product} />
+            </div>
+
             {product && product.is_pre_sale && product.is_pre_sale_text && (
-              <div className="presale-text mb-3">{is_pre_sale_text}</div>
+              <div className="pre-sale-text mb-3">{is_pre_sale_text}</div>
             )}
 
             {/* {product?.is_pre_sale ? <ProductPreSaleForm product={product} /> : <ContactNavLink />} */}

@@ -28,6 +28,12 @@ class StaffProductService extends StaffService {
   patchPage(prodSlug, values, oldValues) {
     return this.patchPath(`${this.path}${prodSlug}/page/`, values, oldValues);
   }
+
+  // COVER
+
+  swapCover(prodSlug, imgSlug) {
+    return this.patchPath(`${this.path}${prodSlug}/swap-cover/`, { slug: imgSlug });
+  }
 }
 
 export const productServices = new StaffProductService('products/');
