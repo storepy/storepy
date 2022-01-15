@@ -175,7 +175,6 @@ API_PATH = f'api/v{API_VERSION}'
 """
 
 USE_TZ = True
-USE_L10N = True
 USE_I18N = True
 TIME_ZONE = 'America/New_York'
 LANGUAGE_CODE = 'en-us'
