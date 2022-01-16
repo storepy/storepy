@@ -103,9 +103,9 @@ class StaffProductViewset(Mixin, viewsets.ModelViewSet):
                 img.position = cover_position
                 img.caption = cover_caption
                 img.save()
-                obj.images.remove(img)
 
             obj.cover = img
+            obj.images.remove(img)
             obj.save()
 
         return self.retrieve(self, request, *args, **kwargs)

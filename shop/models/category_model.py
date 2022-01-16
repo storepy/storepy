@@ -17,7 +17,8 @@ class Category(BaseModelMixin):
         related_name='shop_category')
 
     cover = models.OneToOneField(
-        'miq.Image', verbose_name=_("Cover"), on_delete=models.SET_NULL, blank=True, null=True
+        'miq.Image', verbose_name=_("Cover"), on_delete=models.SET_NULL,
+        blank=True, null=True
     )
 
     name = models.CharField(max_length=100, db_index=True)

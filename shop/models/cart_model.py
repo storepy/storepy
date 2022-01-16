@@ -17,25 +17,15 @@ class Lead(BaseModelMixin):
     )
     number = models.CharField(
         _("Number"), max_length=50,
-        validators=[
-            MinLengthValidator(4, message=_(
-                "Veuillez entrer votre numéro de téléphone.")
-            )
-        ],
-        # error_messages={
-        #     'min_length': _(
-        #         'This username is too short. (4 characters minimum)'),
-        # },
-        # null=True, blank=True
+        validators=[MinLengthValidator(4, message=_(
+            "Veuillez entrer votre numéro de téléphone."))]
     )
     email = models.EmailField(
         _("Email"), max_length=254,
-        null=True, blank=True
-    )
+        null=True, blank=True)
     ig_handle = models.CharField(
         _("Instagram"), max_length=99,
-        null=True, blank=True,
-    )
+        null=True, blank=True)
 
 
 class Cart(BaseModelMixin):
