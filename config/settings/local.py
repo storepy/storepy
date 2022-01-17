@@ -4,6 +4,8 @@ from pathlib import Path
 
 from miq.config import *
 
+from config.settings.logger import LOGGINGDICT
+
 env = environ.Env(
     DEBUG=(bool, False),
     SECRET_KEY=(str, 'my-secret-key-goes-here'),
@@ -199,6 +201,12 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 2621440
 
+
+"""
+LOGGING
+"""
+
+LOGGING = LOGGINGDICT
 
 """
 # Testing with github actions
