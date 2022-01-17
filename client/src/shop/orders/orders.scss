@@ -3,20 +3,15 @@
 .supplier-order-update-view {
   .order-items {
     .order-item {
-      .order-item-form {
-        padding: 0.5rem;
-        border-top: 1px solid var(--border-color);
-      }
-
-      .product-price-display {
-        .fw-bold {
-          font-weight: 500;
+      .miq-loader {
+        .sk-cube-grid {
+          margin: 0;
+          width: 23px;
+          height: 23px;
         }
       }
-
-      .quick-update-btn,
-      .update-btn {
-        border-color: transparent;
+      .submit-btn {
+        padding: 0.5rem 0.75rem;
       }
     }
   }

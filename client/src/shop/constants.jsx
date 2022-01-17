@@ -8,8 +8,8 @@ export const SHOP_PATHS = {
     return this.list('orders/');
   },
 
-  productUpdate: function (slug) {
-    return this.update(this.productList(), slug);
+  productUpdate: function (slug, query) {
+    return this.update(this.productList(), slug, query);
   },
   productList: function () {
     return this.list('products/');
@@ -22,7 +22,8 @@ export const SHOP_PATHS = {
     return this.update(this.categoryList(), slug);
   },
 
-  update: function (path, slug) {
+  update: function (path, slug, query) {
+    if (query) return `${path}${slug}/?${query}`;
     return `${path}${slug}/`;
   },
   list: function (path) {

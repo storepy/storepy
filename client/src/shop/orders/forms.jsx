@@ -35,7 +35,7 @@ export const SupplierProductAddForm = ({ order_slug, ...props }) => {
           .catch((err) => {
             form.setErrors({ ...form.errors, url: 'Something went wrong.' });
             setLoading(false);
-            return props?.onError(data);
+            return props?.onError?.(err);
           });
     }
   };

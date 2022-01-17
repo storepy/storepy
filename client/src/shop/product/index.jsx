@@ -11,7 +11,8 @@ import { Table, ItemTable, ImgSquare, Loading, Button } from '@miq/components';
 import { productServices } from './utils';
 
 const StaffProductAddView = lazy(() => import('./AddView'));
-const StaffProductUpdateView = lazy(() => import('./UpdateView'));
+const StaffProductUpdateView = lazy(() => import('./UpdateView/'));
+const StaffProduct_UpdateView = lazy(() => import('./UpdateView'));
 
 const StaffProductIndexView = (props) => {
   const [data, setData] = useState({ count: 0 });
@@ -199,8 +200,49 @@ export default function StaffProductRoutes(props) {
         requiredPerms={['shop.add_product']}
       />
       <AdminRoute
+        path={`${path}old/:prodSlug/`}
+        render={(args) => <StaffProduct_UpdateView back={addForwardSlash(url)} {...args} />}
+        requiredPerms={['shop.change_product']}
+      />
+
+      <AdminRoute
+        requiredPerms={['shop.view_product']}
+        render={(args) => <StaffProductListView {...args} back={props.back} />}
+      />
+    </Switch>
+  );
+}
+
+const StaffProductListView = (props) => {
+  const { path, url } = props.match;
+  const [QState, setQState] = useState({ loading: true, data: null, error: null });
+
+  const { search } = props.location;
+  const query = new URLSearchParams(search);
+  const cat = query.get('cat') || 'all';
+
+  useEffect(() => {
+    // let params = new URLSearchParams(search);
+    // if (![...params.values()].filter((i) => i).length) {
+    //   params = null;
+    // }
+    console.log('requst list');
+    productServices
+      .list(cat)
+      // .list(params)
+      .then((data) => {
+        setQState({ loading: false, data, error: null });
+      })
+      .catch((error) => {
+        setQState({ loading: false, data: null, error });
+      });
+  }, [cat]);
+
+  return (
+    <Switch>
+      <AdminRoute
         path={`${path}:prodSlug/`}
-        render={(args) => <StaffProductUpdateView back={addForwardSlash(url)} {...args} />}
+        render={(args) => <StaffProductUpdateView back={addForwardSlash(url)} {...args} {...{ QState, setQState }} />}
         requiredPerms={['shop.change_product']}
       />
       <AdminRoute
@@ -209,4 +251,4 @@ export default function StaffProductRoutes(props) {
       />
     </Switch>
   );
-}
+};

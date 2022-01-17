@@ -31,6 +31,7 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
 
 CORS_ORIGIN = 'http://192.168.1.243:3000'
+# CORS_ORIGIN = 'http://127.0.0.1:3000'
 
 CSRF_COOKIE_NAME = 'csrftoken'
 CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
@@ -43,7 +44,6 @@ if CORS_ORIGIN:
     CSRF_TRUSTED_ORIGINS.append(CORS_ORIGIN)
 
 ADMINS = [('Michael', 'michaelgainyo@gmail.com'), ]
-# CORS_ORIGIN = 'http://127.0.0.1:3000'
 
 ALLOWED_HOSTS = ['*']
 

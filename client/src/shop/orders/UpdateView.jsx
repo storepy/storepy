@@ -13,6 +13,8 @@ import { SupplierData } from './components';
 import { SHOP_MSGS, SHOP_PATHS } from '../constants';
 import { productServices } from '../product/utils';
 import { ProductPriceDisplay } from '../public/components';
+import { Loading } from 'src/exports';
+import { StaffProductDeleteButton } from '../product/components';
 
 const formDefault = {
   order_id: '',
@@ -70,7 +72,7 @@ export default function SupplierOrderStaffUpdateView(props) {
       });
   }, [sOrderSlug]);
 
-  if (!order) return null;
+  if (!sOrderSlug || !order) return null;
 
   const handleSubmit = (e, fields) => {
     e.preventDefault();
@@ -94,6 +96,9 @@ export default function SupplierOrderStaffUpdateView(props) {
         form.handleError(err);
       });
   };
+
+  const removeItem = (slug) =>
+    setProducts({ ...products, count: products.count - 1, results: products.results.filter((i) => i.slug !== slug) });
 
   return (
     <AdminView
@@ -121,6 +126,7 @@ export default function SupplierOrderStaffUpdateView(props) {
             order={order}
             products={products}
             setProducts={setProducts}
+            removeItem={removeItem}
             orderSlug={order.slug}
           />
         </div>
@@ -188,10 +194,10 @@ export default function SupplierOrderStaffUpdateView(props) {
   );
 }
 
-const OrderItemListSection = ({ order, products, setProducts, ...props }) => {
+const OrderItemListSection = (props) => {
   const [selected, setSelected] = useState([]);
 
-  const { toast } = props;
+  const { toast, order, products, setProducts } = props;
 
   return (
     <AdminView.Section className="order-items mb-3">
@@ -212,6 +218,7 @@ const OrderItemListSection = ({ order, products, setProducts, ...props }) => {
             </div>
 
             <OrderItem
+              {...props}
               item={item}
               toast={toast}
               categories={order.categories}
@@ -258,97 +265,66 @@ const OrderItemListSection = ({ order, products, setProducts, ...props }) => {
 };
 
 const OrderItem = ({ item, ...props }) => {
-  const [isEdit, setEdit] = useState(props.isEdit || false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const form = useForm({
+    name: item.name || '',
+    category: item.category || '',
+    retail_price: item?.retail_price || 0.0,
+    supplier_item_cost: item?.supplier_item_cost || 0.0,
+    is_pre_sale: item.is_pre_sale || false,
+    is_pre_sale_text: item.is_pre_sale_text || '',
+  });
 
   if (!item?.slug) return null;
 
-  return (
-    <div className="order-item mb-2 border-1 rounded ">
-      <div className="d-flex p-1">
-        <div className="me-1">
-          <ImgSquare {...item.cover_data} className="rounded" />
-        </div>
-
-        <div className="flex-1 detail">
-          <div className="fw-bold" title={item.name}>
-            <span className="me-2">{item.name}</span>
-            {item?.page?.is_published && <PublishedStatusSpan is_published={item?.page?.is_published} pill short />}
-          </div>
-
-          <div className="">
-            <ProductPriceDisplay
-              product={{ ...item, retail_price: item.retail_price_data, sale_price: item.sale_price_data }}
-            />
-          </div>
-
-          <div className="mb-1 text-sm">
-            {item.category_data && <span className="me-1">{item.category_data.name} /</span>}
-            {item.is_pre_sale && <span className="me-1">Pre sale /</span>}
-            <span className="me-1">atc: {item.add_to_cart_count}</span>
-          </div>
-
-          <div className="actions d-flex justify-content-between align-items-center">
-            <a href={SHOP_PATHS.productUpdate(item.slug)} target="_blank" className="update-btn btn btn-primary-2">
-              Update
-            </a>
-
-            <div>
-              <Button onClick={() => setEdit(!isEdit)} className="quick-update-btn btn-secondary-3">
-                Quick update
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {isEdit && <OrderProductUpdateForm {...props} isEdit={isEdit} product={item} />}
-    </div>
-  );
-};
-
-const OrderProductUpdateForm = ({ isEdit, product, ...props }) => {
-  const form = useForm({
-    name: product.name || '',
-    category: product.category || '',
-    retail_price: product?.retail_price || 0.0,
-    supplier_item_cost: product?.supplier_item_cost || 0.0,
-    is_pre_sale: product.is_pre_sale || false,
-    is_pre_sale_text: product.is_pre_sale_text || '',
-  });
-
-  if (!isEdit) return null;
-
   const handleUpdate = (data) => {
-    props?.toast?.success?.({ message: SHOP_MSGS.product.update_success });
+    setLoading(false);
     return props?.onUpdate(data);
   };
 
   const { errors } = form;
   return (
-    <ProductForm
-      context={form}
-      prodSlug={product.slug}
-      fields={['name', 'category', 'retail_price', 'is_pre_sale', 'is_pre_sale_text', 'supplier_item_cost']}
-      className="order-item-form mb-2"
-      onSuccess={handleUpdate}
-      onError={(err) => {
-        return form.handleError(err);
-      }}
-    >
-      <div className="d-grid grid-md-5 gap-2">
-        <div className="span-md-3 mb-2">
-          <ProductForm.NameInput error={errors.name} className="mb-1" />
-          <ProductForm.CategoryInput categories={props?.categories} className="mb-1" />
-          <ProductForm.RetailPriceInput error={errors.retail_price} className="mb-1" />
+    <div className="order-item mb-2 border-1 rounded p-1">
+      {error && <div className="text-danger">Something went wrong.</div>}
 
-          <Form.Label value={`Supplier item cost (${product.supplier_item_cost_currency})`} />
-          <Form.TextInput name="supplier_item_cost" className="" />
-        </div>
+      <div className="d-grid grid-md-3 gap-2">
+        <ProductForm
+          context={form}
+          prodSlug={item.slug}
+          fields={['name', 'category', 'retail_price', 'is_pre_sale', 'is_pre_sale_text', 'supplier_item_cost']}
+          className="order-item-form span-md-2 d-grid grid-md-3 gap-1"
+          onWillSubmit={() => setLoading(true)}
+          onSuccess={handleUpdate}
+          onError={(err) => {
+            setLoading(false);
+            return form.handleError(err);
+          }}
+        >
+          <div className="span-md-3 d-flex align-items-center">
+            <ImgSquare {...item.cover_data} className="rounded" />
+            <ProductForm.NameInput error={errors.name} className="ms-1" />
+          </div>
 
-        <div className="span-md-2">
-          <div className="mb-3">
+          <div className="">
+            <ProductForm.CategoryInput categories={props?.categories} error={errors.category} />
+          </div>
+          <div className="">
+            <ProductForm.RetailPriceInput error={errors.retail_price} />
+          </div>
+          <div className="">
+            <Form.TextInput
+              type="number"
+              name="supplier_item_cost"
+              error={errors.supplier_item_cost}
+              min="0"
+              step="0.01"
+            />
+          </div>
+
+          <div className="span-md-3">
             <div className="mb-1">
-              <ProductForm.PresaleCheckboxInput error={errors.is_pre_sale} className="mb-1" />
+              <ProductForm.PresaleCheckboxInput error={errors.is_pre_sale} />
             </div>
 
             {form.values.is_pre_sale && (
@@ -357,11 +333,44 @@ const OrderProductUpdateForm = ({ isEdit, product, ...props }) => {
               </div>
             )}
 
-            <Form.Submit value="Update" className="btn btn-primary-3 w-100" />
+            <div className="d-flex justify-content-between align-items-center">
+              <StaffProductDeleteButton
+                prodSlug={item.slug}
+                onSuccess={() => {
+                  props?.removeItem?.(item.slug);
+                }}
+                onError={() => setError(true)}
+                className="btn-danger-3"
+                label="Supprimer"
+              />
+              <Form.Submit value="Sauveguarder" className="submit-btn btn btn-primary min-w-35" />
+            </div>
           </div>
-          <SupplierData product={product} />
+        </ProductForm>
+
+        <div className="">
+          <div className="d-flex align-items-center justify-content-between">
+            <div title="Add to cart count">atc: {item.add_to_cart_count}</div>
+            <div style={{ minWidth: 23, minHeight: 23 }}>
+              {loading ? (
+                <Loading className="icon small" />
+              ) : (
+                <PublishedStatusSpan is_published={item?.page?.is_published} pill short />
+              )}
+            </div>
+          </div>
+
+          <SupplierData product={item} />
+
+          <a
+            href={SHOP_PATHS.productUpdate(item.slug)}
+            target="_blank"
+            className="update-btn btn btn-primary-3 w-100 d-block text-center"
+          >
+            Go to update page »
+          </a>
         </div>
       </div>
-    </ProductForm>
+    </div>
   );
 };

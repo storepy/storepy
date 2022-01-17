@@ -1,1 +1,10 @@
 @use '../orders/components';
+
+.product-list-item-card {
+  position: relative;
+  padding: 8px;
+}
+
+.product-price-display {
+  flex-wrap: wrap;
+}

@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
-import { AdminView, StaffCoverUpdateForm, PublishedStatusSpan } from '@miq/adminjs';
+import { AdminView, PublishedStatusSpan } from '@miq/adminjs';
 import Form from '@miq/form';
+import { isRequired } from '@miq/utils';
 import { productServices } from './utils';
-import { ProductImageAltTextInput } from './components';
 import { SHOP_MSGS } from '../constants';
+
+const isR = isRequired;
 
 export function ProductQuickUpdateForm({ form, product, ...props }) {
   const { setProduct, toast, categories } = props;
@@ -90,43 +92,15 @@ export function ProductQuickUpdateForm({ form, product, ...props }) {
             </div>
           </AdminView.Section>
         </div>
-
-        <div className="">
-          <StaffCoverUpdateForm
-            slug={product?.cover}
-            data={product.cover_data}
-            onCreate={(imgData) => {
-              productServices
-                .patch(product.slug, { cover: imgData.slug })
-                .then((data) => {
-                  setProduct?.({ ...product, ...data });
-                  toast?.success({ message: SHOP_MSGS.product.cover_create_success });
-                })
-                .catch((err) => {
-                  toast?.error({ message: SHOP_MSGS.product.cover_update_error });
-                });
-            }}
-            onUpdate={(cover_data) => {
-              toast?.success({ message: SHOP_MSGS.product.cover_update_success });
-              return setProduct?.({ ...product, cover_data });
-            }}
-            onDelete={() => {
-              toast?.success({ message: SHOP_MSGS.product.cover_delete_success });
-              return setProduct?.({ ...product, cover_data: null, cover: null });
-            }}
-            className="mb-1"
-          />
-          <ProductImageAltTextInput image={product?.cover_data} />
-        </div>
       </div>
     </ProductForm>
   );
 }
 
-// INPUTS
+//#region INPUTS
 
 export const ProductNameInput = (props) => {
-  const { showLabel = true, label = 'Name', ...input } = props;
+  const { showLabel = false, label = 'Name', ...input } = props;
   const { placeholder = 'Give a name to the item', ...rest } = input;
   return (
     <>
@@ -136,14 +110,29 @@ export const ProductNameInput = (props) => {
   );
 };
 
+export const ProductDescriptionField = (props) => {
+  const { label, text, ...input } = props;
+  const { placeholder = 'Give a description to the item', ...rest } = input;
+  return (
+    <Form.Field {...{ label, text }}>
+      <Form.TextAreaX
+        {...rest}
+        name="description"
+        // error={form.errors.description}
+        placeholder={placeholder}
+      />
+    </Form.Field>
+  );
+};
+
 export const ProductCategoryInput = (props) => {
-  const { showLabel = true, label = 'Category', ...input } = props;
+  const { showLabel = false, label = 'Category', ...input } = props;
   const { categories, ...rest } = input;
 
   return (
     <>
       {showLabel && <Form.Label value={label} />}
-      <Form.SelectInput {...rest} required name="category" nullValue={{ label: 'Select category' }}>
+      <Form.SelectInput {...rest} required name="category" nullValue={{ label: 'Sélectionnez une catégorie' }}>
         {categories?.items?.map((cat) => {
           return <Form.SelectInput.Option {...cat} key={cat.value} />;
         })}
@@ -153,7 +142,7 @@ export const ProductCategoryInput = (props) => {
 };
 
 export const ProductRetailPriceInput = (props) => {
-  const { showLabel = true, label = 'Retail price', ...rest } = props;
+  const { showLabel = false, label = 'Retail price', ...rest } = props;
 
   return (
     <>
@@ -172,10 +161,10 @@ export const ProductRetailPriceInput = (props) => {
 };
 
 export const ProductPresaleCheckboxInput = (props) => {
-  const { showLabel = true, label = 'Pre-sale', ...rest } = props;
+  const { showLabel = false, label = 'Pre-sale', ...rest } = props;
 
   return (
-    <div className="d-flex">
+    <div className="d-flex align-items-center">
       <Form.CheckboxInput {...rest} name="is_pre_sale" className="me-2" />
       <Form.Label value={label} />
     </div>
@@ -192,10 +181,10 @@ export const ProductPresaleTextInput = (props) => {
 };
 
 export const ProductOnSaleCheckboxInput = (props) => {
-  const { showLabel = true, label = 'On Sale', ...rest } = props;
+  const { showLabel = false, label = 'On Sale', ...rest } = props;
 
   return (
-    <div className="d-flex">
+    <div className="d-flex align-items-center">
       <Form.CheckboxInput {...rest} name="is_on_sale" className="me-2" />
       <Form.Label value={label} />
     </div>
@@ -203,7 +192,7 @@ export const ProductOnSaleCheckboxInput = (props) => {
 };
 
 export const ProductSalePriceInput = (props) => {
-  const { showLabel = true, label = 'Sale price', ...rest } = props;
+  const { showLabel = false, label = 'Sale price', ...rest } = props;
   return (
     <>
       {showLabel && <Form.Label value={label} id="sale_price_label" className="miq-checkbox-label" />}
@@ -221,7 +210,7 @@ export const ProductSalePriceInput = (props) => {
 };
 
 export const ProductStageSelect = (props) => {
-  const { showLabel = true, label = 'Stage', ...input } = props;
+  const { showLabel = false, label = 'Stage', ...input } = props;
   const { stages, name, ...rest } = input;
 
   return (
@@ -236,11 +225,17 @@ export const ProductStageSelect = (props) => {
   );
 };
 
+//#endregion INPUTS
+
+//#region FORMS
+
 export const ProductForm = ({ children, context, fields = [], prodSlug, ...props }) => {
-  const { onSuccess, onError, ...rest } = props;
+  const { onWillSubmit, onSuccess, onError, ...rest } = props;
 
   const handleSubmit = (e) => {
     if (!context || !fields) return;
+
+    onWillSubmit?.();
 
     e.preventDefault();
     const fD = {
@@ -269,7 +264,6 @@ export const ProductForm = ({ children, context, fields = [], prodSlug, ...props
       })
       .catch((err) => {
         if (props.onError) return props.onError(err);
-        console.log('ehey');
         return context.handleError(err);
       });
   };
@@ -281,6 +275,7 @@ export const ProductForm = ({ children, context, fields = [], prodSlug, ...props
 };
 
 ProductForm.NameInput = ProductNameInput;
+ProductForm.DescField = ProductDescriptionField;
 ProductForm.CategoryInput = ProductCategoryInput;
 ProductForm.RetailPriceInput = ProductRetailPriceInput;
 ProductForm.PresaleCheckboxInput = ProductPresaleCheckboxInput;
@@ -288,3 +283,5 @@ ProductForm.PresaleTextInput = ProductPresaleTextInput;
 ProductForm.OnSaleCheckboxInput = ProductOnSaleCheckboxInput;
 ProductForm.SalePriceInput = ProductSalePriceInput;
 ProductForm.StageSelect = ProductStageSelect;
+
+//#endregion

@@ -14,7 +14,11 @@ db.sqlite3-journal
 !.vscode/settings.json
 !.vscode/launch.json
 
+fixtures/
 .idea/
+.vscode/
+
+client/
 
 /config/settings/.env
 config/settings/production.py
