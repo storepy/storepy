@@ -1,1 +1,0 @@
-# MarqetIntl Store Client app
