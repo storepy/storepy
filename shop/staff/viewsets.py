@@ -1,5 +1,7 @@
-from django.utils.text import slugify
+import logging
 # from pprint import pprint
+
+from django.utils.text import slugify
 from django import http
 from django.utils import timezone
 from django.contrib.sites.shortcuts import get_current_site
@@ -30,6 +32,8 @@ from shop.staff.serializers import (
 
 
 from .crawler import Crawler
+
+log = logging.getLogger(__name__)
 
 
 class Mixin(StaffLoginRequired):
@@ -114,30 +118,37 @@ class StaffProductViewset(Mixin, viewsets.ModelViewSet):
     def publish(self, request, *args, **kwargs):
         obj = self.get_object()
         page = obj.page
+        obj_id = obj.id
 
         if page and (unpublish := self.request.data.get('unpublish', False)) and unpublish is True:
             page.is_published = False
             page.save()
+            log.info(f'Unpublished product [{obj_id}]')
             return self.retrieve(self, request, *args, **kwargs)
 
         if not obj.retail_price:
+            log.error(f'Cannot publish [{obj_id}]: retail price required')
             raise serializers.ValidationError(
                 {'retail_price': _('Retail price required')})
 
         category = obj.category
         if not category or not category.page:
+            log.error(f'Cannot publish [{obj_id}]: No category or no category page')
             raise serializers.ValidationError({'category': _('Category required')})
 
         if not category.page.is_published:
+            log.error(f'Cannot publish [{obj_id}]: Category is unpublished')
             raise serializers.ValidationError({'category': _('Unpublished')})
 
         if not page:
+            log.error(f'Cannot publish [{obj_id}]: product has no page')
             raise serializers.ValidationError({'page': _('Page required')})
 
         page.is_published = True
         if not page.dt_published:
             page.dt_published = timezone.now()
         page.save()
+        log.info(f'Published product [{obj_id}]')
 
         return self.retrieve(self, request, *args, **kwargs)
 
@@ -187,18 +198,25 @@ class StaffProductViewset(Mixin, viewsets.ModelViewSet):
     def get_queryset(self):
         qs = super().get_queryset()
         params = self.request.query_params
-        if(cat := params.get('cat')) and cat != '':
-            qs = qs.filter(category__slug=cat)
 
         if(order_slug := params.get('supplier_order_slug')):
             if order_slug == '':
                 return qs.none()
             qs = qs.filter(supplier_orders__slug=order_slug)
 
-        if(status := params.get('status')) and status != '':
-            if status == 'published':
+        if(cat := params.get('cat')) and cat != '':
+            qs = qs.filter(category__slug=cat)
+
+        if(presale := params.get('presale')) and presale != '':
+            qs = qs.filter(is_pre_sale=True)
+
+        if(sale := params.get('sale')) and sale != '':
+            qs = qs.filter(is_on_sale=True)
+
+        if(published := params.get('published')) and published != '':
+            if published == 'include':
                 qs = qs.published()
-            if status == 'draft':
+            if published == 'exclude':
                 qs = qs.draft()
         return qs
 

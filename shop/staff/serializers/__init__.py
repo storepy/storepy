@@ -1,6 +1,6 @@
+import logging
 
 from rest_framework.serializers import ModelSerializer, SlugRelatedField
-
 
 from shop.models import Product, Cart, CartProduct, SupplierOrder
 

@@ -105,6 +105,9 @@ class ProductView(ViewMixin, DetailView):
             ],
         }
 
+        if (similar := obj.category.products.exclude(pk=obj.id)) and similar.exists():
+            data['similar'] = [product_to_dict(item) for item in similar.all()[:4]]
+
         if cart := self.get_cart_items():
             data['cart'] = cart
 
