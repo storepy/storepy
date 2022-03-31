@@ -4,24 +4,25 @@ from django.conf import settings
 from django.urls import path, include
 from django.conf.urls.static import static
 
-from miq.staff.views import StaffLoginView
-from shop.views import IndexView
-
+from shopy.shop import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('staff/', include('miq.staff.urls', namespace='staff')),
-    path('staff/', StaffLoginView.as_view(), name='stafflogin'),
 ]
 
 urlpatterns += [
-    path('', include('shop.urls', namespace='shop')),
+    # path('', include('orders.urls', namespace='orders')),
+    path('', include('shopy.shop.urls', namespace='shopy')),
+    path('', include('shopy.store.urls', namespace='shopy')),
+    # path('', include('miqsocial.urls', namespace='miqsocial')),
 ]
 
 # Must be last
+
 urlpatterns += [
-    path('', include('miq.urls', namespace='miq')),
-    path('', IndexView.as_view(), name='index'),
+    path('', include('miq.staff.urls', namespace='staff')),
+    path('', include('miq.core.urls', namespace='miq')),
+    path('', views.IndexView.as_view(), name='index'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

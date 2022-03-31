@@ -17,8 +17,10 @@ db.sqlite3-journal
 fixtures/
 .idea/
 .vscode/
+.ig/
 
-client/
+stenv/
+miqenv/
 
 /config/settings/.env
 config/settings/production.py
@@ -124,8 +126,6 @@ celerybeat.pid
 
 # Environments
 .venv
-storenv/
-miqenv/
 env/
 venv/
 ENV/

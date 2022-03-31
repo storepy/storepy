@@ -1,10 +1,13 @@
+# from pprint import pprint
+# from django.conf import locale
 import os
 import environ
 from pathlib import Path
 
-from miq.config import *
+from miq.core.config import *
 
-from config.settings.logger import LOGGINGDICT
+
+from .logger import LOGGINGDICT
 
 env = environ.Env(
     DEBUG=(bool, False),
@@ -12,6 +15,10 @@ env = environ.Env(
     DB_NAME=(str, ''),
     DB_USER=(str, ''),
     DB_PWD=(str, ''),
+
+    FB_APP_ID=(str, None),
+    FB_APP_SECRET=(str, None),
+    FB_APP_ACCESS_TOKEN=(str, None),
 
     GH_DB_NAME=(str, 'localhost'),
     GH_DB_USER=(str, 'postgres'),
@@ -50,6 +57,7 @@ ADMINS = [('Michael', 'michaelgainyo@gmail.com'), ]
 ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
+    #
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -66,8 +74,11 @@ INSTALLED_APPS = [
     'rest_framework',
 
     # CORE
-    'miq.apps.MiqConfig',
-    'shop.apps.ShopConfig',
+    'miq.core',
+    'miq.staff',
+
+    'shopy.shop',
+    'shopy.store',
 ]
 
 DATABASES = {
@@ -100,12 +111,12 @@ DJANGO_MIDDLEWARES = (
 MIDDLEWARE = (
 
     # CORS
-    'miq.middleware.CORSMiddleware',
+    'miq.core.middleware.CORSMiddleware',
     #
     *DJANGO_MIDDLEWARES,
     #
-    'miq.middleware.SiteMiddleware',
-    'shop.middleware.StoreMiddleware',
+    'miq.core.middleware.SiteMiddleware',
+    # 'orders.middleware.OrdersMiddleware',
 )
 
 ROOT_URLCONF = 'config.urls'
@@ -154,8 +165,14 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',  # Set for all views
     ],
 
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_PAGINATION_CLASS': 'miq.core.pagination.MiqPageNumberPagination',
     'PAGE_SIZE': 16,
+
+    # 'DEFAULT_RENDERER_CLASSES': [
+    # 'rest_framework.renderers.JSONRenderer',
+    # 'rest_framework.renderers.BrowsableAPIRenderer',
+    # ]
 }
 
 
@@ -209,6 +226,13 @@ LOGGING
 LOGGING = LOGGINGDICT
 
 """
+FB APP
+"""
+
+FB_APP_ACCESS_TOKEN = env('FB_APP_ACCESS_TOKEN')
+
+
+"""
 # Testing with github actions
 """
 
@@ -223,3 +247,4 @@ if os.environ.get('GITHUB_WORKFLOW'):
             'PORT': env('GH_DB_PORT'),
         }
     }
+# pprint(locale.LANG_INFO)

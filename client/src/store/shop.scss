@@ -1,0 +1,48 @@
+@use '@miq/styles/src/variables' as *;
+@use '@miq/styles/src/mixins' as *;
+
+.p-images-grid {
+  grid-auto-columns: minmax(calc(90% - 50px), calc(75%));
+
+  @include xs-screen {
+    grid-auto-columns: calc(100vw - 50px);
+  }
+
+  @include lg-screen {
+    grid-auto-columns: 650px;
+  }
+
+  display: none;
+}
+
+.product-detail-view {
+  .imgs-gallery-horizontal {
+    @include md-down {
+    }
+
+    @include xs-screen {
+      .portrait {
+        width: calc(100vh - 50px);
+      }
+    }
+
+    @include xs-screen {
+      .portrait {
+        width: calc(100vw - 50px);
+      }
+    }
+
+    img {
+      max-height: calc(100vh - 205px);
+    }
+  }
+
+  .p-images {
+    // max-height: calc(var(--vh) - 205px);
+
+    width: 100%;
+    // overflow: hidden;
+    height: auto;
+    // display: flex;
+  }
+}

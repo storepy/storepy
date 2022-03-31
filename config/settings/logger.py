@@ -53,6 +53,11 @@ LOGGINGDICT = {
             'level': 'INFO',
             'propagate': True,
         },
+        'orders': {
+            'handlers': ['console2'],
+            'level': 'INFO',
+            'propagate': True,
+        },
         'django': {
             'handlers': ['console', 'mail_admins'],
             'level': 'INFO',
