@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunk_storepy_clientjs=self.webpackChunk_storepy_clientjs||[]).push([[112],{2112:function(e,n,t){t.r(n),t.d(n,{default:function(){return u}});t(2411);var r=t(3576),s=t(8136);function u(e){return(0,s.jsx)(r.ZP.View,{title:"Planner"})}}}]);
+//# sourceMappingURL=112.892bbfa6.chunk.js.map
