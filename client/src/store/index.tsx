@@ -6,7 +6,9 @@ import {
   CategoryLinks,
   ProductGrid,
   ProductImagesHorizontalGallery,
+  ProductPrice,
   ProductSearchForm,
+  ProductType,
   ShopyClientProductDetailSharedDataState,
   ShopyClientProductListSharedDataState,
   Views,
@@ -14,13 +16,14 @@ import {
 import { Routes, Route, useSearchParams } from 'react-router-dom';
 import { SharedDataCtx } from '@miq/contextjs';
 import { Img, View, BreadCrumbs } from '@miq/componentjs';
-import { ProductAttributeList, ProductPrice } from './components';
+import { ProductAttributeList } from './components';
 
 const ProductDetailView = () => {
   const ctx = React.useContext(SharedDataCtx);
   const { product, similar, breadcrumbs } = ctx as ShopyClientProductDetailSharedDataState;
 
-  const { is_pre_sale, is_pre_sale_text } = product;
+  const { is_pre_sale, is_pre_sale_text, cover, images } = product;
+  const pImages = [cover!, ...images!];
 
   return (
     <>
@@ -29,7 +32,7 @@ const ProductDetailView = () => {
       <Views.ProductDetailView
         images={
           <div className="p-images mb-2" style={{ position: 'sticky', top: 0 }}>
-            <ProductImagesHorizontalGallery images={product?.images || []} mobileOnly={false} />
+            <ProductImagesHorizontalGallery images={pImages} mobileOnly={false} />
           </div>
         }
         className="product-detail-view"
@@ -122,25 +125,23 @@ const ProductGridView = () => {
         title={page_label}
         viewCN="miq-container-lg"
         items={object_list}
-        renderItem={(i) => <ProductGridItem item={i} key={i.meta_slug} />}
+        renderItem={(i) => <ProductGridItem showName item={i} key={i.meta_slug} />}
       />
       {/* <Pagination {...pagination} /> */}
     </View>
   );
 };
 
-const ProductGridItem = (props: any) => {
-  const { url, cover, name } = props.item;
+const ProductGridItem = ({ item, showName, ...props }: { item: ProductType; showName?: boolean }) => {
+  const { url, cover, name } = item;
   return (
     <a href={`${url}`}>
       <div className="">
         <Img.Picture {...cover} />
 
         <div className="product-grid-info">
-          {/* {showName &&  */}
-          <div className="product-grid-name">{name}</div>
-          {/* } */}
-          {/* <ProductPrice instance={product} /> */}
+          {showName && <div className="product-grid-name">{name}</div>}
+          <ProductPrice {...item} />
         </div>
       </div>
     </a>
