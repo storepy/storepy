@@ -6,6 +6,8 @@ A Django powered e-com store.
 caffeinate ./manage.py runserver 192.168.1.243:8000
 ```
 
+sample landing page: https://www.thermalprinteroutlet.com/product/zebra-zp-450-thermal-label-printer-zp450-plus-driver-manual/?gclid=CjwKCAjwo8-SBhAlEiwAopc9W2_Dlew7zRdTfHXTGG3XMNZPcJQ-3g_35lo9fFtkotNY77tcEAv7IBoCxvAQAvD_BwE
+
 ```
 https://www.prettylittlething.us/leopard-underwired-tie-shoulder-bikini-top.html
 https://www.prettylittlething.us/black-acetate-slinky-keyhole-strap-bodycon-dress.html
