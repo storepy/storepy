@@ -15,7 +15,7 @@ import {
 } from '@shopy/shopjs';
 import { Routes, Route, useSearchParams } from 'react-router-dom';
 import { SharedDataCtx } from '@miq/contextjs';
-import { Img, View, BreadCrumbs } from '@miq/componentjs';
+import { Img, View, BreadCrumbs, Pagination } from '@miq/componentjs';
 import { ProductAttributeList } from './components';
 
 const ProductDetailView = () => {
@@ -94,19 +94,19 @@ const ProductDetailView = () => {
   );
 };
 
-type ProductGridSharedData = ShopyClientProductListSharedDataState & {};
+type ProductGridSharedData = ShopyClientProductListSharedDataState & { pagination: any };
 
 const ProductGridView = () => {
   const [params] = useSearchParams();
   const ctx = React.useContext(SharedDataCtx);
-  const { object_list = [], page_label, breadcrumbs }: ProductGridSharedData = ctx as ProductGridSharedData;
+  const { object_list = [], page_label, breadcrumbs, pagination }: ProductGridSharedData = ctx as ProductGridSharedData;
 
   const q = params.get('q');
   const page = params.get('page');
 
   return (
     <View
-      className="p-listview"
+      className="p-listview pb-4"
       header={
         <header className="p-listview-header">
           <div className="miq-container center">
@@ -127,7 +127,8 @@ const ProductGridView = () => {
         items={object_list}
         renderItem={(i) => <ProductGridItem showName item={i} key={i.meta_slug} />}
       />
-      {/* <Pagination {...pagination} /> */}
+
+      <div className="mt-3">{pagination && <Pagination {...pagination} />}</div>
     </View>
   );
 };
