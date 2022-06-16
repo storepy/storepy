@@ -48,7 +48,7 @@ CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
 # if true, browsers may ensure that the cookie is only sent with an HTTPS connection
 CSRF_COOKIE_SECURE = False
 
-CSRF_TRUSTED_ORIGINS = []
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000']
 if CORS_ORIGIN:
     CSRF_TRUSTED_ORIGINS.append(CORS_ORIGIN)
 
