@@ -10,12 +10,7 @@
 <div>[number, social accounts]</div>
 <div>[logo]/[nav]/[cart]</div>
 {% block navbar %}
-  <div class="navbar-banner p-1">
-    <div class="flag">
-      <img src="{% static 'bj-round.png' %}" alt="benin flag" title="Nos produits sont livrés partout dans Cotonou">
-      <span class="me-3">Livraison à Cotonou</span>
-    </div>
-
+  <div class="navbar-banner">
     {% if contact_number %}
       <div class="contact-number">
       <a href="tel:{{contact_number}}" class="contact-number-link" title="{{contact_number_title}}" aria-label="{{contact_number_title}}">
@@ -25,7 +20,7 @@
     {% endif %}
   </div>
 
-  <div class="site-name px-1 px-md-2 text-md text-center">
+  <div class="site-name px-1 px-md-2 text-md">
     <a href="/" class="site-name-link">{{site.name}}</a>
   </div>
 
