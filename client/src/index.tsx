@@ -10,7 +10,7 @@ import './index.scss';
 
 const StaffLayout = React.lazy(() => import('./staff'));
 // const OrdersPublicRoutes = React.lazy(() => import('./orders'));
-const ShopPublicRoutes = React.lazy(() => import('./store'));
+const ShopPublicRoutes = React.lazy(() => import('./shop'));
 
 const App = () => {
   const { pathname } = useLocation();
