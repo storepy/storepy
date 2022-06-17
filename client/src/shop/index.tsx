@@ -4,8 +4,6 @@ import './shop.scss';
 
 import {
   CategoryLinks,
-  ProductGrid,
-  ProductImagesHorizontalGallery,
   ProductPrice,
   ProductSearchForm,
   ProductType,
@@ -17,14 +15,22 @@ import { Routes, Route, useSearchParams } from 'react-router-dom';
 import { SharedDataCtx } from '@miq/contextjs';
 import { Img, View, BreadCrumbs, Pagination, StickyFooterLayout } from '@miq/componentjs';
 import { ProductAttributeList } from './components';
-import { useViewport } from '@miq/hookjs';
+// import { useViewport } from '@miq/hookjs';
 
-const ProductDetailView = () => {
+const ShopProductDetailView = () => {
   const ctx = React.useContext(SharedDataCtx);
-  const { product, similar, breadcrumbs } = ctx as ShopyClientProductDetailSharedDataState;
+  // const { isMDDown } = useViewport();
+
+  const { product, similar, breadcrumbs, whatsapp_number } = ctx as ShopyClientProductDetailSharedDataState & {
+    whatsapp_number: string | undefined;
+  };
 
   const { is_oos, is_pre_sale, is_pre_sale_text, cover, images } = product;
   const pImages = [cover!, ...images!];
+
+  const link = `https://wa.me/${whatsapp_number}?text=${encodeURIComponent(
+    `Coucou!\nCet article est il toujours disponible?\n${window.location.href}`
+  )}`;
 
   return (
     <>
@@ -33,7 +39,7 @@ const ProductDetailView = () => {
       <Views.ProductDetailView
         images={
           <div className="p-images mb-2" style={{ position: 'sticky', top: 0 }}>
-            <ProductImagesHorizontalGallery images={pImages} mobileOnly={false} />
+            <Views.ProductDetailView.HorizontalGallery images={pImages} mobileOnly={false} />
           </div>
         }
         className="product-detail-view"
@@ -45,16 +51,20 @@ const ProductDetailView = () => {
             </div>
           )}
 
-          <h1 className="p-name text-md fw-lighter">{product.name}</h1>
+          <h1 className="p-name text-md fw-lighter mb-1">{product.name}</h1>
+
           <ProductPrice {...product} retail_price={product.retail_price!} />
 
           <div className="mb-3">{/* <ProductPreSaleDate product={product} /> */}</div>
           {is_pre_sale && is_pre_sale_text && <div className="p-presale-text mb-3">{is_pre_sale_text}</div>}
 
-          <div className="mb-3">
-            {/* CART FORMS */}
-            {/* {cartHasProd ? <CartItemUpdateForm {...cartProps} /> : <AddToCartForm {...cartProps} />} */}
-          </div>
+          {whatsapp_number && (
+            <div className="mb-3 text-center">
+              <a href={link} className="btn btn-md btn-primary px-2" target="_blank" style={{ width: 1000 }}>
+                Acheter
+              </a>
+            </div>
+          )}
 
           {product.description && <div className="p-description mb-3">{product.description}</div>}
 
@@ -89,37 +99,25 @@ const ProductDetailView = () => {
 
       {similar && (
         <div className="p-2">
-          <p className="text-md mb-2">Voir les styles semblables</p>
-          <ProductGrid>
+          <p className="text-md mb-2">Vous aimerez peut-être</p>
+
+          <Views.ProductGridView.Grid>
             {similar.map((i) => (
               <ProductGridItem item={i} key={i.meta_slug} />
             ))}
-          </ProductGrid>
+          </Views.ProductGridView.Grid>
         </div>
       )}
     </>
   );
 };
 
-type ProductGridSharedData = ShopyClientProductListSharedDataState & { pagination: any };
-
-const ProductGridMobileView = (props: any) => {
-  return <StickyFooterLayout footer={<>CONTACTEZ NOUS</>}>{p}</StickyFooterLayout>;
-};
-
-const p =
-  'SM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimentalSM support for PnP uses the experimental loader API and is therefore experimental';
-
-const ProductGridView = () => {
+const ShopProductGridView = () => {
   const [params] = useSearchParams();
-  const { isMDDown } = useViewport();
-  const ctx = React.useContext(SharedDataCtx) as ProductGridSharedData;
 
-  // if (isMDDown) return <ProductGridMobileView />;
+  const ctx = React.useContext(SharedDataCtx) as ShopyClientProductListSharedDataState & { pagination: any };
 
   const { object_list = [], page_label, breadcrumbs, pagination } = ctx;
-
-  // const { object_list = [], page_label, breadcrumbs, pagination }: ProductGridSharedData = ctx as ProductGridSharedData;
 
   const q = params.get('q');
   const page = params.get('page');
@@ -173,9 +171,9 @@ const ProductGridItem = ({ item, showName, ...props }: { item: ProductType; show
 export default function ShopPublicRoutes() {
   return (
     <Routes>
-      <Route path=":catMetaSlug/:prodMetaSlug/" element={<ProductDetailView />} />
-      <Route path=":catMetaSlug/" element={<ProductGridView />} />
-      <Route index element={<ProductGridView />} />
+      <Route path=":catMetaSlug/:prodMetaSlug/" element={<ShopProductDetailView />} />
+      <Route path=":catMetaSlug/" element={<ShopProductGridView />} />
+      <Route index element={<ShopProductGridView />} />
     </Routes>
   );
 }
