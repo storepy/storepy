@@ -78,9 +78,11 @@ INSTALLED_APPS = [
     # CORE
     'miq.core',
     'miq.staff',
+    'miq.analytics',
 
     'shopy.shop',
     'shopy.store',
+    # 'shopy.orders',
 ]
 
 DATABASES = {
@@ -91,7 +93,11 @@ DATABASES = {
         'PASSWORD': env('DB_PWD'),
         'HOST': '',
         'PORT': '',
-    }
+    },
+    # 'analytics': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': 'analytics',
+    # }
 }
 
 
@@ -118,6 +124,7 @@ MIDDLEWARE = (
     *DJANGO_MIDDLEWARES,
     #
     'miq.core.middleware.SiteMiddleware',
+    'miq.analytics.middlewares.AnalyticsMiddleware',
     # 'orders.middleware.OrdersMiddleware',
 )
 

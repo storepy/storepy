@@ -12,8 +12,9 @@ urlpatterns = [
 
 urlpatterns += [
     # path('', include('orders.urls', namespace='orders')),
+    path('', include('shopy.store.urls', namespace='shopystore')),
     path('', include('shopy.shop.urls', namespace='shopy')),
-    path('', include('shopy.store.urls', namespace='shopy')),
+    # path('', include('shopy.orders.urls', namespace='shopyorders')),
     # path('', include('miqsocial.urls', namespace='miqsocial')),
 ]
 
