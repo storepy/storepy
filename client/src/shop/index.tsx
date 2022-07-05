@@ -13,7 +13,7 @@ import {
 } from '@shopy/shopjs';
 import { Routes, Route, useSearchParams } from 'react-router-dom';
 import { SharedDataCtx } from '@miq/contextjs';
-import { Img, View, BreadCrumbs, Pagination, StickyFooterLayout } from '@miq/componentjs';
+import { Img, View, BreadCrumbs, Pagination } from '@miq/componentjs';
 import { ProductAttributeList } from './components';
 // import { useViewport } from '@miq/hookjs';
 
@@ -60,7 +60,13 @@ const ShopProductDetailView = () => {
 
           {whatsapp_number && (
             <div className="mb-3 text-center">
-              <a href={link} className="btn btn-md btn-primary px-2" target="_blank" style={{ width: 1000 }}>
+              <a
+                href={link}
+                className="btn btn-md btn-primary px-2"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ width: 1000 }}
+              >
                 Acheter
               </a>
             </div>
@@ -153,6 +159,7 @@ const ShopProductGridView = () => {
 
 const ProductGridItem = ({ item, showName, ...props }: { item: ProductType; showName?: boolean }) => {
   const { url, cover, name, is_oos } = item;
+
   return (
     <a href={`${url}`}>
       <div className="">

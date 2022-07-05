@@ -18,7 +18,7 @@ type TExpense = {
 };
 
 const FinanceIndexView = () => {
-  const [items, setItems] = React.useState<TExpense[]>([]);
+  const [items] = React.useState<TExpense[]>([]);
 
   return (
     <Staff.View
