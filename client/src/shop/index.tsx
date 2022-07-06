@@ -61,11 +61,12 @@ const ShopProductDetailView = () => {
           {whatsapp_number && (
             <div className="mb-3 text-center">
               <a
-                href={link}
+                href={`./?r=1&source=site&medium=shopbtn&campaign=web`}
                 className="btn btn-md btn-primary px-2"
-                target="_blank"
-                rel="noopener noreferrer"
                 style={{ width: 1000 }}
+                // href={link}
+                // target="_blank"
+                // rel="noopener noreferrer"
               >
                 Acheter
               </a>
