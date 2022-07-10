@@ -64,9 +64,9 @@ const ShopProductDetailView = () => {
                 href={`./?r=1&source=site&medium=shopbtn&campaign=web`}
                 className="btn btn-md btn-primary px-2"
                 style={{ width: 1000 }}
+                target="_blank"
+                rel="noopener noreferrer"
                 // href={link}
-                // target="_blank"
-                // rel="noopener noreferrer"
               >
                 Acheter
               </a>

@@ -22,6 +22,7 @@ urlpatterns += [
 # Must be last
 
 urlpatterns += [
+    path('', include('miq.analytics.urls', namespace='analytics')),
     path('', include('miq.staff.urls', namespace='staff')),
     path('', include('miq.core.urls', namespace='miq')),
     path('', views.IndexView.as_view(), name='index'),
