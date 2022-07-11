@@ -28,10 +28,6 @@ const ShopProductDetailView = () => {
   const { is_oos, is_pre_sale, is_pre_sale_text, cover, images } = product;
   const pImages = [cover!, ...images!];
 
-  const link = `https://wa.me/${whatsapp_number}?text=${encodeURIComponent(
-    `Coucou!\nCet article est il toujours disponible?\n${window.location.href}`
-  )}`;
-
   return (
     <>
       <BreadCrumbs items={breadcrumbs} className="my-3 px-2" />
@@ -51,7 +47,9 @@ const ShopProductDetailView = () => {
             </div>
           )}
 
-          <h1 className="p-name text-md fw-lighter mb-1">{product.name}</h1>
+          <h1 className="p-name fw-lighter mb-1" style={{ fontSize: '1.25rem' }}>
+            {product.name}
+          </h1>
 
           <ProductPrice {...product} retail_price={product.retail_price!} />
 
@@ -62,11 +60,9 @@ const ShopProductDetailView = () => {
             <div className="mb-3 text-center">
               <a
                 href={`./?r=1&source=site&medium=shopbtn&campaign=web`}
-                className="btn btn-md btn-primary px-2"
-                style={{ width: 1000 }}
+                className="d-block btn btn-md btn-primary px-2 fw-bold"
                 target="_blank"
                 rel="noopener noreferrer"
-                // href={link}
               >
                 Acheter
               </a>
@@ -75,7 +71,7 @@ const ShopProductDetailView = () => {
 
           {product.description && <div className="p-description mb-3">{product.description}</div>}
 
-          <ul className="p-extra mb-3">
+          <ul className="p-extra my-3">
             {product?.has_attributes && (
               <>
                 <li className="p-extra-title mb-1">Détails</li>
@@ -127,7 +123,6 @@ const ShopProductGridView = () => {
   const { object_list = [], page_label, breadcrumbs, pagination } = ctx;
 
   const q = params.get('q');
-  const page = params.get('page');
 
   return (
     <View
@@ -142,7 +137,7 @@ const ShopProductGridView = () => {
 
           <BreadCrumbs items={breadcrumbs} className="mb-2" />
 
-          {!q && !page && <CategoryLinks showCover />}
+          {!q && <CategoryLinks showCover />}
         </header>
       }
     >
