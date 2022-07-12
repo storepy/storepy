@@ -15,6 +15,7 @@ import { Routes, Route, useSearchParams } from 'react-router-dom';
 import { SharedDataCtx } from '@miq/contextjs';
 import { Img, View, BreadCrumbs, Pagination } from '@miq/componentjs';
 import { ProductAttributeList } from './components';
+import { truncateStr } from '@miq/utiljs';
 // import { useViewport } from '@miq/hookjs';
 
 const ShopProductDetailView = () => {
@@ -83,11 +84,10 @@ const ShopProductDetailView = () => {
 
             <li className="p-extra-title mb-1">Livraison</li>
             <li className="p-extra-content">
-              <p className="mb-2">
-                Livraison standard gratuite sur Cotonou pour les commandes de 50000 CFA et plus.
-                <br />
-                Le délai de traitement de la livraison standard pour cet article est estimé à 1 à 5 jours ouvrables.
-              </p>
+              <p className="mb-1">Livraison standard gratuite sur Cotonou pour les commandes de 50000 CFA et plus.</p>
+              <div className="text-sm text-muted">
+                *Le délai de traitement de la livraison standard pour cet article est estimé à 1 à 5 jours ouvrables.
+              </div>
               {/* <a href="." className="text-underline">
                   Consultez notre page Livraison
                 </a> */}
@@ -158,13 +158,13 @@ const ProductGridItem = ({ item, showName, ...props }: { item: ProductType; show
 
   return (
     <a href={`${url}`}>
-      <div className="">
-        <Img.Picture {...cover} />
+      <div>
+        <Img.Picture {...cover} className="rounded" />
 
         <div className="product-grid-info">
           {is_oos && <span className="bg-red-100 px-1 rounded">En rupture de stock</span>}
-          {showName && <div className="product-grid-name">{name}</div>}
           <ProductPrice {...item} />
+          {showName && <div className="product-grid-name">{truncateStr(name)}</div>}
         </div>
       </div>
     </a>
