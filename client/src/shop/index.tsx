@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Routes, Route, useSearchParams } from 'react-router-dom';
 
 import './shop.scss';
 
@@ -11,10 +12,9 @@ import {
   ShopyClientProductListSharedDataState,
   Views,
 } from '@shopy/shopjs';
-import { Routes, Route, useSearchParams } from 'react-router-dom';
 import { SharedDataCtx } from '@miq/contextjs';
 import { Img, View, BreadCrumbs, Pagination } from '@miq/componentjs';
-import { ProductAttributeList } from './components';
+
 import { truncateStr } from '@miq/utiljs';
 // import { useViewport } from '@miq/hookjs';
 
@@ -22,95 +22,45 @@ const ShopProductDetailView = () => {
   const ctx = React.useContext(SharedDataCtx);
   // const { isMDDown } = useViewport();
 
-  const { product, similar, breadcrumbs, whatsapp_number } = ctx as ShopyClientProductDetailSharedDataState & {
-    whatsapp_number: string | undefined;
-  };
+  const { product, similar, breadcrumbs } = ctx as ShopyClientProductDetailSharedDataState;
 
-  const { is_oos, is_pre_sale, is_pre_sale_text, cover, images } = product;
+  const { cover, images } = product;
   const pImages = [cover!, ...images!];
 
   return (
     <>
-      <BreadCrumbs items={breadcrumbs} className="my-3 px-2" />
-
       <Views.ProductDetailView
+        product={product}
+        header={<BreadCrumbs items={breadcrumbs} className="my-3 px-2" />}
         images={
           <div className="p-images mb-2" style={{ position: 'sticky', top: 0 }}>
             <Views.ProductDetailView.HorizontalGallery images={pImages} mobileOnly={false} />
           </div>
         }
-        className="product-detail-view"
-      >
-        <div className="p-details p-1">
-          {is_oos && (
-            <div className="my-2">
-              <span className="bg-red-100 px-1 rounded">En rupture de stock</span>
-            </div>
-          )}
-
-          <h1 className="p-name fw-lighter mb-1" style={{ fontSize: '1.25rem' }}>
-            {product.name}
-          </h1>
-
-          <ProductPrice {...product} retail_price={product.retail_price!} />
-
-          <div className="mb-3">{/* <ProductPreSaleDate product={product} /> */}</div>
-          {is_pre_sale && is_pre_sale_text && <div className="p-presale-text mb-3">{is_pre_sale_text}</div>}
-
-          {whatsapp_number && (
-            <div className="mb-3 text-center">
-              <a
-                href={`./?r=1&source=site&medium=shopbtn&campaign=web`}
-                className="d-block btn btn-md btn-primary px-2 fw-bold"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Acheter
-              </a>
-            </div>
-          )}
-
-          {product.description && <div className="p-description mb-3">{product.description}</div>}
-
-          <ul className="p-extra my-3">
-            {product?.has_attributes && (
-              <>
-                <li className="p-extra-title mb-1">Détails</li>
-                <li className="p-extra-content">
-                  <ProductAttributeList attributes={product.attributes || []} />
-                </li>
-              </>
-            )}
-
-            <li className="p-extra-title mb-1">Livraison</li>
-            <li className="p-extra-content">
-              <p className="mb-1">Livraison standard gratuite sur Cotonou pour les commandes de 50000 CFA et plus.</p>
-              <div className="text-sm text-muted">
-                *Le délai de traitement de la livraison standard pour cet article est estimé à 1 à 5 jours ouvrables.
-              </div>
-              {/* <a href="." className="text-underline">
-                  Consultez notre page Livraison
-                </a> */}
-            </li>
-          </ul>
-
-          {/* <div className="mb-3">
+        body={
+          <div className="p-details p-1">
+            {/* <div className="mb-3">
               <div className="text-md">Porter avec</div>
             </div> */}
-        </div>
-      </Views.ProductDetailView>
+          </div>
+        }
+        footer={
+          <>
+            {similar && (
+              <div className="p-2">
+                <p className="text-md mb-2">Vous aimerez peut-être</p>
 
-      {similar && (
-        <div className="p-2">
-          <p className="text-md mb-2">Vous aimerez peut-être</p>
-
-          <Views.ProductGridView.Grid>
-            {similar.map((i) => (
-              <ProductGridItem item={i} key={i.meta_slug} />
-            ))}
-          </Views.ProductGridView.Grid>
-        </div>
-      )}
+                <Views.ProductGridView.Grid>
+                  {similar.map((i) => (
+                    <ProductGridItem item={i} key={i.meta_slug} />
+                  ))}
+                </Views.ProductGridView.Grid>
+              </div>
+            )}
+          </>
+        }
+        className="product-detail-view"
+      />
     </>
   );
 };

@@ -82,7 +82,7 @@ INSTALLED_APPS = [
 
     'shopy.shop',
     'shopy.store',
-    # 'shopy.orders',
+    'shopy.sales',
 ]
 
 DATABASES = {
@@ -125,7 +125,7 @@ MIDDLEWARE = (
     #
     'miq.core.middleware.SiteMiddleware',
     'miq.analytics.middlewares.AnalyticsMiddleware',
-    # 'orders.middleware.OrdersMiddleware',
+    'shopy.shop.middleware.ShopMiddleware',
 )
 
 ROOT_URLCONF = 'config.urls'

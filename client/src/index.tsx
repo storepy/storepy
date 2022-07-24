@@ -25,7 +25,6 @@ const App = () => {
             path="/*"
             element={
               <Routes>
-                {/* <Route path="orders/*" element={<OrdersPublicRoutes />} /> */}
                 <Route path="shop/*" element={<ShopPublicRoutes />} />
               </Routes>
             }
