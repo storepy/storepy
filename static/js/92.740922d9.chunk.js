@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunk_storepy_clientjs=self.webpackChunk_storepy_clientjs||[]).push([[92],{4092:function(e,t,r){r.r(t),r.d(t,{default:function(){return i}});r(2411);var n=r(6520),u=r(2356),c=r(3085),s=r(8136);function i(){var e=(0,n.s0)();return(0,s.jsx)(u.ZP.View,{title:"Ajouter un produit",requiredPerms:["store.add_product"],back:"../",children:(0,s.jsx)(u.ZP.Section,{children:(0,s.jsx)(c.Kl,{onSuccess:function(t){var r=t.data;return e("../".concat(r.slug))}})})})}}}]);
-//# sourceMappingURL=92.740922d9.chunk.js.map
