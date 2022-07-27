@@ -7,6 +7,7 @@ import { Loading } from '@miq/componentjs';
 import { SharedDataProvider } from '@miq/contextjs';
 
 import './index.scss';
+import PartnerRoutes from './miqpartnersjs';
 
 const StaffLayout = React.lazy(() => import('./staff'));
 // const OrdersPublicRoutes = React.lazy(() => import('./orders'));
@@ -26,6 +27,7 @@ const App = () => {
             element={
               <Routes>
                 <Route path="shop/*" element={<ShopPublicRoutes />} />
+                <Route path="/*" element={<PartnerRoutes />} />
               </Routes>
             }
           />
