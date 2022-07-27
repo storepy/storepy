@@ -1,16 +1,16 @@
 import * as React from 'react';
-
-import { Button, Loading, Pagination, ViewSection } from '@miq/componentjs';
-import { PartnerOnboardForm } from './forms';
+import { Route, Routes } from 'react-router-dom';
 
 import img from './imgs/1.jpg';
-import { SharedDataCtx } from '@miq/contextjs';
+
 import Staff from '@miq/staffjs';
-import StaffView from '@miq/staffjs/src/Views';
-import { Route, Routes } from 'react-router-dom';
-import { usePartnerListRequest } from './utils';
 import { Response } from '@miq/utiljs';
+import { SharedDataCtx } from '@miq/contextjs';
+import { Button, Loading, Pagination, ViewSection } from '@miq/componentjs';
+
 import { TPartner } from './types';
+import { PartnerOnboardForm } from './forms';
+import { usePartnerListRequest } from './utils';
 
 const PartnerIndexView = () => {
   const { res, loading } = usePartnerListRequest();
@@ -19,8 +19,6 @@ const PartnerIndexView = () => {
 
   if (loading) return <Loading />;
   if (!r.isSuccess) return <div>Something went wrong</div>;
-
-  console.log(r.data);
 
   return (
     <Staff.View
