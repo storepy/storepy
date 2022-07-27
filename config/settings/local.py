@@ -80,9 +80,13 @@ INSTALLED_APPS = [
     'miq.staff',
     'miq.analytics',
 
+    # SHOP
     'shopy.shop',
     'shopy.store',
     'shopy.sales',
+
+    #
+    'miqpartners',
 ]
 
 DATABASES = {

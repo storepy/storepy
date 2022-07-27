@@ -15,7 +15,7 @@ urlpatterns += [
     path('', include('shopy.store.urls', namespace='shopystore')),
     path('', include('shopy.shop.urls', namespace='shopy')),
     path('', include('shopy.sales.urls', namespace='sales')),
-    # path('', include('miqsocial.urls', namespace='miqsocial')),
+    path('', include('miqpartners.urls', namespace='miqpartners')),
 ]
 
 # Must be last
