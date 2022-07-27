@@ -10,3 +10,5 @@ export default function PartnerRoutes() {
     </Routes>
   );
 }
+
+export { PartnerRoutes } from './Views';

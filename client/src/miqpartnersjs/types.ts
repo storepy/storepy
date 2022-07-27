@@ -6,7 +6,7 @@ export type TPartner = {
   email?: string;
   tt?: string;
   ig?: string;
-  extra: {
+  extra?: {
     age?: string | number;
     size?: string;
     interests?: string[];

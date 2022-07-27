@@ -1,11 +1,81 @@
 import * as React from 'react';
 
-import { Button, ViewSection } from '@miq/componentjs';
-import { IFormUpdateProps } from '@miq/formjs';
+import { Button, Loading, Pagination, ViewSection } from '@miq/componentjs';
 import { PartnerOnboardForm } from './forms';
 
 import img from './imgs/1.jpg';
 import { SharedDataCtx } from '@miq/contextjs';
+import Staff from '@miq/staffjs';
+import StaffView from '@miq/staffjs/src/Views';
+import { Route, Routes } from 'react-router-dom';
+import { usePartnerListRequest } from './utils';
+import { Response } from '@miq/utiljs';
+import { TPartner } from './types';
+
+const PartnerIndexView = () => {
+  const { res, loading } = usePartnerListRequest();
+
+  const r = new Response<TPartner>(res);
+
+  if (loading) return <Loading />;
+  if (!r.isSuccess) return <div>Something went wrong</div>;
+
+  console.log(r.data);
+
+  return (
+    <Staff.View
+      title="Partners"
+      actions={<div>{r.data.count}</div>}
+      footer={<Pagination {...r.data} component={Staff.Link} to className="" />}
+    >
+      {r.items?.map((p) => {
+        const { extra = {} } = p;
+        return (
+          <Staff.Section
+            border
+            title={<div className="">{`${p.first_name} ${p.last_name}`}</div>}
+            actions={
+              <div>
+                {extra.age} {extra.size?.toUpperCase()}
+              </div>
+            }
+            key={p.slug}
+          >
+            <ul className="text-muted text-sm">
+              <li>
+                <span className="">@{p.ig}</span>
+                <span>{p.tt && ` | ${p.tt}`}</span>
+              </li>
+              <li>
+                <span>{p.phone}</span>
+                <span>{p.email && ` | ${p.email}`}</span>
+              </li>
+              <li>
+                {extra.wears_lingerie ? `Wears lingerie` : '-'}
+                {extra.is_newbie && ` | Newbie`}
+              </li>
+              <li>{extra.interests?.map((i) => `${i} `)}</li>
+            </ul>
+          </Staff.Section>
+        );
+      })}
+    </Staff.View>
+  );
+};
+
+export const PartnerRoutes = () => {
+  return (
+    <Staff.View>
+      <Routes>
+        <Route index element={<PartnerIndexView />} />
+      </Routes>
+    </Staff.View>
+  );
+};
+
+//
+// +++++++++++++++++++++++++++++++ PUBLIC ++++++++++++++++++++++++++++++++++++++++++++++
+//
 
 export function PartnerOnboardView() {
   const ctx: any = React.useContext(SharedDataCtx);
@@ -84,10 +154,6 @@ const Done = () => (
     </div>
   </div>
 );
-
-type TFormProps<T, I> = IFormUpdateProps<T> & {
-  instance?: I;
-};
 
 const disclaimer = (
   <p className="text-sm text-muted mt-4 p-1">
