@@ -143,7 +143,10 @@ const Done = () => (
     </h1>
 
     <div className="mb-4 text-center">
-      <div style={{ paddingBottom: 250 }}>Nous avons reçu vos réponses avec succès.</div>
+      <div style={{ paddingBottom: 250 }}>
+        <div>Nous avons reçu vos réponses avec succès.</div>
+        <div>Une membre de notre équipe vous contactera pour la suite si vous êtes acceptée.</div>
+      </div>
       <div>
         <a href="/shop/" className="btn btn-primary btn-md fw-bold">
           Visitez notre catalogue

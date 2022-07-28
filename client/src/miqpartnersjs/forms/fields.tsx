@@ -1,3 +1,4 @@
+import * as React from 'react';
 import Form, { SelectFieldProps, TextFieldProps } from '@miq/formjs';
 
 export const PartnerPhoneField = ({

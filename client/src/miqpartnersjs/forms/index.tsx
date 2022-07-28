@@ -1,7 +1,6 @@
 import * as React from 'react';
 
 import Form, { EmailField, FirstNameField, LastNameField, useForm } from '@miq/formjs';
-import { TPartner } from '../types';
 import { createPartner } from '../utils';
 import {
   InstagramField,
@@ -12,10 +11,59 @@ import {
   YNSelectField,
 } from './fields';
 import { SharedDataCtx } from '@miq/contextjs';
+import { useSearchParams } from 'react-router-dom';
+import { isRequired } from '@miq/utiljs';
+
+export const PartnerListFilterForm = () => {
+  const [params, setParams] = useSearchParams();
+  return (
+    <form
+      action="."
+      onSubmit={(e) => {
+        e.preventDefault();
+
+        // if (!q) params.delete('q');
+        // else params.set('q', q);
+        params.delete('page');
+
+        setParams(params);
+      }}
+    >
+      <ParamsToggleField name="is_newbie" label="Newbies" />
+      <ParamsToggleField name="wears_lingerie" label="Wears lingerie" />
+    </form>
+  );
+};
+
+const ParamsToggleField = (props: React.ComponentPropsWithoutRef<'input'> & { label: string; name: string }) => {
+  const [params, setParams] = useSearchParams();
+
+  const { label, ...rest } = props;
+  const { name = isRequired('name') } = rest;
+
+  return (
+    <div>
+      <input
+        className="miq-checkbox me-1"
+        {...rest}
+        type="checkbox"
+        onChange={(e) => {
+          const { checked } = e.target;
+          if (!checked) params.delete(name);
+          else params.set(name, `${checked}`);
+          params.delete('page');
+          setParams(params);
+        }}
+        checked={Boolean(params.get(name)) || false}
+      />
+      <label className="miq-form-label">{label}</label>
+    </div>
+  );
+};
 
 export const PartnerOnboardForm = () => {
   const ctx: any = React.useContext(SharedDataCtx);
-  const { partner = {} } = ctx;
+  // const { partner = {} } = ctx;
 
   const form = useForm({
     first_name: '',
@@ -27,7 +75,8 @@ export const PartnerOnboardForm = () => {
     //
     interests: [],
     is_newbie: '',
-    wears_lingerie: false,
+    wears_lingerie: '',
+    is_sn_active: '',
     //
     ig: '',
     tt: '',
@@ -123,9 +172,15 @@ export const PartnerOnboardForm = () => {
         </Form.Field>
       </div>
 
-      <div className="mb-2">
-        <Form.Field label="Êtes-vous comfortable à poser en lingerie?" error={errors.wears_lingerie}>
+      <div className="mb-3">
+        <Form.Field label="Êtes-vous comfortable à poser en lingerie et maillots?" error={errors.wears_lingerie}>
           <YNSelectField required name="wears_lingerie" />
+        </Form.Field>
+      </div>
+
+      <div className="mb-3">
+        <Form.Field label="Êtes-vous active sur les réseaux sociaux?" error={errors.is_sn_active}>
+          <YNSelectField required name="is_sn_active" />
         </Form.Field>
       </div>
 

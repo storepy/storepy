@@ -11,7 +11,7 @@ export type TPartner = {
     size?: string;
     interests?: string[];
     pay?: string;
-    wears_lingerie?: boolean;
-    is_newbie?: boolean;
+    wears_lingerie?: string;
+    is_newbie?: string;
   };
 };
