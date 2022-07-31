@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Route, Routes, useSearchParams } from 'react-router-dom';
+import { Link, Route, Routes, useParams } from 'react-router-dom';
 
 import Staff from '@miq/staffjs';
 import { Response } from '@miq/utiljs';
@@ -8,6 +8,10 @@ import { Loading, Pagination } from '@miq/componentjs';
 import { TPartner } from './types';
 import { usePartnerListRequest } from './utils';
 import { PartnerListFilterForm } from './forms';
+import { useRequest } from '@miq/hookjs';
+import { Partner } from './models';
+
+const AuditRoutes = React.lazy(() => import('./audit'));
 
 const PartnerIndexView = () => {
   //   const [params]=useSearchParams();
@@ -21,7 +25,13 @@ const PartnerIndexView = () => {
   return (
     <Staff.View
       title="Partners"
-      actions={<div>{r.data.count}</div>}
+      actions={
+        <div>
+          <Staff.Link to="audit/" className="btn btn-primary-3">
+            {` « Audit » `}
+          </Staff.Link>
+        </div>
+      }
       footer={<Pagination {...r.data} component={Staff.Link} to className="" />}
     >
       <Staff.Section>
@@ -30,22 +40,21 @@ const PartnerIndexView = () => {
 
       <Staff.Section>
         {r.items?.map((p) => {
-          const { extra = {} } = p;
+          const { extra = {}, slug } = p;
           return (
             <Staff.Section
               border
-              title={<div className="">{`${p.first_name} ${p.last_name}`}</div>}
-              actions={
-                <div>
-                  {extra.age} {extra.size?.toUpperCase()}
-                </div>
-              }
-              key={p.slug}
+              title={`${p.first_name} ${p.last_name} - ${extra.age}yo (${extra.size?.toUpperCase()})`}
+              actions={<div>{``}</div>}
+              key={slug}
             >
-              <ul className="text-muted text-sm">
+              <ul className="text-sm">
                 <li>
                   <a href={`https://instagram.com/${p.ig}/`} target="_blank" rel="noreferrer noopener">
                     {p.ig}
+                  </a>
+                  <a href={`/staff/partners/audit/?username=${p.ig}`} className="text-sm text-muted">
+                    {` « audit » `}
                   </a>
                   {p.tt && (
                     <a
@@ -56,12 +65,12 @@ const PartnerIndexView = () => {
                   )}
                 </li>
                 <li>
-                  <span>{p.phone}</span>
+                  <span className="text-muted">{p.phone}</span>
                   <span>{p.email && ` | ${p.email}`}</span>
                 </li>
                 <li>
                   {extra?.wears_lingerie === 'oui' ? `Wears lingerie` : '-'}
-                  {extra.is_newbie === 'oui' && ` | Newbie`}
+                  {extra.is_newbie === 'oui' ? ` | Newbie` : ' | -'}
                 </li>
                 <li>{extra.interests?.map((i) => `${i} `)}</li>
               </ul>
@@ -73,10 +82,11 @@ const PartnerIndexView = () => {
   );
 };
 
-export const PartnerRoutes = () => {
+export const PartnerStaffRoutes = () => {
   return (
     <Staff.View>
       <Routes>
+        <Route path="audit/*" element={<AuditRoutes />} />
         <Route index element={<PartnerIndexView />} />
       </Routes>
     </Staff.View>

@@ -3,24 +3,15 @@ import { Routes, Route, useSearchParams } from 'react-router-dom';
 
 import './shop.scss';
 
-import {
-  CategoryLinks,
-  ProductPrice,
-  ProductSearchForm,
-  ProductType,
-  ShopyClientProductDetailSharedDataState,
-  ShopyClientProductListSharedDataState,
-  Views,
-} from '@shopy/shopjs';
 import { SharedDataCtx } from '@miq/contextjs';
 import { Img, View, BreadCrumbs, Pagination } from '@miq/componentjs';
+import { CategoryLinks, ProductPrice, ProductSearchForm, ProductType, Views } from '@shopy/shopjs';
+import { ShopyClientProductDetailSharedDataState, ShopyClientProductListSharedDataState } from '@shopy/shopjs';
 
 import { truncateStr } from '@miq/utiljs';
-// import { useViewport } from '@miq/hookjs';
 
 const ShopProductDetailView = () => {
   const ctx = React.useContext(SharedDataCtx);
-  // const { isMDDown } = useViewport();
 
   const { product, similar, breadcrumbs } = ctx as ShopyClientProductDetailSharedDataState;
 

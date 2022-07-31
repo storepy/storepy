@@ -11,4 +11,4 @@ export default function PartnerRoutes() {
   );
 }
 
-export { PartnerRoutes } from './views.staff';
+export { PartnerStaffRoutes } from './views.staff';

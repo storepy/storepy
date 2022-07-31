@@ -1,16 +1,14 @@
 import * as React from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
-// import reportWebVitals from "./reportWebVitals";
-
-import { Loading } from '@miq/componentjs';
-import { SharedDataProvider } from '@miq/contextjs';
 
 import './index.scss';
+
+import { Loading } from '@miq/componentjs';
 import PartnerRoutes from './miqpartnersjs';
+import { SharedDataProvider } from '@miq/contextjs';
 
 const StaffLayout = React.lazy(() => import('./staff'));
-// const OrdersPublicRoutes = React.lazy(() => import('./orders'));
 const ShopPublicRoutes = React.lazy(() => import('./shop'));
 
 const App = () => {
@@ -48,5 +46,3 @@ if (root)
     </React.StrictMode>,
     root
   );
-
-// reportWebVitals();

@@ -1,27 +1,57 @@
 import * as React from 'react';
+
 import Form, { SelectFieldProps, TextFieldProps } from '@miq/formjs';
 
-export const PartnerPhoneField = ({
-  label = 'Numéro',
-  text,
-  // text = 'Nous vous contacterons sur ce numéro si vous êtes sélectionnée',
-  error,
-  ...props
-}: TextFieldProps) => (
+export const PartnerPhoneField = ({ label = 'Numéro', text, error, ...props }: TextFieldProps) => (
   <Form.Field {...{ label, error, text }}>
-    <Form.Phone required name="phone" {...props} placeholder="Votre Numéro de téléphone" />
+    <Form.Phone
+      required
+      name="phone"
+      {...props}
+      onDebounce={({ value, ctx }) => {
+        if (new Set(value).size === 1) ctx.setError('phone', 'Entrez votre Numéro de téléphone');
+      }}
+      placeholder="Votre Numéro de téléphone"
+    />
   </Form.Field>
 );
 
-export const InstagramField = ({ label = 'Instagram', text, error, fieldCN, ...props }: TextFieldProps) => (
-  <Form.Field {...{ label, error, text }} className={fieldCN}>
-    <Form.Text name="ig" required {...props} maxLength={99} minLength={2} placeholder="Votre instagram" />
-  </Form.Field>
-);
+export const InstagramField = ({
+  label = "Nom d'utilisateur Instagram",
+  text,
+  error,
+  fieldCN,
+  ...props
+}: TextFieldProps) => {
+  return (
+    <Form.Field {...{ label, error, text, className: fieldCN }}>
+      <Form.Text
+        name="ig"
+        required
+        {...props}
+        onDebounce={({ value, ctx }) => {
+          if (value.includes(' ')) ctx?.setError('ig', "Ce nom d'utilisateur n'existe pas.");
+        }}
+        maxLength={99}
+        minLength={2}
+        placeholder="Votre instagram"
+      />
+    </Form.Field>
+  );
+};
 
-export const TikTokField = ({ label = 'Tiktok', text, error, fieldCN, ...props }: TextFieldProps) => (
-  <Form.Field {...{ label, error, text }} className={fieldCN}>
-    <Form.Text name="tt" {...props} maxLength={99} minLength={2} placeholder="Votre tiktok si vous l'avez" />
+export const TikTokField = ({ label = "Nom d'utilisateur Tiktok", text, error, fieldCN, ...props }: TextFieldProps) => (
+  <Form.Field {...{ label, error, text, className: fieldCN }}>
+    <Form.Text
+      name="tt"
+      {...props}
+      onDebounce={({ value, ctx }) => {
+        if (value.includes(' ')) ctx?.setError('tt', "Ce nom d'utilisateur n'existe pas.");
+      }}
+      maxLength={99}
+      minLength={2}
+      placeholder="Votre tiktok si vous l'avez"
+    />
   </Form.Field>
 );
 

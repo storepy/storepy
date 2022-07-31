@@ -2,14 +2,12 @@ import * as React from 'react';
 
 import './index.scss';
 
-import Staff, { AnalyticsRoutes } from '@miq/staffjs';
 import { Icons } from '@miq/componentjs';
 import ShopStaffRoutes from '@shopy/storejs';
 import SalesStaffRoutes from '@shopy/orderjs/';
-import { PartnerRoutes } from '../miqpartnersjs';
+import Staff, { AnalyticsRoutes } from '@miq/staffjs';
 
-// const OrdersStaffRoutes = React.lazy(() => import('../orders/staff'));
-// const FinanceRoutes = React.lazy(() => import('./finance'));
+import { PartnerStaffRoutes } from '../miqpartnersjs';
 
 export default function StaffLayout() {
   return (
@@ -28,7 +26,7 @@ export default function StaffLayout() {
           href: 'partners/',
           label: 'Partners',
           icon: <Icons.PersonBadge />,
-          element: <PartnerRoutes />,
+          element: <PartnerStaffRoutes />,
           mobile: true,
         },
       ]}

@@ -13,5 +13,6 @@ export type TPartner = {
     pay?: string;
     wears_lingerie?: string;
     is_newbie?: string;
+    info?: any;
   };
 };
