@@ -17,12 +17,14 @@ const IndexView = () => {
   const { res, loading } = useRequest(
     () => {
       if (!username) return null;
-      return API.get(`partners/audit/`, { params: { username } });
+      return API.get(`partners/audit/`, { params: { username }, timeout: 10000 });
     },
     { refreshDeps: [username] }
   );
 
   const usr = new Usr(res?.data);
+
+  console.log(usr?.cached);
 
   return (
     <Staff.View back={back}>

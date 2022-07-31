@@ -146,7 +146,7 @@ export default class Usr {
     return this._data?.['id'];
   }
   get profile_pic_url() {
-    return this._data?.['profile_pic_url'];
+    return this._data?.['profile_pic_b64'];
   }
   get business_phone_number() {
     return this._data?.['business_phone_number'];
@@ -182,6 +182,9 @@ export default class Usr {
   get isValid() {
     return Boolean(this._data?.fbid);
   }
+  get cached(): boolean {
+    return this._data?.cached;
+  }
 }
 
 export class Post {
@@ -210,6 +213,9 @@ export class Post {
     if (!date) return;
     return new Date(date * 1000);
   }
+  get dateStr() {
+    return `${this.date?.format()} ${this.date?.formatTime()}`;
+  }
 
   get comments_count() {
     return this._data?.edge_media_to_comment?.count;
@@ -222,6 +228,12 @@ export class Post {
   }
   get location() {
     return this._data?.location;
+  }
+  get display_url() {
+    return this._data?.display_url;
+  }
+  get url() {
+    return `https://instagram.com/p/${this.shortcode}/`;
   }
   get is_video() {
     return this._data?.is_video;

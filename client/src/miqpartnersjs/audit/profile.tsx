@@ -9,14 +9,72 @@ type TProfileProps = { usr: Usr };
 
 export const Profile = ({ usr }: TProfileProps) => {
   return (
-    <div className="d-grid grid-md-2 gap-2">
-      <Info usr={usr} />
+    <div>
+      <div className="d-grid grid-md-2 gap-2">
+        <Info usr={usr} />
+      </div>
 
-      <Locations usr={usr} />
-      <Hashtags usr={usr} />
-      <TaggedUser usr={usr} />
-      <Schedule usr={usr} />
+      <Posts usr={usr} />
+
+      <div className="d-grid grid-md-2 gap-2">
+        <Locations usr={usr} />
+        <Hashtags usr={usr} />
+        <TaggedUser usr={usr} />
+        <Schedule usr={usr} />
+      </div>
     </div>
+  );
+};
+
+const Posts = ({ usr }: TProfileProps) => {
+  return (
+    <div className="my-3">
+      <div className="d-grid grid-2 grid-md-3 gap-1">
+        <PostImg post={usr.last_post!} title={<div className="text-sm my-1">Last post</div>} />
+        <PostImg post={usr.most_liked_post} title={<div className="text-sm my-1">Most likes</div>} />
+        <PostImg post={usr.most_commented_post} title={<div className="text-sm my-1">Most comments</div>} />
+        <PostImg post={usr.least_liked_post} title={<div className="text-sm my-1">Least likes</div>} />
+        <PostImg post={usr.least_commented_post} title={<div className="text-sm my-1">Least comments</div>} />
+      </div>
+    </div>
+  );
+};
+
+const PostImg = ({ post, ...props }: { post: Post; title?: React.ReactNode }) => {
+  const [o, setO] = React.useState(false);
+  return (
+    <Staff.Section
+      title={props?.title}
+      actions={
+        <div>
+          <span className="p-1" onClick={() => setO(!o)}>
+            {o ? '[ - ]' : '[ + ]'}
+          </span>
+        </div>
+      }
+      footer={
+        <>
+          <div className="text-sm">
+            <div>{`❤️ ${post.likes_count}   💬 ${post.comments_count}`}</div>
+            <div>{`🕜 ${post.dateStr}`}</div>
+            {o && (
+              <>
+                <div style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{post.caption}</div>
+              </>
+            )}
+          </div>
+        </>
+      }
+      style={{ position: 'relative', marginBottom: 0 }}
+    >
+      <a href={post.url} target="_blank" rel="noopener noreferrer">
+        <img
+          src={`data:image/jpg;base64, ${post.display_url}`}
+          style={{ width: '100%', height: 'auto', objectFit: 'cover', aspectRatio: '1/1' }}
+          className="rounded"
+        />
+      </a>
+    </Staff.Section>
   );
 };
 
@@ -24,12 +82,18 @@ const Info = ({ usr }: TProfileProps) => {
   return (
     <>
       <div className="mt-2">
-        <div className="fw-bold mb-1">{usr.full_name}</div>
-        <div className="">{`followers: ${usr.followers_count} | following: ${usr.following_count} | posts: ${usr.media_count}`}</div>
-        <div className="mb-1">{`avg likes: ${usr.avg_likes | 0} | avg comments: ${
-          usr.avg_comments | 0
-        } | last post: ${usr.last_post?.date?.format()}`}</div>
-        <div style={{ whiteSpace: 'pre' }}>{usr.biography}</div>
+        <div className="d-flex align-items-center mb-1">
+          <Img64 src={usr.profile_pic_url} alt={usr.username} />
+          <div className="ms-1 mb-1">
+            {usr?.cached && <span className="text-sm fw-lighter text-muted">{`- cached🕘`}</span>}
+            <div className="fw-bold">{usr.full_name}</div>
+            <div>{`followers: ${usr.followers_count} | following: ${usr.following_count} | posts: ${usr.media_count}`}</div>
+            <div>{`avg likes: ${usr.avg_likes | 0} | avg comments: ${usr.avg_comments | 0}`}</div>
+          </div>
+        </div>
+
+        {usr.biography && <div style={{ whiteSpace: 'pre' }}>{usr.biography}</div>}
+
         {usr.external_url && (
           <a href={usr.external_url} className="text-muted text-sm" target="_blank" rel="noopener noreferrer">
             {truncateStr(usr.external_url)}
@@ -60,6 +124,7 @@ const Locations = ({ usr }: TProfileProps) => {
     </Sect>
   );
 };
+
 const Hashtags = ({ usr }: TProfileProps) => {
   return (
     <Sect title="Top hashtags">
@@ -76,7 +141,7 @@ const TaggedUser = ({ usr }: { usr: Usr }) => {
       {usr.top_tagged_users.map((u: any) => {
         return (
           <div className="mb-1" key={uuid()}>
-            <div className="">
+            <div>
               <span className="me-1">{u?.full_name}</span>
               <a href={`/staff/partners/audit/?username=${u?.username}`} target="_blank" rel="noopener noreferrer">
                 [audit]
@@ -135,7 +200,7 @@ const Schedule = ({ usr }: { usr: Usr }) => {
   );
 };
 
-const Sect = ({ title, children }: { title: string; children: React.ReactNode }) => {
+const Sect = ({ title, children }: { title: React.ReactNode; children: React.ReactNode }) => {
   const [open, setOpen] = React.useState(true);
   return (
     <Staff.Section
@@ -147,4 +212,8 @@ const Sect = ({ title, children }: { title: string; children: React.ReactNode })
       {open && children}
     </Staff.Section>
   );
+};
+
+const Img64 = ({ src, width = 64, ...props }: { src: string; alt?: string; width?: number }) => {
+  return <img src={`data:image/jpg;base64, ${src}`} {...props} style={{ width, height: 'auto' }} className="rounded" />;
 };
