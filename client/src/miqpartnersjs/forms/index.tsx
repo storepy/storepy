@@ -1,7 +1,12 @@
 import * as React from 'react';
+import { useSearchParams } from 'react-router-dom';
 
+import { isRequired } from '@miq/utiljs';
+import { SharedDataCtx } from '@miq/contextjs';
 import Form, { EmailField, FirstNameField, LastNameField, useForm } from '@miq/formjs';
+
 import { createPartner } from '../utils';
+
 import {
   InstagramField,
   PartnerAgeField,
@@ -10,9 +15,8 @@ import {
   TikTokField,
   YNSelectField,
 } from './fields';
-import { SharedDataCtx } from '@miq/contextjs';
-import { useSearchParams } from 'react-router-dom';
-import { isRequired } from '@miq/utiljs';
+
+// const { i18n } = window;
 
 export const PartnerListFilterForm = () => {
   const [params, setParams] = useSearchParams();
@@ -21,11 +25,7 @@ export const PartnerListFilterForm = () => {
       action="."
       onSubmit={(e) => {
         e.preventDefault();
-
-        // if (!q) params.delete('q');
-        // else params.set('q', q);
         params.delete('page');
-
         setParams(params);
       }}
     >

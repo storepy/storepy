@@ -11,9 +11,9 @@ import { ShopyClientProductDetailSharedDataState, ShopyClientProductListSharedDa
 import { truncateStr } from '@miq/utiljs';
 
 const ShopProductDetailView = () => {
-  const ctx = React.useContext(SharedDataCtx);
+  const ctx = React.useContext<ShopyClientProductDetailSharedDataState>(SharedDataCtx);
 
-  const { product, similar, breadcrumbs } = ctx as ShopyClientProductDetailSharedDataState;
+  const { product, similar, breadcrumbs } = ctx;
 
   const { cover, images } = product;
   const pImages = [cover!, ...images!];
@@ -58,8 +58,7 @@ const ShopProductDetailView = () => {
 
 const ShopProductGridView = () => {
   const [params] = useSearchParams();
-
-  const ctx = React.useContext(SharedDataCtx) as ShopyClientProductListSharedDataState & { pagination: any };
+  const ctx = React.useContext<ShopyClientProductListSharedDataState & { pagination: any }>(SharedDataCtx);
 
   const { object_list = [], page_label, breadcrumbs, pagination } = ctx;
 

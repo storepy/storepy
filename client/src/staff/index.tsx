@@ -5,7 +5,7 @@ import './index.scss';
 import { Icons } from '@miq/componentjs';
 import ShopStaffRoutes from '@shopy/storejs';
 import SalesStaffRoutes from '@shopy/orderjs/';
-import Staff, { AnalyticsRoutes } from '@miq/staffjs';
+import Staff, { AnalyticsStaffRoutes } from '@miq/staffjs';
 
 import { PartnerStaffRoutes } from '../miqpartnersjs';
 
@@ -17,7 +17,7 @@ export default function StaffLayout() {
           href: 'analytics/',
           label: 'Analytics',
           icon: <Icons.GraphUpArrow />,
-          element: <AnalyticsRoutes />,
+          element: <AnalyticsStaffRoutes />,
           mobile: true,
         },
         { href: 'sales/', label: 'Sales', icon: <Icons.CashStack />, element: <SalesStaffRoutes />, mobile: true },

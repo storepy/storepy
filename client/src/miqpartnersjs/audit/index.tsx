@@ -5,6 +5,8 @@ import { Loading } from '@miq/componentjs';
 import { useRequest } from '@miq/hookjs';
 import Staff, { API } from '@miq/staffjs';
 
+import lang from './index.lang';
+
 import Usr from './usr';
 import { Profile } from './profile';
 
@@ -17,42 +19,44 @@ const IndexView = () => {
   const { res, loading } = useRequest(
     () => {
       if (!username) return null;
-      return API.get(`partners/audit/`, { params: { username }, timeout: 10000 });
+      return API.get(`partners/audit/`, { params: { username }, timeout: 15000 });
     },
     { refreshDeps: [username] }
   );
 
   const usr = new Usr(res?.data);
 
-  console.log(usr?.cached);
-
   return (
     <Staff.View back={back}>
       <Staff.Section
-        title={
-          <form method="GET">
+        header={
+          <form method="GET" className="miq-container center mb-3">
             <input
               required
               name="username"
               value={usn}
               onChange={({ target }) => setUsn(target.value)}
-              placeholder="Enter username to audit ..."
+              placeholder={window.i18n(lang, 'IndexView.usernameInput.placeholder')}
               className="miq-form-input"
+              minLength={2}
+              maxLength={99}
             />
           </form>
         }
       >
-        {loading ? (
-          <Loading />
-        ) : username && !usr.isValid ? (
-          <>
-            <div className="">
-              <div className="text-md">This username is invalid</div>
-            </div>
-          </>
-        ) : (
-          username && <Profile usr={usr} />
-        )}
+        <div className="miq-container center">
+          {loading ? (
+            <Loading />
+          ) : username && !usr.isValid ? (
+            <>
+              <div className="">
+                <div className="text-md">This username is invalid</div>
+              </div>
+            </>
+          ) : (
+            username && <Profile usr={usr} />
+          )}
+        </div>
       </Staff.Section>
     </Staff.View>
   );
@@ -60,7 +64,7 @@ const IndexView = () => {
 
 export default function AuditRoutes() {
   return (
-    <Staff.View title="Account audit" back="/staff/partners/">
+    <Staff.View title={window.i18n(lang, 'AuditRoutes.viewTitle')} back="/staff/partners/">
       <Routes>
         <Route path="/*" element={<IndexView />} />
       </Routes>

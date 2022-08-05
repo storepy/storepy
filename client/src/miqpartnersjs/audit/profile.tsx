@@ -1,9 +1,13 @@
 import * as React from 'react';
 
+import lang from './profile.lang';
+
 import Staff from '@miq/staffjs';
+import { truncateStr, uuid } from '@miq/utiljs';
 
 import Usr, { Post } from './usr';
-import { truncateStr, uuid } from '@miq/utiljs';
+
+const { i18n } = window || {};
 
 type TProfileProps = { usr: Usr };
 
@@ -19,7 +23,7 @@ export const Profile = ({ usr }: TProfileProps) => {
       <div className="d-grid grid-md-2 gap-2">
         <Locations usr={usr} />
         <Hashtags usr={usr} />
-        <TaggedUser usr={usr} />
+        <TaggedUsers usr={usr} />
         <Schedule usr={usr} />
       </div>
     </div>
@@ -30,11 +34,26 @@ const Posts = ({ usr }: TProfileProps) => {
   return (
     <div className="my-3">
       <div className="d-grid grid-2 grid-md-3 gap-1">
-        <PostImg post={usr.last_post!} title={<div className="text-sm my-1">Last post</div>} />
-        <PostImg post={usr.most_liked_post} title={<div className="text-sm my-1">Most likes</div>} />
-        <PostImg post={usr.most_commented_post} title={<div className="text-sm my-1">Most comments</div>} />
-        <PostImg post={usr.least_liked_post} title={<div className="text-sm my-1">Least likes</div>} />
-        <PostImg post={usr.least_commented_post} title={<div className="text-sm my-1">Least comments</div>} />
+        <PostImg
+          post={usr.last_post!}
+          title={<div className="text-sm my-1">{i18n?.(lang, 'PostImg.lastPostTitle')}</div>}
+        />
+        <PostImg
+          post={usr.most_liked_post}
+          title={<div className="text-sm my-1">{i18n?.(lang, 'PostImg.mostLikeTitle')}</div>}
+        />
+        <PostImg
+          post={usr.most_commented_post}
+          title={<div className="text-sm my-1">{i18n?.(lang, 'PostImg.mostCommentTitle')}</div>}
+        />
+        <PostImg
+          post={usr.least_liked_post}
+          title={<div className="text-sm my-1">{i18n?.(lang, 'PostImg.leastLikeTitle')}</div>}
+        />
+        <PostImg
+          post={usr.least_commented_post}
+          title={<div className="text-sm my-1">{i18n?.(lang, 'PostImg.leastCommentTitle')}</div>}
+        />
       </div>
     </div>
   );
@@ -42,6 +61,8 @@ const Posts = ({ usr }: TProfileProps) => {
 
 const PostImg = ({ post, ...props }: { post: Post; title?: React.ReactNode }) => {
   const [o, setO] = React.useState(false);
+  if (!post?.id) return null;
+
   return (
     <Staff.Section
       title={props?.title}
@@ -85,7 +106,6 @@ const Info = ({ usr }: TProfileProps) => {
         <div className="d-flex align-items-center mb-1">
           <Img64 src={usr.profile_pic_url} alt={usr.username} />
           <div className="ms-1 mb-1">
-            {usr?.cached && <span className="text-sm fw-lighter text-muted">{`- cached🕘`}</span>}
             <div className="fw-bold">{usr.full_name}</div>
             <div>{`followers: ${usr.followers_count} | following: ${usr.following_count} | posts: ${usr.media_count}`}</div>
             <div>{`avg likes: ${usr.avg_likes | 0} | avg comments: ${usr.avg_comments | 0}`}</div>
@@ -103,11 +123,12 @@ const Info = ({ usr }: TProfileProps) => {
 
       <div>
         <ul>
+          <li>{usr?.cached && <span className="text-xs fw-lighter text-muted">{`cached`}</span>}</li>
           <li>ID: {usr.id}</li>
           {usr?.is_business_account && <li>Business account </li>}
           {usr?.is_professional_account && <li>Professional account</li>}
-          {usr?.business_email && <li>business_email: {usr?.business_email}</li>}
-          {usr?.business_phone_number && <li>business_phone_number: {usr?.business_phone_number}</li>}
+          {usr?.business_email && <li>Email: {usr?.business_email}</li>}
+          {usr?.business_phone_number && <li>Numéro: {usr?.business_phone_number}</li>}
           {Boolean(usr.saved_media_count) && <li>Saved media: {usr.saved_media_count}</li>}
         </ul>
       </div>
@@ -117,7 +138,7 @@ const Info = ({ usr }: TProfileProps) => {
 
 const Locations = ({ usr }: TProfileProps) => {
   return (
-    <Sect title="Recent locations">
+    <Sect title={i18n(lang, 'Locations.title')}>
       {usr.top_locations.map((loc: any) => {
         return <div key={uuid()}>{loc?.[0]?.location?.name}</div>;
       })}
@@ -127,7 +148,7 @@ const Locations = ({ usr }: TProfileProps) => {
 
 const Hashtags = ({ usr }: TProfileProps) => {
   return (
-    <Sect title="Top hashtags">
+    <Sect title={i18n(lang, 'Hashtags.title')}>
       {usr.top_hashtags.splice(0, 10).map((h) => {
         return <div key={h?.[0]}>{h?.[0]}</div>;
       })}
@@ -135,16 +156,21 @@ const Hashtags = ({ usr }: TProfileProps) => {
   );
 };
 
-const TaggedUser = ({ usr }: { usr: Usr }) => {
+const TaggedUsers = ({ usr }: { usr: Usr }) => {
   return (
-    <Sect title="Tagged users">
+    <Sect title={i18n(lang, 'TaggedUsers.title')}>
       {usr.top_tagged_users.map((u: any) => {
         return (
           <div className="mb-1" key={uuid()}>
             <div>
               <span className="me-1">{u?.full_name}</span>
-              <a href={`/staff/partners/audit/?username=${u?.username}`} target="_blank" rel="noopener noreferrer">
-                [audit]
+              <a
+                href={`/staff/partners/audit/?username=${u?.username}`}
+                className="color-blue-400"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {i18n(lang, 'TaggedUsers.auditLinkLabel')}
               </a>
             </div>
             <a
@@ -164,7 +190,7 @@ const TaggedUser = ({ usr }: { usr: Usr }) => {
 
 const Schedule = ({ usr }: { usr: Usr }) => {
   return (
-    <Sect title="Schedule">
+    <Sect title={i18n(lang, 'Schedule.title')}>
       {Object.entries(usr.post_schedule).map(([k, v]: any) => {
         return (
           <div key={k} className="mb-1">
@@ -183,12 +209,7 @@ const Schedule = ({ usr }: { usr: Usr }) => {
                     })}
                     {` - ${p.likes_count} | ${p.comments_count} `}
 
-                    <a
-                      href={`http://instagram.com/p/${p.shortcode}/`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="ms-2"
-                    >{` >> `}</a>
+                    <a href={p.url} target="_blank" rel="noopener noreferrer" className="ms-2">{` >> `}</a>
                   </div>
                 );
               })}
