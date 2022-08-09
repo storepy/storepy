@@ -8,7 +8,7 @@ from django.views.generic import TemplateView
 from shopy.shop import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('adm/', admin.site.urls),
 ]
 
 urlpatterns += [
