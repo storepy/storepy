@@ -99,7 +99,7 @@ const ProductGridItem = ({ item, showName, ...props }: { item: ProductType; show
   return (
     <a href={`${url}`}>
       <div>
-        <Img.Picture {...cover} className="rounded" />
+        <Img.Picture {...cover} className="rounded" style={{ aspectRatio: '4/5', objectFit: 'cover' }} />
 
         <div className="product-grid-info">
           {is_oos && <span className="bg-red-100 px-1 rounded">En rupture de stock</span>}

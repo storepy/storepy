@@ -7,7 +7,7 @@ import './index.scss';
 import { Loading } from '@miq/componentjs';
 import PartnerRoutes from './miqpartnersjs';
 import { SharedDataProvider } from '@miq/contextjs';
-import { AnalyticsPublicRoutes } from '@miq/staffjs';
+import { LIBCreateView } from '@shopy/shopjs';
 
 const StaffLayout = React.lazy(() => import('./staff'));
 const ShopPublicRoutes = React.lazy(() => import('./shop'));
@@ -26,7 +26,7 @@ const App = () => {
             element={
               <Routes>
                 <Route path="shop/*" element={<ShopPublicRoutes />} />
-                <Route path="p/*" element={<AnalyticsPublicRoutes />} />
+                <Route path="p/:libName/" element={<LIBCreateView />} />
                 <Route path="/*" element={<PartnerRoutes />} />
               </Routes>
             }
