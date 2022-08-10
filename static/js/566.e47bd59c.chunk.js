@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunk_storepy_clientjs=self.webpackChunk_storepy_clientjs||[]).push([[566],{6566:function(n,e,t){t.r(e),t.d(e,{default:function(){return u}});t(2379),t(6520),t(8136);function u(){return null}}}]);
-//# sourceMappingURL=566.e47bd59c.chunk.js.map

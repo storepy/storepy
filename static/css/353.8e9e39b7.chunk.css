@@ -1,0 +1,2 @@
+.p-images-grid{display:none;grid-auto-columns:minmax(calc(90% - 50px),75%)}@media(max-width:640px){.p-images-grid{grid-auto-columns:calc(100vw - 50px)}}@media(min-width:1024px){.p-images-grid{grid-auto-columns:650px}}@media(max-width:640px){.product-detail-view .imgs-gallery-horizontal .portrait{width:calc(100vh - 50px);width:calc(100vw - 50px)}}.product-detail-view .imgs-gallery-horizontal img{max-height:calc(100vh - 205px)}.product-detail-view .p-images{height:auto;width:100%}
+/*# sourceMappingURL=353.8e9e39b7.chunk.css.map*/
