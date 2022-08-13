@@ -5,7 +5,7 @@ import './shop.scss';
 
 import { SharedDataCtx } from '@miq/contextjs';
 import { Img, View, BreadCrumbs, Pagination } from '@miq/componentjs';
-import { CategoryLinks, ProductPrice, ProductSearchForm, ProductType, Views } from '@shopy/shopjs';
+import { CategoryLinks, PresaleStarIcon, ProductPrice, ProductSearchForm, ProductType, Views } from '@shopy/shopjs';
 import { ShopyClientProductDetailSharedDataState, ShopyClientProductListSharedDataState } from '@shopy/shopjs';
 
 import { truncateStr } from '@miq/utiljs';
@@ -74,20 +74,30 @@ const ShopProductGridView = () => {
               <ProductSearchForm />
             </div>
           </div>
-
           <BreadCrumbs items={breadcrumbs} className="mb-2" />
-
-          {!q && <CategoryLinks showCover />}
+          {!q || (q && object_list.length === 0) ? <CategoryLinks showCover /> : null}
         </header>
       }
     >
+      {q && object_list.length === 0 && (
+        <div className="text-center">
+          <div className="my-4">
+            Votre recherche ne correspond à aucun résultat.
+            <p className="text-muted">Veuillez vérifier l'orthographe ou réessayez avec des termes plus généraux.</p>
+          </div>
+          <div className="my-4">
+            <a href="/shop/" className="btn btn-md btn-primary-3 fw-bold">
+              Visiter la boutique
+            </a>
+          </div>
+        </div>
+      )}
       <Views.ProductGridView
         title={page_label}
         viewCN="miq-container-lg"
         items={object_list}
         renderItem={(i) => <ProductGridItem showName item={i} key={i.meta_slug} />}
       />
-
       <div className="mt-3">{pagination && <Pagination {...pagination} />}</div>
     </View>
   );
@@ -103,7 +113,11 @@ const ProductGridItem = ({ item, showName, ...props }: { item: ProductType; show
 
         <div className="product-grid-info">
           {is_oos && <span className="bg-red-100 px-1 rounded">En rupture de stock</span>}
-          <ProductPrice {...item} />
+          <div className="d-flex justify-content-between align-items-center">
+            <ProductPrice {...item} />
+            {item.is_pre_sale && <PresaleStarIcon width={16} height={16} />}
+          </div>
+
           {showName && <div className="product-grid-name">{truncateStr(name)}</div>}
         </div>
       </div>

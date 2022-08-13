@@ -48,6 +48,11 @@ LOGGINGDICT = {
         }
     },
     'loggers': {
+        'miq.analytics': {
+            'handlers': ['console2'],
+            'level': 'INFO',
+            'propagate': True,
+        },
         'shop': {
             'handlers': ['console2'],
             'level': 'INFO',
