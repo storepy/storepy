@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunk_storepy_clientjs=self.webpackChunk_storepy_clientjs||[]).push([[323],{3323:function(e,t,n){n.r(t),n.d(t,{default:function(){return o}});n(2411);var r=n(6520),c=n(505),s=n(815),i=n(5223),u=n(8136),a=window.i18n;function o(){var e=(0,r.s0)();return(0,u.jsx)(s.ZP.View,{title:a(c.Z,"CreateView.title"),requiredPerms:["store.add_product"],back:"../",children:(0,u.jsx)(s.ZP.Section,{children:(0,u.jsx)(i.Kl,{onSuccess:function(t){var n=t.data;return e("../".concat(n.slug))}})})})}}}]);
+//# sourceMappingURL=323.27b6dca9.chunk.js.map
