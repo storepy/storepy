@@ -14,17 +14,17 @@ export default function StaffLayout() {
     <Staff.Layout
       links={[
         {
-          href: 'analytics/',
+          href: 'analytics',
           label: 'Analytics',
           icon: <Icons.ChartBar />,
           element: <AnalyticsStaffRoutes />,
           mobile: true,
         },
-        { href: 'sales/', label: 'Sales', icon: <Icons.Coin />, element: <SalesStaffRoutes />, mobile: true },
-        { href: 'store/', label: 'Store', icon: <Icons.ShoppingCart />, element: <ShopStaffRoutes />, mobile: true },
+        { href: 'sales', label: 'Sales', icon: <Icons.Coin />, element: <SalesStaffRoutes />, mobile: true },
+        { href: 'store', label: 'Store', icon: <Icons.ShoppingCart />, element: <ShopStaffRoutes />, mobile: true },
 
         {
-          href: 'partners/',
+          href: 'partners',
           label: 'Partners',
           icon: <Icons.Affiliate />,
           element: <PartnerStaffRoutes />,
