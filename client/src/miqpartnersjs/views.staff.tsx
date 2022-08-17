@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Link, Route, Routes, useParams } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 
 import Staff from '@miq/staffjs';
 import { Response } from '@miq/utiljs';
@@ -8,8 +8,6 @@ import { Loading, Pagination } from '@miq/componentjs';
 import { TPartner } from './types';
 import { usePartnerListRequest } from './utils';
 import { PartnerListFilterForm } from './forms';
-import { useRequest } from '@miq/hookjs';
-import { Partner } from './models';
 
 const AuditRoutes = React.lazy(() => import('./audit'));
 

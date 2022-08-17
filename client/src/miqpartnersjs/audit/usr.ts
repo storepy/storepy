@@ -31,7 +31,7 @@ export default class Usr {
   get hashtags(): string[] {
     let tags: string[] = [];
     this.posts.forEach((p: Post) => {
-      tags = tags.concat(p.hashtags);
+      tags = [...tags, ...p.hashtags];
     });
     return tags;
   }
@@ -51,7 +51,7 @@ export default class Usr {
 
   get last_post() {
     const p = this.media?.[0];
-    if (!p) return;
+    if (!p) return null;
     return new Post(p);
   }
 
@@ -196,21 +196,26 @@ export class Post {
     }
   }
 
-  get hashtags() {
+  get hashtags(): string[] {
     const cap: string = this.caption || '';
-    return Array.from(cap.matchAll(/(^|\s)(#[a-z\d-]+)/g)).map((h) => h?.[0]?.replace('\n', '')?.replace(' ', ''));
+    const match = cap.matchAll(/(^|\s)(#[a-z\d-]+)/g);
+    if (match)
+      return Array.from(match)
+        .filter((h) => h.length !== 0)
+        .map((h) => h[0]!.replace('\n', '')?.replace(' ', ''));
+    return [];
   }
 
   get tagged_users() {
     return this._data?.edge_media_to_tagged_user?.edges?.map((i: any) => i?.node?.user);
   }
-  get caption() {
+  get caption(): string {
     return this._data?.edge_media_to_caption?.edges?.[0]?.node?.text;
   }
 
   get date() {
     const date = this._data?.taken_at_timestamp;
-    if (!date) return;
+    if (!date) return null;
     return new Date(date * 1000);
   }
   get dateStr() {

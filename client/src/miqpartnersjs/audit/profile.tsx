@@ -93,6 +93,7 @@ const PostImg = ({ post, ...props }: { post: Post; title?: React.ReactNode }) =>
           src={`data:image/jpg;base64, ${post.display_url}`}
           style={{ width: '100%', height: 'auto', objectFit: 'cover', aspectRatio: '1/1' }}
           className="rounded"
+          alt=""
         />
       </a>
     </Staff.Section>
@@ -236,5 +237,13 @@ const Sect = ({ title, children }: { title: React.ReactNode; children: React.Rea
 };
 
 const Img64 = ({ src, width = 64, ...props }: { src: string; alt?: string; width?: number }) => {
-  return <img src={`data:image/jpg;base64, ${src}`} {...props} style={{ width, height: 'auto' }} className="rounded" />;
+  return (
+    <img
+      src={`data:image/jpg;base64, ${src}`}
+      {...props}
+      style={{ width, height: 'auto' }}
+      className="rounded"
+      alt=""
+    />
+  );
 };
