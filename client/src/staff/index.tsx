@@ -4,7 +4,7 @@ import './index.scss';
 
 import { Icons } from '@miq/componentjs';
 import ShopStaffRoutes from '@shopy/storejs';
-import SalesStaffRoutes from '@shopy/orderjs/';
+import SalesStaffRoutes from '@shopy/salejs/';
 import Staff, { AnalyticsStaffRoutes } from '@miq/staffjs';
 
 import { PartnerStaffRoutes } from '../miqpartnersjs';

@@ -13,7 +13,7 @@
     "@miq/staffjs": "workspace:*",
     "@miq/styles": "workspace:*",
     "@miq/utiljs": "workspace:*",
-    "@shopy/orderjs": "workspace:*",
+    "@shopy/salejs": "workspace:*",
     "@shopy/shopjs": "workspace:*",
     "@shopy/storejs": "workspace:*",
     "@testing-library/jest-dom": "^5.16.2",
