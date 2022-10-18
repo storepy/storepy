@@ -23,6 +23,11 @@ urlpatterns += [
 urlpatterns += [
     path('', include('miq.analytics.urls', namespace='analytics')),
     path('', include('miq.staff.urls', namespace='staff')),
+
+    # !! careful when moving this !!
+    path('', include('miq.honeypot.urls', namespace='honeypot')),
+    # !!
+
     path('', include('miq.core.urls', namespace='miq')),
     path('', views.IndexView.as_view(), name='index'),
 ]
@@ -31,6 +36,9 @@ urlpatterns += [
     path('robots.txt', TemplateView.as_view(
         template_name="core/robots.txt",
         content_type="text/plain"), name="robots_file"),
+
+
+
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

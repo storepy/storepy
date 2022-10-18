@@ -18,5 +18,6 @@
     "jsx": "react-jsx",
     "noImplicitThis": false
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["node_modules"]
 }

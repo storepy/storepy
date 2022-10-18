@@ -2,10 +2,10 @@ import * as React from 'react';
 import { Route, Routes } from 'react-router-dom';
 
 import Staff from '@miq/staffjs';
-import { Response } from '@miq/utiljs';
+import { ResultsResponse } from '@miq/hookjs';
 import { Loading, Pagination } from '@miq/componentjs';
 
-import { TPartner } from './types';
+import type { TPartner } from './types';
 import { usePartnerListRequest } from './utils';
 import { PartnerListFilterForm } from './forms';
 
@@ -15,7 +15,7 @@ const PartnerIndexView = () => {
   //   const [params]=useSearchParams();
   const { res, loading } = usePartnerListRequest();
 
-  const r = new Response<TPartner>(res);
+  const r = new ResultsResponse<TPartner>(res);
 
   if (loading) return <Loading />;
   if (!r.isSuccess) return <div>Something went wrong</div>;
@@ -30,7 +30,7 @@ const PartnerIndexView = () => {
           </Staff.Link>
         </div>
       }
-      footer={<Pagination {...r.data} component={Staff.Link} to className="" />}
+      footer={<Pagination {...r.pagination} component={Staff.Link} to className="" />}
     >
       <Staff.Section>
         <PartnerListFilterForm />
@@ -70,7 +70,7 @@ const PartnerIndexView = () => {
                   {extra?.wears_lingerie === 'oui' ? `Wears lingerie` : '-'}
                   {extra.is_newbie === 'oui' ? ` | Newbie` : ' | -'}
                 </li>
-                <li>{extra.interests?.map((i) => `${i} `)}</li>
+                <li>{extra.interests?.map((i: any) => `${i} `)}</li>
               </ul>
             </Staff.Section>
           );

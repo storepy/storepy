@@ -3,29 +3,29 @@ import { Routes, Route, useSearchParams } from 'react-router-dom';
 
 import './shop.scss';
 
-import { SharedDataCtx } from '@miq/contextjs';
-import { Img, View, BreadCrumbs, Pagination } from '@miq/componentjs';
-import { CategoryLinks, PresaleStarIcon, ProductPrice, ProductSearchForm, ProductType, Views } from '@shopy/shopjs';
-import { ShopyClientProductDetailSharedDataState, ShopyClientProductListSharedDataState } from '@shopy/shopjs';
+import { SharedDataCtx, TSDState } from '@miq/contextjs';
+import { Img, View, BreadCrumbs, Pagination, TBreadCrumb } from '@miq/componentjs';
+import { CategoryLinks, PresaleStarIcon, ProductPrice, ProductSearchForm, Views } from '@shopy/shopjs';
 
 import { truncateStr } from '@miq/utiljs';
+import { TAPIProduct } from '@shopy/salejs';
 
 const ShopProductDetailView = () => {
-  const ctx = React.useContext<ShopyClientProductDetailSharedDataState>(SharedDataCtx);
+  const ctx =
+    React.useContext<TSDState<{ product: TAPIProduct; similar: TAPIProduct[]; breadcrumbs: TBreadCrumb[] }>>(
+      SharedDataCtx
+    );
 
   const { product, similar, breadcrumbs } = ctx;
-
-  const { cover, images } = product;
-  const pImages = [cover!, ...images!];
+  const { cover_data, images_data } = product;
 
   return (
     <>
       <Views.ProductDetailView
-        product={product}
         header={<BreadCrumbs items={breadcrumbs} className="my-3 px-2" />}
         images={
           <div className="p-images mb-2" style={{ position: 'sticky', top: 0 }}>
-            <Views.ProductDetailView.HorizontalGallery images={pImages} mobileOnly={false} />
+            <Views.ProductDetailView.HorizontalGallery images={[cover_data!, ...images_data!]} mobileOnly={false} />
           </div>
         }
         body={
@@ -58,7 +58,12 @@ const ShopProductDetailView = () => {
 
 const ShopProductGridView = () => {
   const [params] = useSearchParams();
-  const ctx = React.useContext<ShopyClientProductListSharedDataState & { pagination: any }>(SharedDataCtx);
+  const ctx = React.useContext<{
+    object_list: TAPIProduct[];
+    page_label: string;
+    breadcrumbs?: TBreadCrumb[];
+    pagination: any;
+  }>(SharedDataCtx);
 
   const { object_list = [], page_label, breadcrumbs, pagination } = ctx;
 
@@ -103,13 +108,13 @@ const ShopProductGridView = () => {
   );
 };
 
-const ProductGridItem = ({ item, showName, ...props }: { item: ProductType; showName?: boolean }) => {
-  const { url, cover, name, is_oos } = item;
+const ProductGridItem = ({ item, showName }: { item: TAPIProduct; showName?: boolean }) => {
+  const { url, cover_data, name, is_oos } = item;
 
   return (
     <a href={`${url}`}>
       <div>
-        <Img.Picture {...cover} className="rounded" style={{ aspectRatio: '4/5', objectFit: 'cover' }} />
+        <Img.Picture {...cover_data} className="rounded" style={{ aspectRatio: '4/5', objectFit: 'cover' }} />
 
         <div className="product-grid-info">
           {is_oos && <span className="bg-red-100 px-1 rounded">En rupture de stock</span>}

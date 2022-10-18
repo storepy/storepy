@@ -40,7 +40,7 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
 
 CORS_ORIGIN = 'http://127.0.0.1:3000'
-CORS_ORIGIN = 'http://192.168.1.231:3000'
+# CORS_ORIGIN = 'http://192.168.1.231:3000'
 
 CSRF_COOKIE_NAME = 'csrftoken'
 CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
@@ -79,6 +79,7 @@ INSTALLED_APPS = [
     'miq.core',
     'miq.staff',
     'miq.analytics',
+    'miq.honeypot',
 
     # SHOP
     'shopy.shop',
