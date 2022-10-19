@@ -1,0 +1,1 @@
+{"version":3,"file":"static/css/82.5eec3036.chunk.css","mappings":"AAKI,4CACE","sources":["../../../../shopy/shopy-salejs/src/cart/views.list.scss"],"sourcesContent":[".cart-list-item-card {\n  .view-card-header {\n    .view-card-title {\n      //   font-size: 0.85rem;\n    }\n    .btn {\n      padding: 4px;\n    }\n  }\n}\n"],"names":[],"sourceRoot":""}
