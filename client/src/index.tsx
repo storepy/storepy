@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-// import {  useLocation } from 'react-router-dom';
 
 import './index.scss';
 
@@ -14,8 +13,6 @@ const StaffLayout = React.lazy(() => import('./staff'));
 const ShopPublicRoutes = React.lazy(() => import('./shop'));
 
 const App = () => {
-  // const { pathname } = useLocation();
-
   return (
     <React.Suspense fallback={<Loading />}>
       <SharedDataProvider path={window.location.pathname}>
