@@ -8,7 +8,7 @@ import { Loading } from '@miq/componentjs';
 import PartnerRoutes from './miqpartnersjs';
 import { SharedDataProvider } from '@miq/contextjs';
 import { LIBCreateView } from '@shopy/shopjs';
-import { DOMAIN } from '@miq/utiljs';
+import { DOMAIN, IS_DEV } from '@miq/utiljs';
 
 const StaffLayout = React.lazy(() => import('./staff'));
 const ShopPublicRoutes = React.lazy(() => import('./shop'));
@@ -43,22 +43,24 @@ const Beacon = () => {
   console.log('Beac');
 
   React.useEffect(() => {
-    const cookies = document.cookie;
-    console.log(1, cookies);
-
-    if (!cookies || cookies === '') return;
-
-    let token = cookies.split(';').find((i) => i.includes('csrftoken'));
-    if (token) token = token.split('=')[1];
-
-    console.log(2, token);
-
-    if (!token || token === '') return;
-
     const data = new FormData();
-    data.append('csrfmiddlewaretoken', token);
+    if (IS_DEV) {
+      const cookies = document.cookie;
+      console.log(1, cookies);
 
-    console.log('BeacFX', token);
+      if (!cookies || cookies === '') return;
+
+      let token = cookies.split(';').find((i) => i.includes('csrftoken'));
+      if (token) token = token.split('=')[1];
+
+      console.log(2, token);
+
+      if (!token || token === '') return;
+
+      data.append('csrfmiddlewaretoken', token);
+
+      console.log('BeacFX', token);
+    }
 
     // console.log(navigator);
 
