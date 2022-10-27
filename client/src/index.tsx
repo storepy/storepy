@@ -44,23 +44,22 @@ const Beacon = () => {
 
   React.useEffect(() => {
     const data = new FormData();
-    if (IS_DEV) {
-      const cookies = document.cookie;
-      console.log(1, cookies);
 
-      if (!cookies || cookies === '') return;
+    const cookies = document.cookie;
+    console.log(1, cookies);
 
-      let token = cookies.split(';').find((i) => i.includes('csrftoken'));
-      if (token) token = token.split('=')[1];
+    if (!cookies || cookies === '') return;
 
-      console.log(2, token);
+    let token = cookies.split(';').find((i) => i.includes('csrftoken'));
+    if (token) token = token.split('=')[1];
 
-      if (!token || token === '') return;
+    console.log(2, token);
 
-      data.append('csrfmiddlewaretoken', token);
+    if (!token || token === '') return;
 
-      console.log('BeacFX', token);
-    }
+    data.append('csrfmiddlewaretoken', token);
+
+    console.log('BeacFX', token);
 
     // console.log(navigator);
 
