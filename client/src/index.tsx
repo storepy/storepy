@@ -40,6 +40,7 @@ const root = document.getElementById('root');
 
 const Beacon = () => {
   const { key } = useLocation();
+  console.log('Beac');
 
   React.useEffect(() => {
     const cookies = document.cookie;
@@ -51,6 +52,8 @@ const Beacon = () => {
 
     const data = new FormData();
     data.append('csrfmiddlewaretoken', token);
+
+    console.log('BeacFX', token);
 
     // console.log(navigator);
 
