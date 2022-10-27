@@ -44,10 +44,15 @@ const Beacon = () => {
 
   React.useEffect(() => {
     const cookies = document.cookie;
+    console.log(1, cookies);
+
     if (!cookies || cookies === '') return;
 
     let token = cookies.split(';').find((i) => i.includes('csrftoken'));
     if (token) token = token.split('=')[1];
+
+    console.log(2, token);
+
     if (!token || token === '') return;
 
     const data = new FormData();
@@ -61,6 +66,7 @@ const Beacon = () => {
     // data.append('url', window.location.href);
 
     navigator.sendBeacon(`${DOMAIN}/beat/`, data);
+    console.log(4, 'Done');
   }, [key]);
   return null;
 };
