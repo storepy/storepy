@@ -40,26 +40,22 @@ const root = document.getElementById('root');
 
 const Beacon = () => {
   const { key } = useLocation();
-  console.log('Beac');
+  // console.log('Beac');
 
   React.useEffect(() => {
     const data = new FormData();
 
-    const cookies = document.cookie;
-    console.log(1, cookies);
+    // const cookies = document.cookie;
+    // if (!cookies || cookies === '') return;
 
-    if (!cookies || cookies === '') return;
+    // let token = cookies.split(';').find((i) => i.includes('csrftoken'));
+    // if (token) token = token.split('=')[1];
 
-    let token = cookies.split(';').find((i) => i.includes('csrftoken'));
-    if (token) token = token.split('=')[1];
+    // if (!token || token === '') return;
 
-    console.log(2, token);
+    // data.append('csrfmiddlewaretoken', token);
 
-    if (!token || token === '') return;
-
-    data.append('csrfmiddlewaretoken', token);
-
-    console.log('BeacFX', token);
+    // console.log('BeacFX', token);
 
     // console.log(navigator);
 
@@ -67,7 +63,6 @@ const Beacon = () => {
     // data.append('url', window.location.href);
 
     navigator.sendBeacon(`${DOMAIN}/beat/`, data);
-    console.log(4, 'Done');
   }, [key]);
   return null;
 };

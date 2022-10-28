@@ -2,6 +2,7 @@ import random
 import hashlib
 import requests
 
+from django.views.decorators.csrf import csrf_exempt
 
 from django.contrib import admin
 from django.conf import settings
@@ -29,6 +30,7 @@ def set_cache_key(key, size=99):
     cache[key] = True
 
 
+@csrf_exempt
 def beacon_view(request):
     ua = request.META.get('HTTP_USER_AGENT')
     ip = get_ip(request)
@@ -36,7 +38,7 @@ def beacon_view(request):
 
     key = get_vid(ip, ua)
     if key in cache:
-        return JsonResponse({'status': 'ok'})
+        return response
 
     set_cache_key(key)
 
