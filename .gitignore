@@ -1,5 +1,6 @@
 
 server.sh
+Makefile
 
 # Django stuff:
 */media/
