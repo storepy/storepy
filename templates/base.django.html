@@ -1,4 +1,5 @@
 {% extends 'base-react.html' %}
+{% load static %}
 
 {% block head %}{% spaceless %}
 
@@ -9,6 +10,13 @@
 {% block meta %}{% endblock meta %}
 
 <link rel="canonical" href="{{ request.build_absolute_uri }}" />
+
+
+{% comment %} <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}"> {% endcomment %}
+{% comment %} <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}"> {% endcomment %}
+{% comment %} <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}"> {% endcomment %}
+{% comment %} <link rel="icon" href="{% static 'favicon.ico' %}"> {% endcomment %}
+
 
 {% block head_scripts %} {% endblock head_scripts %}
 

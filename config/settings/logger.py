@@ -28,7 +28,7 @@ LOGGINGDICT = {
             'style': '{',
         },
         'standard': {
-            'format': "%(levelname)s [%(name)s::%(lineno)s] %(message)s",
+            'format': "=> %(levelname)s - %(message)8s [%(name)s::%(lineno)s]",
             'datefmt': "%d/%b/%Y %H:%M:%S",
         },
     },
