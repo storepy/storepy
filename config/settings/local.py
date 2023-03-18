@@ -4,8 +4,7 @@ import os
 import environ
 from pathlib import Path
 
-from miq.core.config import *
-
+# from miq.core.config import *
 
 from .logger import LOGGINGDICT
 
@@ -28,6 +27,9 @@ env = environ.Env(
 )
 
 environ.Env.read_env()
+
+
+AUTH_USER_MODEL = 'core.User'
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
